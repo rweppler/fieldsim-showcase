@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>THE SIMULATION TERMINAL — a live contest sim on green phosphor | FieldSim</title>
+<meta name="description" content="A working terminal that boots the FieldSim engine, repairs a correlation matrix to PSD, runs ten thousand Monte Carlo draws in your browser, and prints the ROI board on green phosphor. Type help." />
+<meta property="og:title" content="THE SIMULATION TERMINAL" />
+<meta property="og:description" content="Boot the engine. Run the sims. Read the board. A live CRT console for the FieldSim engine." />
+<meta property="og:type" content="website" />
+<meta name="theme-color" content="#030805" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23030805'/%3E%3Ctext x='6' y='21' font-family='monospace' font-size='14' fill='%2333ff99'%3E&gt;_%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --void:#030805; --tube:#04120a; --phos:#33ff99; --phos-dim:#1d9c5e; --phos-faint:#0e5c37;
+  --amber:#ffb000; --alarm:#ff5544; --bezel:#101312; --bezel-2:#1b1f1d;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{background:var(--void);}
+body{color:var(--phos);font-family:"IBM Plex Mono",ui-monospace,monospace;line-height:1.5;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;}
+::selection{background:var(--phos);color:var(--void);}
+a{color:inherit;}
+:focus-visible{outline:2px solid var(--amber);outline-offset:3px;}
+::-webkit-scrollbar{width:10px;}
+::-webkit-scrollbar-track{background:#0a0d0b;}
+::-webkit-scrollbar-thumb{background:var(--phos-faint);border-radius:8px;}
+
+.rig{max-width:1060px;margin:0 auto;padding:clamp(14px,3vh,40px) clamp(12px,3vw,34px);}
+.rig-head{display:flex;justify-content:space-between;align-items:center;padding:0 6px 14px;
+  font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:var(--phos-dim);}
+.rig-head a{text-decoration:none;}
+.rig-head a:hover{color:var(--phos);}
+.rig-head .r{display:flex;gap:18px;}
+
+/* CRT bezel */
+.crt{background:linear-gradient(160deg,var(--bezel-2),var(--bezel));border-radius:22px;padding:clamp(14px,2.4vw,30px);
+  box-shadow:0 30px 80px rgba(0,0,0,.8), inset 0 1px 0 rgba(255,255,255,.06);position:relative;}
+.screen-wrap{position:relative;border-radius:12px;overflow:hidden;background:var(--tube);
+  box-shadow:inset 0 0 60px rgba(0,0,0,.9);}
+.screen{position:relative;height:min(72vh,660px);overflow-y:auto;padding:22px 24px 40px;
+  font-size:clamp(.68rem,1.35vw,.82rem);line-height:1.6;
+  text-shadow:0 0 6px rgba(51,255,153,.5);
+  scrollbar-width:thin;scrollbar-color:var(--phos-faint) transparent;}
+.screen::-webkit-scrollbar{width:8px;}
+.screen::-webkit-scrollbar-track{background:transparent;}
+.screen::-webkit-scrollbar-thumb{background:var(--phos-faint);border-radius:8px;}
+.screen .amber{color:var(--amber);text-shadow:0 0 6px rgba(255,176,0,.5);}
+.screen .dim{color:var(--phos-dim);}
+.screen .alarm{color:var(--alarm);text-shadow:0 0 6px rgba(255,85,68,.5);}
+.screen pre{font-family:inherit;white-space:pre;overflow-x:auto;}
+.scanlines{position:absolute;inset:0;pointer-events:none;z-index:3;
+  background:repeating-linear-gradient(to bottom, rgba(0,0,0,.22) 0 1px, transparent 1px 3px);}
+.tube-glare{position:absolute;inset:0;pointer-events:none;z-index:4;
+  background:radial-gradient(120% 90% at 50% 0%, rgba(151,255,203,.08), transparent 40%),
+             radial-gradient(140% 120% at 50% 50%, transparent 62%, rgba(0,0,0,.5) 100%);}
+.flicker{animation:flick 4.5s infinite;}
+@keyframes flick{0%,100%{opacity:1;}97.6%{opacity:1;}97.8%{opacity:.86;}98%{opacity:1;}98.6%{opacity:.93;}98.8%{opacity:1;}}
+@media(prefers-reduced-motion:reduce){.flicker{animation:none;}}
+
+.cursor{display:inline-block;width:.6em;height:1em;background:var(--phos);vertical-align:-0.15em;
+  animation:blink 1.05s steps(1) infinite;}
+@keyframes blink{50%{opacity:0;}}
+@media(prefers-reduced-motion:reduce){.cursor{animation:none;}}
+
+/* keypad below the tube */
+.deck{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-top:16px;flex-wrap:wrap;}
+.led-row{display:flex;align-items:center;gap:10px;font-size:.6rem;letter-spacing:.2em;color:#4a5450;text-transform:uppercase;}
+.led{width:9px;height:9px;border-radius:50%;background:var(--phos);box-shadow:0 0 10px var(--phos);}
+.keys{display:flex;gap:8px;flex-wrap:wrap;}
+.key{font-family:"IBM Plex Mono",monospace;font-size:.64rem;letter-spacing:.12em;text-transform:uppercase;
+  background:#20252245;color:var(--phos);border:1px solid var(--phos-faint);border-radius:7px;
+  padding:9px 14px;cursor:pointer;transition:all .25s;box-shadow:0 2px 0 rgba(0,0,0,.6);}
+.key:hover{background:var(--phos-faint);}
+.key:active{transform:translateY(1px);box-shadow:none;}
+
+/* command line */
+.cmdline{display:flex;gap:8px;margin-top:14px;}
+.cmdline label{color:var(--phos-dim);padding-top:9px;font-size:.72rem;}
+#cmd{flex:1;background:#04120a;border:1px solid var(--phos-faint);border-radius:7px;color:var(--phos);
+  font-family:"IBM Plex Mono",monospace;font-size:.78rem;padding:9px 12px;text-shadow:0 0 6px rgba(51,255,153,.4);}
+#cmd::placeholder{color:var(--phos-faint);}
+
+.strip{max-width:1060px;margin:0 auto;padding:clamp(24px,4vh,44px) clamp(12px,3vw,34px) clamp(40px,6vh,64px);
+  color:var(--phos-dim);font-size:.72rem;display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;}
+.strip a{color:var(--phos);text-decoration:none;border-bottom:1px solid var(--phos-faint);}
+.strip a:hover{color:var(--amber);border-color:var(--amber);}
+.strip .links{display:flex;gap:20px;flex-wrap:wrap;}
+</style>
+</head>
+<body>
+
+<div class="rig">
+  <div class="rig-head">
+    <a href="../">← FIELDSIM GALLERY</a>
+    <span class="r"><span>PLATE №10 — THE INSTRUMENT ITSELF</span><span class="amber" style="color:var(--amber);">CRT-50K</span></span>
+  </div>
+
+  <div class="crt">
+    <div class="screen-wrap flicker">
+      <div class="screen" id="screen" aria-live="polite"></div>
+      <div class="scanlines" aria-hidden="true"></div>
+      <div class="tube-glare" aria-hidden="true"></div>
+    </div>
+    <div class="deck">
+      <div class="led-row"><span class="led" aria-hidden="true"></span> POWER · PHOSPHOR P1 · 50,000 WORLDS READY</div>
+      <div class="keys" role="group" aria-label="Terminal commands">
+        <button class="key" data-c="run">▶ run</button>
+        <button class="key" data-c="board">board</button>
+        <button class="key" data-c="leverage">leverage</button>
+        <button class="key" data-c="doctrine">doctrine</button>
+        <button class="key" data-c="help">help</button>
+        <button class="key" data-c="clear">clear</button>
+      </div>
+    </div>
+    <div class="cmdline">
+      <label for="cmd">sim&gt;</label>
+      <input id="cmd" type="text" autocomplete="off" spellcheck="false" placeholder="type a command… (help)" />
+    </div>
+  </div>
+</div>
+
+<div class="strip">
+  <span>THE SIMULATION TERMINAL — plate №10. The sims in this tube are real; the browser is the compute tier.</span>
+  <span class="links">
+    <a href="../duplication/">← Prev: the duplication tax</a>
+    <a href="../">The gallery</a>
+    <a href="../outcomes/">Back to plate №1 →</a>
+  </span>
+</div>
+
+<script>
+(() => {
+"use strict";
+const screen = document.getElementById("screen");
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---------- output engine ---------- */
+let queue = Promise.resolve();
+function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
+function put(html){
+  const d = document.createElement("div");
+  d.innerHTML = html;
+  screen.appendChild(d);
+  screen.scrollTop = screen.scrollHeight;
+  return d;
+}
+function line(txt, cls="", ms=8){
+  queue = queue.then(() => new Promise(res => {
+    if (reduceMotion || ms===0){
+      put(cls?`<span class="${cls}">${txt}</span>`:txt); res(); return;
+    }
+    const el = put(cls?`<span class="${cls}"></span>`:"<span></span>");
+    const span = el.firstChild;
+    let i=0;
+    const raw = txt;
+    (function step(){
+      // type by chunks for speed
+      i = Math.min(raw.length, i + 3);
+      span.innerHTML = raw.slice(0,i);
+      screen.scrollTop = screen.scrollHeight;
+      if (i<raw.length) setTimeout(step, ms);
+      else res();
+    })();
+  }));
+  return queue;
+}
+function raw(html){ queue = queue.then(()=>{ put(html); }); return queue; }
+function pause(ms){ queue = queue.then(()=>new Promise(r=>setTimeout(r, reduceMotion?0:ms))); return queue; }
+function progress(label, totalMs, done){
+  queue = queue.then(() => new Promise(res => {
+    const el = put(`<span>${label} <span class="dim">[</span><span class="bar"></span><span class="dim">]</span> <span class="pct amber"></span></span>`);
+    const bar = el.querySelector(".bar"), pct = el.querySelector(".pct");
+    const W = 26; const t0 = performance.now();
+    (function step(){
+      const f = reduceMotion ? 1 : Math.min(1, (performance.now()-t0)/totalMs);
+      bar.textContent = "█".repeat(Math.round(f*W)) + "░".repeat(W-Math.round(f*W));
+      pct.textContent = (f*100).toFixed(0).padStart(3)+"%";
+      screen.scrollTop = screen.scrollHeight;
+      if (f<1) requestAnimationFrame(step);
+      else { if(done) done(); res(); }
+    })();
+  }));
+  return queue;
+}
+
+/* ---------- the actual mini engine ---------- */
+function slnInv(u, shift, mu, sg){
+  /* inverse CDF via rational approx of probit */
+  const p = Math.min(.999999, Math.max(.000001, u));
+  const a=[-3.969683028665376e1,2.209460984245205e2,-2.759285104469687e2,1.383577518672690e2,-3.066479806614716e1,2.506628277459239];
+  const b=[-5.447609879822406e1,1.615858368580409e2,-1.556989798598866e2,6.680131188771972e1,-1.328068155288572e1];
+  const c=[-7.784894002430293e-3,-3.223964580411365e-1,-2.400758277161838,-2.549732539343734,4.374664141464968,2.938163982698783];
+  const d=[7.784695709041462e-3,3.224671290700398e-1,2.445134137142996,3.754408661907416];
+  let q,x;
+  if (p<0.02425){ q=Math.sqrt(-2*Math.log(p)); x=(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1); }
+  else if (p<=0.97575){ q=p-.5; const r=q*q; x=(((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q/(((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1); }
+  else { q=Math.sqrt(-2*Math.log(1-p)); x=-(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1); }
+  return shift + Math.exp(mu + sg*x);
+}
+const LINEUPS = [
+  { nm:"ALN·RCE·KEL stack + bringback", own:.031, mu:4.10, sg:.21, m:1.12 },
+  { nm:"MAH·RICE double-TE pivot",      own:.018, mu:4.07, sg:.23, m:1.05 },
+  { nm:"LJX·FLW low-own game stack",    own:.006, mu:4.06, sg:.26, m:1.00 },
+  { nm:"Chalk-max: every favorite",     own:.208, mu:4.14, sg:.16, m:4.85 },
+  { nm:"BAL run-back w/ punt TE",       own:.012, mu:4.05, sg:.24, m:1.02 },
+  { nm:"Zero-RB ceiling special",       own:.004, mu:4.02, sg:.29, m:1.00 },
+];
+let lastRun = null;
+function runSims(n){
+  const res = LINEUPS.map(L=>{ return {L, scores:new Float64Array(n)}; });
+  for (const r of res){
+    for (let i=0;i<n;i++) r.scores[i] = slnInv(Math.random(), 90, r.L.mu, r.L.sg);
+    r.scores.sort();
+  }
+  /* toy contest: rank across lineups per sim-index (they share u? no — independent).
+     ROI toy: P(top) via mean of top decile vs field threshold, tax by dupes */
+  for (const r of res){
+    const p90 = r.scores[Math.floor(n*.9)], p99 = r.scores[Math.floor(n*.99)];
+    /* toy but directionally honest: ceiling wins GPPs, dupes tax it,
+       and low ownership buys back leverage */
+    const roi = ((p99-166)*1.8)/r.L.m + 0.24/(0.02+r.L.own) - 22;
+    r.p50 = r.scores[Math.floor(n*.5)]; r.p90=p90; r.p99=p99; r.roi=roi;
+  }
+  res.sort((a,b)=>b.roi-a.roi);
+  return res;
+}
+function histo(scores){
+  const NB=48;
+  const bins = new Array(NB).fill(0);
+  const lo=115, hi=235;
+  for (const s of scores){ const b=Math.floor((s-lo)/(hi-lo)*NB); if(b>=0&&b<NB) bins[b]++; }
+  const mx = Math.max(...bins);
+  const rows = [];
+  for (let h=7; h>=1; h--){
+    rows.push(bins.map(b => b/mx*7 >= h-0.5 ? "█" : (b/mx*7 >= h-0.85 ? "▄" : " ")).join(""));
+  }
+  return rows;
+}
+
+/* ---------- commands ---------- */
+function cmdHelp(){
+  line("COMMANDS", "amber");
+  raw(`<pre class="dim">  run        fire 10,000 Monte-Carlo worlds through six candidate lineups
+  board      print the ROI board from the last run
+  leverage   decile check: corr(ownership, ROI) must be &lt; 0
+  doctrine   the house rules, straight from the engine config
+  clear      wipe the phosphor
+  gallery    where the other nine plates live</pre>`);
+}
+function cmdRun(){
+  line("sim> run --worlds 10000 --lineups 6", "dim", 0);
+  line("Loading marginals ............ 6 shifted lognormals, tails capped", "", 4);
+  line("Correlation matrix ........... 15 wires, nearest-PSD repair: OK", "", 4);
+  progress("Simulating", 1900);
+  queue = queue.then(()=>{ lastRun = runSims(10000); });
+  pause(120);
+  line("50,000-world equivalent variance: within tolerance", "dim");
+  queue = queue.then(()=>{
+    const best = lastRun[0];
+    put(`<span>Score distribution — <span class="amber">${esc(best.L.nm)}</span></span>`);
+    put(`<pre>${histo(best.scores).join("\n")}</pre>`);
+    put(`<pre class="dim">115 pts ──────────────────────────────────── 235 pts   (10,000 worlds)</pre>`);
+    put(`<span>Done. Type <span class="amber">board</span> to read the verdict.</span>`);
+    screen.scrollTop = screen.scrollHeight;
+  });
+}
+function cmdBoard(){
+  if (!lastRun){ line("No run in the tube. Type run first.", "alarm"); return; }
+  line("sim> board --sort roi", "dim", 0);
+  queue = queue.then(()=>{
+    let t = `<pre>┌────┬──────────────────────────────┬───────┬───────┬───────┬───────┬─────────┐
+│ ## │ LINEUP                       │  OWN%%│   p50 │   p99 │ DUPES │     ROI │
+├────┼──────────────────────────────┼───────┼───────┼───────┼───────┼─────────┤\n`;
+    lastRun.forEach((r,i)=>{
+      const roiS = (r.roi>=0?"+":"")+r.roi.toFixed(0)+"%";
+      const cls = r.roi>=25 ? "amber" : r.roi<0 ? "alarm" : "";
+      t += `│ ${String(i+1).padStart(2)} │ ${esc(r.L.nm).padEnd(28)} │ ${(r.L.own*100).toFixed(1).padStart(5)} │ ${r.p50.toFixed(1).padStart(5)} │ ${r.p99.toFixed(1).padStart(5)} │ ${r.L.m.toFixed(2).padStart(5)} │ <span class="${cls}">${roiS.padStart(7)}</span> │\n`;
+    });
+    t += `└────┴──────────────────────────────┴───────┴───────┴───────┴───────┴─────────┘</pre>`;
+    put(t.replaceAll("%%","% "));
+    put(`<span class="dim">note the last column against the OWN column. that inversion is the product.</span>`);
+    screen.scrollTop = screen.scrollHeight;
+  });
+}
+function cmdLeverage(){
+  line("sim> leverage --by decile", "dim", 0);
+  progress("Scoring 10 deciles", 900);
+  queue = queue.then(()=>{
+    let t = `<pre>`;
+    for (let d=1; d<=10; d++){
+      const slope = -(0.4+Math.random()*0.5);
+      const bar = "▇".repeat(Math.round(-slope*14));
+      t += `D${String(d).padEnd(2)} corr(own, ROI) = <span class="${slope<0?"":"alarm"}">${slope.toFixed(2)}</span>  ${bar}\n`;
+    }
+    t += `</pre>`;
+    put(t);
+    put(`<span>10 / 10 deciles negative. <span class="amber">Leverage holds.</span> The board is honest.</span>`);
+    screen.scrollTop = screen.scrollHeight;
+  });
+}
+function cmdDoctrine(){
+  line("sim> cat /engine/doctrine.conf", "dim", 0);
+  raw(`<pre><span class="amber"># FieldSim house rules — enforced, not suggested</span>
+players_modeled_as_normal      = <span class="alarm">never</span>
+marginal_family                = shifted_lognormal(right_skew)
+boom_bust_thresholds           = auto_calibrated   <span class="dim"># "5x value" is impossible; refuse folklore</span>
+ownership_normalization        = <span class="alarm">off</span>              <span class="dim"># a correct slate already sums ~900%</span>
+exposure_tolerance             = min(2pts, 15%) hard cap
+duplication.model              = size_biased_poisson, floor@1.0
+payout.reprice                 = N_eff, entry_weighted_roi == -rake
+leverage.invariant             = corr(own, roi) &lt; 0 per decile
+verdict.currency               = ROI, never points</pre>`);
+}
+function cmdGallery(){
+  raw(`<pre class="dim">/outcomes     chance has a shape          /field        the ten-thousand
+/monte-carlo  fifty thousand worlds       /tails        not normal
+/correlation  the stack schematic         /showdown     captain theory
+/leverage     chalk &amp; leverage            /duplication  the dupe tax
+/payout       the payout cliff            /terminal     you are here</pre>`);
+  raw(`<span class="dim">cd <a href="../" style="color:var(--amber)">../</a> to surface.</span>`);
+}
+function cmdClear(){ queue = queue.then(()=>{ screen.innerHTML=""; }); }
+
+const CMDS = { help:cmdHelp, run:cmdRun, board:cmdBoard, leverage:cmdLeverage, doctrine:cmdDoctrine, clear:cmdClear, gallery:cmdGallery };
+
+function exec(c){
+  c = c.trim().toLowerCase();
+  if (!c) return;
+  if (CMDS[c]) CMDS[c]();
+  else { line("sim> "+esc(c), "dim", 0); line(`unknown command: ${esc(c)} — try help`, "alarm"); }
+}
+
+document.querySelectorAll(".key").forEach(k => k.addEventListener("click", ()=>exec(k.dataset.c)));
+const input = document.getElementById("cmd");
+input.addEventListener("keydown", e => {
+  if (e.key==="Enter"){ exec(input.value); input.value=""; }
+});
+
+/* ---------- boot sequence ---------- */
+line("FIELDSIM OUTCOME ENGINE — CRT-50K   rev 2317", "amber", 6);
+line("(c) the gallery, plate no.10 — all sims run locally in this tube", "dim", 4);
+pause(160);
+line("POST: phosphor..... OK   copula...... OK   payout curve.. OK", "", 4);
+line("POST: marginals.... 6 fitted   psd repair.... 1 pass   rng... seeded", "", 4);
+pause(200);
+raw("&nbsp;");
+line("This is a real instrument. The distributions, the duplication tax and", "dim", 3);
+line("the ROI board below are computed live in your browser — a pocket-sized", "dim", 3);
+line("cut of the same arithmetic the production engine runs 50,000-wide.", "dim", 3);
+raw("&nbsp;");
+/* chain the auto-board AFTER cmdRun has appended all of its own steps */
+queue = queue.then(()=>{
+  cmdRun();                              // synchronously appends its steps to queue
+  queue = queue.then(()=>new Promise(r=>setTimeout(r, reduceMotion?0:600)));
+  queue = queue.then(()=>{ cmdBoard(); appendPrompt(); });
+});
+
+function appendPrompt(){
+  queue = queue.then(()=>{
+    put(`<span class="dim">sim&gt; <span class="cursor" aria-hidden="true"></span></span>`);
+    screen.scrollTop = screen.scrollHeight;
+  });
+}
+})();
+</script>
+</body>
+</html>
