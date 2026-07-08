@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>THE DUPLICATION TAX — a receipt for sharing your lineup | FieldSim</title>
+<meta name="description" content="Every duplicate of your lineup splits your prize. FieldSim prices that with a size-biased Poisson: expected copies λ/(1−e^−λ), floored at one, repriced so the field's mean ROI is exactly minus the rake. Print your receipt." />
+<meta property="og:title" content="THE DUPLICATION TAX — print your receipt" />
+<meta property="og:description" content="Chalk splits the summit. A thermal-receipt calculator for the size-biased Poisson duplication model." />
+<meta property="og:type" content="website" />
+<meta name="theme-color" content="#17181c" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2317181c'/%3E%3Crect x='9' y='4' width='14' height='24' fill='%23fbfaf6'/%3E%3Cg fill='%231c1b18'%3E%3Crect x='11' y='8' width='10' height='1.6'/%3E%3Crect x='11' y='12' width='7' height='1.6'/%3E%3Crect x='11' y='16' width='10' height='1.6'/%3E%3C/g%3E%3Crect x='11' y='21' width='10' height='3' fill='%23d21f2c'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;500;700&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --desk:#17181c; --desk-2:#1e2026; --paper:#fbfaf6; --paper-shadow:#d8d5c9;
+  --rink:#1c1b18; --rink-soft:#5a574d; --stamp:#d21f2c; --hilite:#ffe86e;
+  --white:#e9eaee; --white-dim:#9a9da8; --mute:#5b5e6a;
+  --line:rgba(233,234,238,.1);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--desk);color:var(--white);font-family:"Courier Prime",monospace;line-height:1.6;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;}
+::selection{background:var(--stamp);color:var(--paper);}
+a{color:inherit;}
+:focus-visible{outline:2px solid var(--hilite);outline-offset:3px;}
+.unb{font-family:"Unbounded",sans-serif;}
+::-webkit-scrollbar{width:10px;}
+::-webkit-scrollbar-track{background:var(--desk-2);}
+::-webkit-scrollbar-thumb{background:#33363f;border-radius:8px;}
+
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:18px clamp(18px,3.4vw,40px);}
+.brand{display:flex;gap:12px;align-items:baseline;text-decoration:none;}
+.brand .unb{font-weight:700;font-size:.9rem;letter-spacing:.08em;}
+.brand small{font-size:.68rem;color:var(--white-dim);}
+.topnav{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--white-dim);display:flex;gap:20px;}
+.topnav a{text-decoration:none;}
+.topnav a:hover{color:var(--hilite);}
+
+/* ---------- hero: desk + receipt ---------- */
+.hero{display:grid;grid-template-columns:minmax(300px,1fr) minmax(340px,460px);gap:clamp(24px,5vw,80px);
+  padding:clamp(30px,5vh,70px) clamp(18px,3.4vw,40px) clamp(60px,8vh,100px);max-width:1200px;margin:0 auto;
+  align-items:start;}
+.kick{font-size:.66rem;letter-spacing:.28em;text-transform:uppercase;color:var(--mute);display:flex;gap:10px;align-items:center;}
+.kick::before{content:"";width:26px;height:1px;background:var(--stamp);}
+h1{font-family:"Unbounded",sans-serif;font-weight:700;font-size:clamp(2rem,4.6vw,3.6rem);line-height:1.06;
+  margin:18px 0 16px;letter-spacing:-.01em;}
+h1 .r{color:var(--stamp);}
+.lede{color:var(--white-dim);font-size:.92rem;max-width:46ch;}
+.lede b{color:var(--white);font-weight:700;}
+.tillrow{margin-top:26px;display:flex;gap:10px;flex-wrap:wrap;}
+.till{font-family:"Unbounded",sans-serif;font-weight:500;font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;
+  background:var(--desk-2);color:var(--white-dim);border:1px solid var(--line);border-radius:10px;
+  padding:14px 18px;cursor:pointer;transition:all .3s;box-shadow:0 3px 0 rgba(0,0,0,.5);}
+.till:hover{color:var(--white);transform:translateY(-1px);}
+.till.active{background:var(--hilite);color:var(--rink);border-color:var(--hilite);box-shadow:0 3px 0 #b7a338;}
+.law{margin-top:34px;border-left:2px solid var(--stamp);padding-left:16px;font-size:.78rem;color:var(--white-dim);max-width:44ch;}
+.law b{color:var(--white);}
+
+/* the receipt */
+.receipt-slot{position:relative;}
+.printer-lip{height:16px;background:linear-gradient(to bottom,#000,#26282f);border-radius:8px 8px 0 0;
+  box-shadow:0 4px 12px rgba(0,0,0,.6);position:relative;z-index:3;}
+.receipt{background:var(--paper);color:var(--rink);padding:26px 26px 30px;position:relative;z-index:1;
+  filter:drop-shadow(0 18px 30px rgba(0,0,0,.55));
+  clip-path:polygon(0 0,100% 0,100% calc(100% - 10px),97.5% 100%,95% calc(100% - 10px),92.5% 100%,90% calc(100% - 10px),87.5% 100%,85% calc(100% - 10px),82.5% 100%,80% calc(100% - 10px),77.5% 100%,75% calc(100% - 10px),72.5% 100%,70% calc(100% - 10px),67.5% 100%,65% calc(100% - 10px),62.5% 100%,60% calc(100% - 10px),57.5% 100%,55% calc(100% - 10px),52.5% 100%,50% calc(100% - 10px),47.5% 100%,45% calc(100% - 10px),42.5% 100%,40% calc(100% - 10px),37.5% 100%,35% calc(100% - 10px),32.5% 100%,30% calc(100% - 10px),27.5% 100%,25% calc(100% - 10px),22.5% 100%,20% calc(100% - 10px),17.5% 100%,15% calc(100% - 10px),12.5% 100%,10% calc(100% - 10px),7.5% 100%,5% calc(100% - 10px),2.5% 100%,0 calc(100% - 10px));}
+.receipt .rc-head{text-align:center;border-bottom:1.5px dashed var(--rink);padding-bottom:14px;margin-bottom:14px;}
+.receipt .rc-head .unb{font-weight:700;font-size:1rem;letter-spacing:.14em;}
+.receipt .rc-head small{display:block;font-size:.68rem;color:var(--rink-soft);margin-top:6px;letter-spacing:.06em;}
+.rline{display:flex;justify-content:space-between;gap:12px;font-size:.8rem;padding:3px 0;font-variant-numeric:tabular-nums;}
+.rline .k{color:var(--rink-soft);}
+.rline .v{font-weight:700;white-space:nowrap;}
+.rline.big .v{font-size:1rem;}
+.rline.hl .v{background:var(--hilite);padding:0 6px;}
+.rdiv{border-bottom:1.5px dashed var(--rink);margin:12px 0;}
+.rc-formula{text-align:center;font-size:.86rem;padding:8px 0 2px;letter-spacing:.04em;}
+.rc-formula b{font-weight:700;}
+.rc-note{font-size:.66rem;color:var(--rink-soft);text-align:center;letter-spacing:.04em;}
+.rc-stamp{position:absolute;right:16px;bottom:74px;transform:rotate(-11deg);border:3px solid var(--stamp);
+  color:var(--stamp);font-family:"Unbounded",sans-serif;font-weight:700;font-size:.86rem;letter-spacing:.12em;
+  text-transform:uppercase;padding:8px 14px;opacity:.9;pointer-events:none;transition:opacity .3s;}
+.barcode{margin:14px auto 0;height:38px;width:78%;
+  background:repeating-linear-gradient(to right,var(--rink) 0 2px,transparent 2px 5px,var(--rink) 5px 6px,transparent 6px 10px,var(--rink) 10px 13px,transparent 13px 15px);}
+.rc-print .rline,.rc-print .rdiv,.rc-print .rc-formula,.rc-print .rc-note{animation:printline .45s both;}
+@keyframes printline{from{opacity:0;transform:translateY(-5px);}to{opacity:1;transform:none;}}
+@media(prefers-reduced-motion:reduce){.rc-print .rline,.rc-print .rdiv{animation:none;}}
+
+/* ---------- laws ---------- */
+section{padding:clamp(56px,8vw,104px) clamp(18px,3.4vw,40px);border-top:1px solid var(--line);}
+.inner{max-width:1080px;margin:0 auto;}
+.sec-kick{font-size:.64rem;letter-spacing:.28em;text-transform:uppercase;color:var(--mute);}
+h2{font-family:"Unbounded",sans-serif;font-weight:700;font-size:clamp(1.5rem,3.4vw,2.4rem);line-height:1.12;margin:14px 0 16px;}
+h2 .r{color:var(--stamp);} h2 .y{color:var(--hilite);}
+section p{color:var(--white-dim);font-size:.9rem;max-width:62ch;margin-bottom:14px;}
+section p b{color:var(--white);font-weight:700;}
+.laws{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:28px;}
+.lawcard{background:var(--desk-2);padding:24px;}
+.lawcard h3{font-family:"Unbounded",sans-serif;font-weight:500;font-size:.9rem;margin-bottom:10px;color:var(--hilite);}
+.lawcard h3 small{display:block;font-family:"Courier Prime",monospace;font-size:.62rem;color:var(--mute);
+  letter-spacing:.2em;margin-bottom:6px;}
+.lawcard p{font-size:.8rem;margin:0;max-width:none;}
+.lawcard code{color:var(--white);background:rgba(233,234,238,.08);padding:1px 6px;border-radius:4px;font-size:.9em;}
+
+footer{border-top:1px solid var(--line);padding:clamp(38px,6vw,64px) clamp(18px,3.4vw,40px);}
+.foot{max-width:1080px;margin:0 auto;display:flex;flex-wrap:wrap;gap:18px;justify-content:space-between;
+  font-size:.7rem;letter-spacing:.08em;color:var(--mute);}
+.foot a{color:var(--white-dim);text-decoration:none;}
+.foot a:hover{color:var(--hilite);}
+.foot-links{display:flex;gap:22px;flex-wrap:wrap;}
+
+@media(max-width:880px){
+  .hero{grid-template-columns:1fr;}
+  .receipt-slot{max-width:440px;margin:0 auto;width:100%;}
+  .topnav{display:none;}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto;}}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="../"><span class="unb">FIELDSIM</span><small>plate №9 — duplication</small></a>
+  <nav class="topnav" aria-label="Primary">
+    <a href="../">Gallery</a>
+    <a href="#laws">The three laws</a>
+  </nav>
+</header>
+
+<main>
+  <div class="hero">
+    <div>
+      <div class="kick">FieldSim · outcome engine · plate №9 — the dupe model</div>
+      <h1>Your lineup is brilliant. <span class="r">So is theirs.</span> It's the same lineup.</h1>
+      <p class="lede">
+        In a 10,000-entry contest, the question isn't just <b>will my lineup win</b> —
+        it's <b>how many strangers printed the same ticket</b>. Every copy standing on your
+        ledge splits the prize. FieldSim charges that tax up front, with a size-biased
+        Poisson: pick a build style and read the damage.
+      </p>
+      <div class="tillrow" role="group" aria-label="Choose a build style">
+        <button class="till" data-p="0">Mass chalk</button>
+        <button class="till active" data-p="1">Balanced</button>
+        <button class="till" data-p="2">Degenerate punt</button>
+      </div>
+      <div class="law">
+        <b>House rule:</b> copies are floored at one — being <i>extra</i> unique earns
+        nothing extra. There is no bonus for loneliness; there is only escaping the tax.
+      </div>
+    </div>
+
+    <div class="receipt-slot">
+      <div class="printer-lip" aria-hidden="true"></div>
+      <div class="receipt" id="receipt" aria-live="polite">
+        <div class="rc-head">
+          <div class="unb">FIELDSIM CONTEST CO.</div>
+          <small>10,000 ENTRIES · $20 · $180,000 GTD<br />DUPLICATION WINDOW — LANE 9</small>
+        </div>
+        <div id="rbody"></div>
+        <div class="rc-stamp" id="stamp">CHALK TAX</div>
+      </div>
+    </div>
+  </div>
+
+  <section id="laws">
+    <div class="inner">
+      <span class="sec-kick">01 — the three laws of the window</span>
+      <h2>Duplication is <span class="r">priced</span>, never <span class="y">punished</span></h2>
+      <p>
+        The model isn't a penalty slider someone tuned to feel right. It's bookkeeping —
+        three rules that keep ten thousand entries' worth of prizes exactly conserved.
+      </p>
+      <div class="laws">
+        <div class="lawcard"><h3><small>LAW I</small>The size-biased window</h3>
+          <p>If a construction's expected copies per field is λ, the count <i>given you booked
+          it</i> is <code>λ/(1−e^−λ)</code> — you can't observe your own lineup zero times.
+          Chalk compounds: popular tickets are popular precisely when they're printed.</p></div>
+        <div class="lawcard"><h3><small>LAW II</small>The floor at one</h3>
+          <p>Copies never drop below <code>1.0</code>. A unique lineup keeps its whole prize —
+          and that is all it gets. Sub-one multipliers were tried, flattered longshots,
+          and were removed. Uniqueness is a shield, not a sword.</p></div>
+        <div class="lawcard"><h3><small>LAW III</small>Conservation of rake</h3>
+          <p>After every ledge is split, the payout curve is repriced to
+          <code>N_eff = Σ max(1, λᵢ)</code> effective entries, so the entry-weighted mean ROI
+          of the whole field is <code>−rake</code> to a rounding error. The house always
+          balances; the only question is who pays whom.</p></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="foot">
+    <span>THE DUPLICATION TAX — plate №9 of the FieldSim gallery. Keep your receipt.</span>
+    <span class="foot-links">
+      <a href="../showdown/">← Prev: captain theory</a>
+      <a href="../">The gallery</a>
+      <a href="../terminal/">Next: the simulation terminal →</a>
+    </span>
+  </div>
+</footer>
+
+<script>
+(() => {
+"use strict";
+const PRESETS = [
+  { name:"MASS CHALK", desc:"top-owned player at every slot", jointOwn:"1 in 210", lam:6.2,
+    story:"six other people at your window" },
+  { name:"BALANCED", desc:"two pivots off the main stack", jointOwn:"1 in 1,900", lam:1.4,
+    story:"a stranger or two, some Sundays" },
+  { name:"DEGENERATE PUNT", desc:"punt CPT logic on a main slate", jointOwn:"1 in 26,000", lam:0.18,
+    story:"almost always alone at the window" },
+];
+const PRIZE = 30000;
+const rbody = document.getElementById("rbody");
+const stamp = document.getElementById("stamp");
+const receipt = document.getElementById("receipt");
+const tills = [...document.querySelectorAll(".till")];
+
+function money(v){ return "$"+Math.round(v).toLocaleString(); }
+function render(pi){
+  const p = PRESETS[pi];
+  const copies = Math.max(1, p.lam/(1-Math.exp(-p.lam)));
+  const cut = PRIZE/copies;
+  const tax = PRIZE-cut;
+  const now = new Date();
+  rbody.innerHTML = `
+    <div class="rline"><span class="k">BUILD STYLE</span><span class="v">${p.name}</span></div>
+    <div class="rline"><span class="k">CONSTRUCTION</span><span class="v" style="font-weight:400;">${p.desc}</span></div>
+    <div class="rline"><span class="k">JOINT OWNERSHIP</span><span class="v">${p.jointOwn}</span></div>
+    <div class="rdiv" style="animation-delay:.08s"></div>
+    <div class="rline" style="animation-delay:.12s"><span class="k">EXPECTED COPIES λ</span><span class="v">${p.lam.toFixed(2)} / field</span></div>
+    <div class="rc-formula" style="animation-delay:.16s">copies at the window = <b>λ / (1 − e<sup>−λ</sup>)</b></div>
+    <div class="rline big hl" style="animation-delay:.2s"><span class="k">GIVEN YOU BOOKED IT</span><span class="v">${copies.toFixed(2)} copies</span></div>
+    <div class="rc-note" style="animation-delay:.22s">(${p.story})</div>
+    <div class="rdiv" style="animation-delay:.26s"></div>
+    <div class="rline" style="animation-delay:.3s"><span class="k">SUMMIT PRIZE (№1)</span><span class="v">${money(PRIZE)}</span></div>
+    <div class="rline" style="animation-delay:.34s"><span class="k">SPLIT ${copies.toFixed(2)} WAYS</span><span class="v">${money(cut)}</span></div>
+    <div class="rline big" style="animation-delay:.38s"><span class="k">DUPLICATION TAX</span><span class="v" style="color:var(--stamp);">−$${Math.round(tax).toLocaleString()}</span></div>
+    <div class="rdiv" style="animation-delay:.42s"></div>
+    <div class="rline" style="animation-delay:.46s"><span class="k">FLOOR AT 1.0</span><span class="v">APPLIED</span></div>
+    <div class="rline" style="animation-delay:.5s"><span class="k">FIELD REPRICED TO N_eff</span><span class="v">YES</span></div>
+    <div class="rline" style="animation-delay:.54s"><span class="k">ENTRY-WTD MEAN ROI</span><span class="v">−RAKE, EXACT</span></div>
+    <div class="rdiv" style="animation-delay:.58s"></div>
+    <div class="rc-note" style="animation-delay:.62s">${now.toLocaleDateString()} ${now.toLocaleTimeString()} · SIM 50,000 OF 50,000<br />THANK YOU FOR FADING RESPONSIBLY</div>
+    <div class="barcode" style="animation-delay:.66s" aria-hidden="true"></div>
+  `;
+  receipt.classList.remove("rc-print");
+  void receipt.offsetWidth;      // restart the print animation
+  receipt.classList.add("rc-print");
+  stamp.style.opacity = pi===0 ? ".9" : pi===1 ? ".35" : "0";
+  tills.forEach((t,i)=>t.classList.toggle("active", i===pi));
+}
+tills.forEach((t,i)=>t.addEventListener("click",()=>render(i)));
+render(1);
+})();
+</script>
+</body>
+</html>
