@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>THE STACK SCHEMATIC — a blueprint of correlated fates | FieldSim</title>
+<meta name="description" content="An engineering blueprint of an NFL game stack: drag any player's outcome and watch conditional expectation propagate along real correlation values — QB×WR tethers, bring-backs, and the negative wire to the opposing defense." />
+<meta property="og:title" content="THE STACK SCHEMATIC — a blueprint of correlated fates" />
+<meta property="og:description" content="Drag one player's Sunday and the whole game moves: a live cyanotype of FieldSim's Gaussian-copula correlation engine." />
+<meta property="og:type" content="website" />
+<meta name="theme-color" content="#0d2c52" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d2c52'/%3E%3Cg stroke='%23cfe4ff' stroke-width='1.4' fill='none'%3E%3Ccircle cx='10' cy='11' r='3'/%3E%3Ccircle cx='22' cy='21' r='3'/%3E%3Cpath d='M12.5 13 L19.5 19'/%3E%3C/g%3E%3Ccircle cx='22' cy='11' r='2' fill='%23ffc94d'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders:opsz,wght@10..72,300..800&family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Caveat:wght@400;600&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --paper:#0d2c52; --paper-2:#0a2444; --paper-3:#123763;
+  --ink:#cfe4ff; --ink-dim:#8fb3dd; --ink-faint:#5d81ac;
+  --annot:#ffc94d; --annot-deep:#e8a820;
+  --neg:#ff8f7a;
+  --line:rgba(207,228,255,.16); --line-2:rgba(207,228,255,.34);
+  --grid:rgba(207,228,255,.05);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--paper);color:var(--ink);font-family:"IBM Plex Mono",monospace;line-height:1.65;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size:36px 36px;}
+::selection{background:var(--annot);color:var(--paper);}
+a{color:inherit;}
+:focus-visible{outline:2px solid var(--annot);outline-offset:3px;}
+.disp{font-family:"Big Shoulders",sans-serif;}
+.hand{font-family:"Caveat",cursive;}
+::-webkit-scrollbar{width:10px;}
+::-webkit-scrollbar-track{background:var(--paper-2);}
+::-webkit-scrollbar-thumb{background:#1d4a7e;border-radius:8px;}
+
+/* blueprint frame */
+.sheet{max-width:1280px;margin:0 auto;padding:0 clamp(14px,3vw,34px);}
+.frame{border:1.5px solid var(--line-2);border-top:none;position:relative;}
+.frame::before{content:"";position:absolute;inset:8px;border:1px solid var(--line);pointer-events:none;}
+
+.topbar{display:flex;justify-content:space-between;align-items:center;border:1.5px solid var(--line-2);
+  border-bottom:none;padding:16px clamp(14px,2.4vw,28px);max-width:1280px;margin:0 auto;position:relative;z-index:5;}
+.brand{display:flex;gap:12px;align-items:baseline;text-decoration:none;}
+.brand .disp{font-size:1rem;font-weight:700;letter-spacing:.2em;color:var(--ink);}
+.brand small{font-size:.62rem;letter-spacing:.14em;color:var(--annot);}
+.topnav{font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-dim);display:flex;gap:20px;}
+.topnav a{text-decoration:none;transition:color .3s;}
+.topnav a:hover{color:var(--annot);}
+
+/* hero drawing */
+.hero{position:relative;padding:clamp(28px,4.5vw,56px) clamp(16px,3vw,40px) clamp(90px,10vw,120px);}
+.kick{font-size:.62rem;letter-spacing:.28em;text-transform:uppercase;color:var(--ink-faint);display:flex;gap:10px;align-items:center;}
+.kick::before{content:"";width:24px;height:1px;background:var(--annot);}
+h1{font-family:"Big Shoulders",sans-serif;font-weight:700;font-size:clamp(2.6rem,7vw,5.6rem);
+  line-height:.94;letter-spacing:.015em;text-transform:uppercase;margin:16px 0 10px;color:#fff;}
+h1 .amber{color:var(--annot);}
+.dek{font-size:.78rem;color:var(--ink-dim);max-width:60ch;line-height:1.8;}
+.dek b{color:var(--ink);font-weight:500;}
+
+/* the schematic */
+.schematic-wrap{position:relative;margin-top:clamp(22px,3.5vw,40px);}
+#schematic{width:100%;height:auto;display:block;touch-action:none;}
+.sch-hint{position:absolute;top:-4px;right:0;font-family:"Caveat",cursive;font-size:1.25rem;color:var(--annot);
+  transform:rotate(-2deg);pointer-events:none;}
+.sch-hint svg{vertical-align:middle;}
+
+/* title block (like a real drawing) */
+.titleblock{margin-top:18px;margin-left:auto;width:max-content;border:1px solid var(--line-2);
+  background:rgba(10,36,68,.88);font-size:.6rem;letter-spacing:.1em;color:var(--ink-dim);
+  display:grid;grid-template-columns:auto auto;z-index:4;}
+.titleblock div{padding:7px 14px;border-top:1px solid var(--line);}
+.titleblock div:nth-child(-n+2){border-top:none;}
+.titleblock div:nth-child(odd){border-right:1px solid var(--line);color:var(--ink-faint);text-transform:uppercase;font-size:.55rem;}
+.titleblock b{color:var(--ink);font-weight:500;}
+
+/* readout strip */
+.readout{display:flex;gap:1px;background:var(--line);border:1px solid var(--line-2);margin-top:18px;flex-wrap:wrap;}
+.ro{flex:1;min-width:150px;background:var(--paper-2);padding:14px 18px;}
+.ro .k{font-size:.56rem;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-faint);}
+.ro .v{font-size:.9rem;color:var(--ink);margin-top:6px;font-variant-numeric:tabular-nums;}
+.ro .v b{color:var(--annot);font-weight:500;}
+
+/* sections */
+section{padding:clamp(56px,8vw,100px) clamp(16px,3vw,40px);border-top:1.5px solid var(--line-2);}
+.sec-head{display:flex;gap:16px;align-items:baseline;margin-bottom:20px;}
+.sec-num{font-size:.62rem;letter-spacing:.3em;color:var(--annot);}
+h2{font-family:"Big Shoulders",sans-serif;font-weight:700;font-size:clamp(1.7rem,3.6vw,2.7rem);
+  text-transform:uppercase;letter-spacing:.02em;color:#fff;line-height:1.05;}
+section p{font-size:.78rem;color:var(--ink-dim);max-width:62ch;margin-bottom:14px;line-height:1.85;}
+section p b{color:var(--ink);font-weight:500;}
+section p .hand{color:var(--annot);font-size:1.15rem;}
+.grid2{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(24px,4vw,56px);align-items:start;}
+
+/* matrix */
+.matrix-wrap{border:1px solid var(--line-2);background:var(--paper-2);padding:18px;}
+.matrix-cap{font-size:.6rem;letter-spacing:.22em;color:var(--ink-faint);margin-bottom:12px;
+  display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+#matrixHover{color:var(--annot);}
+table.matrix{border-collapse:collapse;width:100%;table-layout:fixed;}
+.matrix th{font-size:.55rem;font-weight:400;color:var(--ink-faint);padding:3px 2px;letter-spacing:.04em;}
+.matrix td{border:1px solid rgba(207,228,255,.08);text-align:center;font-size:.55rem;padding:6px 0;
+  cursor:crosshair;color:var(--ink);transition:outline .15s;font-variant-numeric:tabular-nums;}
+.matrix td:hover{outline:1.5px solid var(--annot);outline-offset:-1.5px;}
+
+/* callouts */
+.callouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1px;background:var(--line);border:1px solid var(--line-2);margin-top:30px;}
+.co{background:var(--paper-2);padding:20px;position:relative;}
+.co .idx{position:absolute;top:14px;right:16px;font-size:.6rem;color:var(--ink-faint);}
+.co h3{font-family:"Big Shoulders",sans-serif;font-size:1.05rem;font-weight:600;text-transform:uppercase;
+  letter-spacing:.06em;color:var(--ink);margin-bottom:8px;}
+.co p{font-size:.72rem;margin:0;max-width:none;}
+.co .rho{color:var(--annot);}
+.co .rho.neg{color:var(--neg);}
+
+footer{border-top:1.5px solid var(--line-2);padding:clamp(36px,5vw,60px) clamp(16px,3vw,40px);}
+.foot{display:flex;flex-wrap:wrap;gap:18px;justify-content:space-between;font-size:.62rem;
+  letter-spacing:.1em;color:var(--ink-faint);}
+.foot a{color:var(--ink-dim);text-decoration:none;}
+.foot a:hover{color:var(--annot);}
+.foot-links{display:flex;gap:22px;flex-wrap:wrap;}
+
+@media(max-width:860px){
+  .grid2{grid-template-columns:1fr;}
+  .topnav{display:none;}
+  .schematic-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  #schematic{min-width:880px;touch-action:pan-x;}
+  .titleblock{margin-left:0;width:100%;}
+  .hero{padding-bottom:clamp(28px,4.5vw,56px);}
+  .sch-hint{display:none;}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto;}}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="../"><span class="disp">FIELDSIM</span><small>DWG №3 — CORRELATION</small></a>
+  <nav class="topnav" aria-label="Primary">
+    <a href="../">Gallery</a>
+    <a href="#matrix">The matrix</a>
+    <a href="#wiring">Wiring rules</a>
+  </nav>
+</header>
+
+<div class="sheet"><div class="frame">
+
+<main>
+  <section class="hero">
+    <div class="kick">FieldSim · outcome engine · plate №3 — dependence</div>
+    <h1>No player is<br />an <span class="amber">island.</span></h1>
+    <p class="dek">
+      This sheet is live. <b>Drag any node vertically</b> to hand that player a great —
+      or terrible — Sunday, measured in standard deviations. Every other node answers with
+      its conditional expectation, <b>E[z<sub>j</sub> | z<sub>i</sub>] = ρ<sub>ij</sub>·z<sub>i</sub></b>,
+      along the wires of a real game stack. Solid wires pull together; dashed wires pull apart.
+    </p>
+
+    <div class="schematic-wrap">
+      <span class="sch-hint">↓ grab a player, pull his Sunday</span>
+      <svg id="schematic" viewBox="0 -100 1200 700" role="application" aria-label="Interactive correlation schematic: drag a player node to see correlated responses"></svg>
+    </div>
+
+    <div class="readout" id="readout">
+      <div class="ro"><div class="k">Perturbed</div><div class="v" id="roWho">— drag a node</div></div>
+      <div class="ro"><div class="k">His z-score</div><div class="v" id="roZ">z = 0.00</div></div>
+      <div class="ro"><div class="k">Strongest response</div><div class="v" id="roMax">—</div></div>
+      <div class="ro"><div class="k">Opposing defense</div><div class="v" id="roDst">—</div></div>
+      <div class="ro"><div class="k">Stack Δ (6 skaters)</div><div class="v" id="roSum">—</div></div>
+    </div>
+
+    <div class="titleblock" aria-label="Drawing title block">
+      <div>Drawing</div><div><b>GAME STACK — KAN @ BUF</b></div>
+      <div>Sheet</div><div><b>№3 / 10 — FieldSim gallery</b></div>
+      <div>Scale</div><div><b>1 σ = 56 px</b></div>
+      <div>Method</div><div><b>Gaussian copula, nearest-PSD</b></div>
+      <div>Drawn by</div><div><b>the correlation engine</b></div>
+    </div>
+  </section>
+
+  <section id="matrix">
+    <div class="sec-head"><span class="sec-num">01</span><h2>The matrix is the machine</h2></div>
+    <div class="grid2">
+      <div>
+        <p>
+          Under every FieldSim contest sits a player-by-player correlation matrix. Same-team
+          wires are warm: a quarterback and his №1 receiver share completions, so they share
+          ceilings <span class="hand">(one deep ball = two stat lines!)</span>. The wire to the
+          <b>opposing defense</b> runs negative — every sack that feeds the DST starves the QB.
+        </p>
+        <p>
+          And the two quarterbacks? <b>Positive.</b> Points beget points: a shootout lifts both
+          passing games, which is why a <b>bring-back</b> — one opposing receiver bolted onto
+          your stack — is wired into the engine, not bolted on as a rule of thumb.
+        </p>
+        <p>
+          Hand-set matrices are almost never mathematically valid. FieldSim repairs every
+          matrix to its <b>nearest positive-semi-definite neighbour</b> before sampling —
+          otherwise the copula would be asked to draw from a correlation structure that
+          cannot exist in any universe, simulated or otherwise.
+        </p>
+      </div>
+      <div class="matrix-wrap">
+        <div class="matrix-cap"><span>ρ — GAME STACK, KAN @ BUF</span><span id="matrixHover">hover a cell</span></div>
+        <table class="matrix" id="mtable" aria-label="Correlation matrix"></table>
+      </div>
+    </div>
+  </section>
+
+  <section id="wiring">
+    <div class="sec-head"><span class="sec-num">02</span><h2>Wiring rules of the trade</h2></div>
+    <p>Every wire on this sheet ships in the production engine's config — these are the defaults
+      the simulator draws through, not illustrations.</p>
+    <div class="callouts">
+      <div class="co"><span class="idx">W-01</span><h3>The primary tether</h3>
+        <p>QB ↔ WR1, same team: <b class="rho">ρ +0.62</b>. The single strongest wire on the
+        board. Stacking is just obeying it.</p></div>
+      <div class="co"><span class="idx">W-02</span><h3>The bring-back</h3>
+        <p>Your stack ↔ opposing WR1: <b class="rho">ρ +0.35</b> via the shootout. If the game
+        goes nuclear, own both sides of the mushroom cloud.</p></div>
+      <div class="co"><span class="idx">W-03</span><h3>The negative wire</h3>
+        <p>QB ↔ opposing DST: <b class="rho neg">ρ −0.45</b>. A defense scores by eating your
+        quarterback. Never roster the meal and the mouth.</p></div>
+      <div class="co"><span class="idx">W-04</span><h3>The quiet couple</h3>
+        <p>RB ↔ own DST: <b class="rho">ρ +0.25</b>. Leads make runs and rested defenses —
+        the grind-it-out correlation everyone forgets.</p></div>
+      <div class="co"><span class="idx">W-05</span><h3>The cannibals</h3>
+        <p>QB ↔ own RB: <b class="rho neg">ρ −0.08</b>. Slightly negative — every kneel-down
+        drive is a passing ceiling that never happened.</p></div>
+      <div class="co"><span class="idx">W-06</span><h3>The shootout switch</h3>
+        <p>QB ↔ QB: <b class="rho">ρ +0.28</b>. Scoreboards are contagious. Game environment
+        is a player in every lineup, priced or not.</p></div>
+    </div>
+  </section>
+</main>
+
+</div></div>
+
+<footer>
+  <div class="foot sheet">
+    <span>THE STACK SCHEMATIC — plate №3 of the FieldSim gallery. Dependence, drawn to scale.</span>
+    <span class="foot-links">
+      <a href="../monte-carlo/">← Prev: fifty thousand worlds</a>
+      <a href="../">The gallery</a>
+      <a href="../leverage/">Next: chalk &amp; leverage →</a>
+    </span>
+  </div>
+</footer>
+
+<script>
+(() => {
+"use strict";
+/* ============================================================
+   THE STACK SCHEMATIC — conditional expectation, made draggable.
+   Nodes carry a z-score; dragging node i sets z_i and every
+   other node shows E[z_j | z_i] = rho_ij * z_i.
+   ============================================================ */
+const NS = "http://www.w3.org/2000/svg";
+const svg = document.getElementById("schematic");
+
+const PLAYERS = [
+  { id:"qbA",  name:"P. MAHOMES",  pos:"QB",  team:"KAN", proj:21.4, sd:6.8, x:180, y:120 },
+  { id:"wrA",  name:"R. RICE",     pos:"WR1", team:"KAN", proj:16.8, sd:6.2, x:355, y:70  },
+  { id:"teA",  name:"T. KELCE",    pos:"TE",  team:"KAN", proj:13.9, sd:5.4, x:355, y:180 },
+  { id:"rbA",  name:"I. PACHECO",  pos:"RB",  team:"KAN", proj:14.2, sd:5.1, x:180, y:265 },
+  { id:"dstA", name:"KAN DST",     pos:"DST", team:"KAN", proj:6.8,  sd:4.6, x:180, y:400 },
+  { id:"qbB",  name:"J. ALLEN",    pos:"QB",  team:"BUF", proj:22.6, sd:7.0, x:1020, y:120 },
+  { id:"wrB",  name:"K. COLEMAN",  pos:"WR1", team:"BUF", proj:14.6, sd:6.0, x:845, y:70  },
+  { id:"teB",  name:"D. KINCAID",  pos:"TE",  team:"BUF", proj:11.2, sd:4.9, x:845, y:180 },
+  { id:"rbB",  name:"J. COOK",     pos:"RB",  team:"BUF", proj:15.1, sd:5.3, x:1020, y:265 },
+  { id:"dstB", name:"BUF DST",     pos:"DST", team:"BUF", proj:6.2,  sd:4.4, x:1020, y:400 },
+];
+const N = PLAYERS.length;
+const idx = Object.fromEntries(PLAYERS.map((p,i)=>[p.id,i]));
+
+/* correlation matrix (upper wires listed once) */
+const R = Array.from({length:N},(_,i)=>Array.from({length:N},(_,j)=>i===j?1:0));
+function setR(a,b,v){ R[idx[a]][idx[b]]=v; R[idx[b]][idx[a]]=v; }
+/* same team KAN */
+setR("qbA","wrA", .62); setR("qbA","teA", .42); setR("qbA","rbA",-.08);
+setR("qbA","dstA",.05); setR("wrA","teA",-.05); setR("wrA","rbA",-.06);
+setR("rbA","dstA",.25); setR("teA","rbA",-.04); setR("wrA","dstA",.02); setR("teA","dstA",.02);
+/* same team BUF */
+setR("qbB","wrB", .62); setR("qbB","teB", .42); setR("qbB","rbB",-.08);
+setR("qbB","dstB",.05); setR("wrB","teB",-.05); setR("wrB","rbB",-.06);
+setR("rbB","dstB",.25); setR("teB","rbB",-.04); setR("wrB","dstB",.02); setR("teB","dstB",.02);
+/* cross game */
+setR("qbA","qbB", .28); setR("qbA","wrB", .35); setR("qbB","wrA", .35);
+setR("qbA","dstB",-.45); setR("qbB","dstA",-.45);
+setR("wrA","dstB",-.28); setR("wrB","dstA",-.28);
+setR("teA","dstB",-.18); setR("teB","dstA",-.18);
+setR("rbA","dstB",-.12); setR("rbB","dstA",-.12);
+setR("dstA","dstB",-.10);
+setR("rbA","qbB",-.10); setR("rbB","qbA",-.10);
+setR("teA","qbB",.12); setR("teB","qbA",.12);
+setR("wrA","wrB",.15); setR("teA","wrB",.06); setR("teB","wrA",.06);
+setR("rbA","wrB",-.02); setR("rbB","wrA",-.02); setR("rbA","rbB",-.05);
+setR("teA","teB",.04); setR("rbA","teB",-.02); setR("rbB","teA",-.02);
+setR("dstA","wrB",-.28); /* symmetric already set via wrB,dstA — harmless repeat */
+
+/* wires to draw (visible edges — the meaningful ones) */
+const WIRES = [
+  ["qbA","wrA"],["qbA","teA"],["qbA","rbA"],["rbA","dstA"],
+  ["qbB","wrB"],["qbB","teB"],["qbB","rbB"],["rbB","dstB"],
+  ["qbA","qbB"],["qbA","wrB"],["qbB","wrA"],
+  ["qbA","dstB"],["qbB","dstA"],["wrA","dstB"],["wrB","dstA"],
+];
+
+const SD_PX = 56;             // 1 z = 56 px of travel
+const Z_MAX = 2.5;
+
+/* ---- build svg ---- */
+function el(tag, attrs, parent){
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  (parent||svg).appendChild(e); return e;
+}
+/* faint field-plan: hash marks + center divider */
+el("line",{x1:600,y1:-60,x2:600,y2:530,stroke:"rgba(207,228,255,.12)","stroke-dasharray":"3 9"});
+el("text",{x:600,y:566,fill:"rgba(207,228,255,.35)","text-anchor":"middle",
+  "font-size":"11","letter-spacing":"6","font-family":"IBM Plex Mono"}).textContent="K A N S A S   C I T Y   @   B U F F A L O";
+/* blueprint ornaments: north arrow + revision stamp */
+const orn = el("g",{});
+el("circle",{cx:1150,cy:-52,r:16,fill:"none",stroke:"rgba(207,228,255,.35)","stroke-width":1},orn);
+el("path",{d:"M1150 -40 L1150 -62 M1146 -58 L1150 -62 L1154 -58",stroke:"rgba(207,228,255,.55)","stroke-width":1.2,fill:"none"},orn);
+el("text",{x:1150,y:-18,fill:"rgba(207,228,255,.4)","text-anchor":"middle","font-size":"9","letter-spacing":"2","font-family":"IBM Plex Mono"},orn).textContent="GAME N";
+el("text",{x:1064,y:-48,fill:"rgba(207,228,255,.3)","text-anchor":"end","font-size":"9","letter-spacing":"2","font-family":"IBM Plex Mono"},orn).textContent="REV C — WK 14";
+
+/* baseline rails (dashed) showing each node's rest position */
+const rails = el("g",{});
+PLAYERS.forEach(p=>{
+  el("line",{x1:p.x-46,y1:p.y,x2:p.x+46,y2:p.y,stroke:"rgba(207,228,255,.18)","stroke-dasharray":"2 5"},rails);
+});
+
+const wireG = el("g",{}), nodeG = el("g",{});
+const wireEls = WIRES.map(([a,b])=>{
+  const r = R[idx[a]][idx[b]];
+  const path = el("path",{fill:"none",
+    stroke: r>=0 ? "rgba(207,228,255,.5)" : "rgba(255,143,122,.55)",
+    "stroke-width": Math.max(.8, Math.abs(r)*4.4),
+    "stroke-dasharray": r>=0 ? "" : "6 5",
+  }, wireG);
+  const lbl = el("text",{fill: r>=0? "rgba(255,201,77,.95)":"rgba(255,143,122,.95)",
+    "font-size":"11","text-anchor":"middle","font-family":"IBM Plex Mono",opacity:0,
+    style:"transition:opacity .25s;"}, wireG);
+  lbl.textContent = "ρ "+(r>0?"+":"")+r.toFixed(2).replace("0.",".");
+  return {a:idx[a], b:idx[b], r, path, lbl};
+});
+
+const nodeEls = PLAYERS.map((p,i)=>{
+  const g = el("g",{class:"node",transform:`translate(${p.x},${p.y})`,style:"cursor:grab;"},nodeG);
+  const halo = el("circle",{r:30,fill:"transparent"},g);
+  const ring = el("circle",{r:22,fill:"#0d2c52",stroke:"rgba(207,228,255,.75)","stroke-width":1.5},g);
+  const posT = el("text",{y:4,fill:"#cfe4ff","text-anchor":"middle","font-size":"11","font-weight":"600","font-family":"IBM Plex Mono"},g);
+  posT.textContent = p.pos;
+  const name = el("text",{y:40,fill:"rgba(143,179,221,.9)","text-anchor":"middle","font-size":"10","letter-spacing":"1","font-family":"IBM Plex Mono"},g);
+  name.textContent = p.name;
+  const pts = el("text",{y:54,fill:"rgba(255,201,77,.0)","text-anchor":"middle","font-size":"10","font-family":"IBM Plex Mono"},g);
+  return {g, ring, pts, name, z:0, drawn:0};
+});
+
+function wirePath(w){
+  const A = PLAYERS[w.a], B = PLAYERS[w.b];
+  const ay = A.y - nodeEls[w.a].drawn*SD_PX, by = B.y - nodeEls[w.b].drawn*SD_PX;
+  const mx = (A.x+B.x)/2, my = Math.min(ay,by) - 26 - Math.abs(A.x-B.x)*0.042;
+  w.path.setAttribute("d",`M ${A.x} ${ay} Q ${mx} ${my} ${B.x} ${by}`);
+  /* label at the bezier midpoint (t=.5), lifted slightly off the wire */
+  const midX = .25*A.x + .5*mx + .25*B.x;
+  const midY = .25*ay + .5*my + .25*by;
+  w.lbl.setAttribute("x",midX);
+  w.lbl.setAttribute("y",midY-7);
+}
+function layout(){
+  wireEls.forEach(wirePath);
+  nodeEls.forEach((n,i)=>{
+    const p=PLAYERS[i];
+    n.g.setAttribute("transform",`translate(${p.x},${p.y - n.drawn*SD_PX})`);
+  });
+}
+
+/* ---- drag interaction ---- */
+let drag = null;      // {i, startY, startZ}
+const roWho=document.getElementById("roWho"), roZ=document.getElementById("roZ"),
+      roMax=document.getElementById("roMax"), roDst=document.getElementById("roDst"),
+      roSum=document.getElementById("roSum");
+
+function applyPerturb(i, z){
+  lastActive = i;
+  nodeEls.forEach((n,j)=>{
+    n.z = j===i ? z : R[i][j]*z;
+  });
+  updateVisual(i);
+}
+function updateVisual(active){
+  let maxJ=-1, maxAbs=0, sumDelta=0;
+  nodeEls.forEach((n,j)=>{
+    n.drawn = n.z;
+    const p = PLAYERS[j];
+    const delta = n.z*p.sd;
+    if (j!==active && Math.abs(n.z)>maxAbs){ maxAbs=Math.abs(n.z); maxJ=j; }
+    if (p.pos!=="DST"&&p.pos!=="K") sumDelta+=delta;
+    const glow = Math.min(1, Math.abs(n.z)/1.5);
+    n.ring.setAttribute("stroke", n.z>0.02 ? `rgba(255,201,77,${.4+.6*glow})` : n.z<-0.02 ? `rgba(255,143,122,${.4+.6*glow})` : "rgba(207,228,255,.75)");
+    n.ring.setAttribute("stroke-width", 1.5+2.2*glow);
+    const pts = p.proj + delta;
+    n.pts.textContent = (n.z>=0?"+":"")+delta.toFixed(1)+" → "+pts.toFixed(1)+" pts";
+    n.pts.setAttribute("fill", Math.abs(n.z)>0.03 ? (n.z>0?"rgba(255,201,77,.95)":"rgba(255,143,122,.95)") : "rgba(255,201,77,0)");
+  });
+  wireEls.forEach(w=>{
+    const involved = (w.a===active||w.b===active) && active>=0;
+    w.path.setAttribute("stroke-opacity", involved? 1 : (active>=0 ? .25 : .55));
+    w.lbl.setAttribute("opacity", involved? 1 : 0);
+  });
+  layout();
+  if (active>=0){
+    const p=PLAYERS[active], z=nodeEls[active].z;
+    roWho.textContent = p.name+" ("+p.pos+")";
+    roZ.textContent = "z = "+(z>=0?"+":"")+z.toFixed(2)+" σ";
+    if (maxJ>=0){
+      const q=PLAYERS[maxJ];
+      roMax.innerHTML = q.name+" <b>"+(nodeEls[maxJ].z>=0?"+":"")+(nodeEls[maxJ].z*q.sd).toFixed(1)+" pts</b>";
+    }
+    const dstJ = p.team==="KAN" ? idx["dstB"] : idx["dstA"];
+    roDst.innerHTML = PLAYERS[dstJ].name+" <b>"+(nodeEls[dstJ].z>=0?"+":"")+(nodeEls[dstJ].z*PLAYERS[dstJ].sd).toFixed(1)+" pts</b>";
+    roSum.innerHTML = "<b>"+(sumDelta>=0?"+":"")+sumDelta.toFixed(1)+" pts</b> across skill spots";
+  }
+}
+function svgY(e){
+  const pt = svg.createSVGPoint(); pt.x=e.clientX; pt.y=e.clientY;
+  return pt.matrixTransform(svg.getScreenCTM().inverse()).y;
+}
+nodeEls.forEach((n,i)=>{
+  n.g.addEventListener("pointerdown",e=>{
+    e.preventDefault();
+    drag={i,startY:svgY(e),startZ:n.z};
+    n.g.style.cursor="grabbing";
+    n.g.setPointerCapture?.(e.pointerId);
+  });
+  /* hover reveals this node's wires + rho labels */
+  n.g.addEventListener("pointerenter",()=>{ if(!drag) updateVisual(i); });
+  n.g.addEventListener("pointerleave",()=>{ if(!drag){
+    const anyZ = nodeEls.some(m=>Math.abs(m.z)>0.03);
+    updateVisual(anyZ ? lastActive : -1);
+  }});
+});
+let lastActive=-1;
+addEventListener("pointermove",e=>{
+  if(!drag) return;
+  const dy = svgY(e)-drag.startY;
+  let z = drag.startZ - dy/SD_PX;
+  z = Math.max(-Z_MAX, Math.min(Z_MAX, z));
+  applyPerturb(drag.i, z);
+});
+addEventListener("pointerup",()=>{
+  if (drag){ nodeEls[drag.i].g.style.cursor="grab"; }
+  drag=null;
+});
+/* double-click resets */
+svg.addEventListener("dblclick",()=>{ nodeEls.forEach(n=>n.z=0); updateVisual(-1);
+  roWho.textContent="— drag a node"; roZ.textContent="z = 0.00"; roMax.textContent="—"; roDst.textContent="—"; roSum.textContent="—"; });
+
+layout(); updateVisual(-1);
+
+/* gentle idle sway to show it's alive (reduced-motion aware) */
+if (!matchMedia("(prefers-reduced-motion: reduce)").matches){
+  let t=0; let idleOn=true;
+  svg.addEventListener("pointerdown",()=>idleOn=false,{once:true});
+  (function idle(){
+    requestAnimationFrame(idle);
+    if(!idleOn||drag) return;
+    t+=0.008;
+    nodeEls.forEach((n,i)=>{ n.drawn = Math.sin(t+i*1.3)*0.045; });
+    layout();
+  })();
+}
+
+/* ---- matrix table ---- */
+const mt = document.getElementById("mtable"), mh = document.getElementById("matrixHover");
+{
+  const head = document.createElement("tr");
+  head.appendChild(document.createElement("th"));
+  PLAYERS.forEach(p=>{ const th=document.createElement("th"); th.textContent=p.pos+(p.team==="KAN"?"ᴋ":"ᴮ"); head.appendChild(th); });
+  mt.appendChild(head);
+  PLAYERS.forEach((p,i)=>{
+    const tr=document.createElement("tr");
+    const th=document.createElement("th"); th.textContent=p.pos+(p.team==="KAN"?"ᴋ":"ᴮ"); th.style.textAlign="right"; th.style.paddingRight="6px"; tr.appendChild(th);
+    PLAYERS.forEach((q,j)=>{
+      const td=document.createElement("td");
+      const r=R[i][j];
+      td.textContent = i===j ? "1" : (r===0?"·":(r>0?"+":"−")+Math.abs(r).toFixed(2).slice(1));
+      const a=Math.min(.85,Math.abs(r));
+      td.style.background = i===j ? "rgba(207,228,255,.14)" :
+        r>0 ? `rgba(255,201,77,${a*.5})` : r<0 ? `rgba(255,143,122,${a*.55})` : "transparent";
+      td.addEventListener("mouseenter",()=>{ mh.textContent=`${p.name} × ${q.name} — ρ ${r>=0?"+":""}${r.toFixed(2)}`; });
+      tr.appendChild(td);
+    });
+    mt.appendChild(tr);
+  });
+  mt.addEventListener("mouseleave",()=>{ mh.textContent="hover a cell"; });
+}
+})();
+</script>
+</body>
+</html>

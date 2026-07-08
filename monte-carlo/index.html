@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FIFTY THOUSAND WORLDS — the Monte Carlo observatory | FieldSim</title>
+<meta name="description" content="Watch a histogram get earned, not drawn: simulated fantasy outcomes fall as meteor streaks into a live distribution, tail events flare, and a correlation slider shows how a Gaussian copula tethers two players' fates." />
+<meta property="og:title" content="FIFTY THOUSAND WORLDS — the Monte Carlo observatory" />
+<meta property="og:description" content="A live Monte Carlo engine: outcome rain, tail-event flares, and correlated worlds on a copula tether." />
+<meta property="og:type" content="website" />
+<meta name="theme-color" content="#04060b" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2304060b'/%3E%3Cg fill='%238b9dff'%3E%3Crect x='7' y='20' width='3' height='6' rx='1'/%3E%3Crect x='12' y='14' width='3' height='12' rx='1'/%3E%3Crect x='17' y='17' width='3' height='9' rx='1'/%3E%3Crect x='22' y='23' width='3' height='3' rx='1'/%3E%3Ccircle cx='23' cy='8' r='1.6' fill='%2357e6d6'/%3E%3C/g%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Michroma&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Manrope:wght@200;300;400;600&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --space:#04060b; --space-2:#080c16; --panel:#0a1020;
+  --star:#c3d2ea; --star-dim:#7284a3; --mute:#4a5a75;
+  --pulsar:#8b9dff; --comet:#57e6d6; --flare:#ff6b5e; --gold:#ffd27a;
+  --line:rgba(195,210,234,.10); --line-2:rgba(195,210,234,.24);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--space);color:var(--star);font-family:"Manrope",system-ui,sans-serif;
+  font-weight:300;line-height:1.7;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+::selection{background:var(--pulsar);color:var(--space);}
+a{color:inherit;}
+:focus-visible{outline:2px solid var(--comet);outline-offset:3px;border-radius:2px;}
+.disp{font-family:"Michroma",sans-serif;font-weight:400;}
+.mono{font-family:"Space Mono",monospace;}
+::-webkit-scrollbar{width:10px;}
+::-webkit-scrollbar-track{background:var(--space-2);}
+::-webkit-scrollbar-thumb{background:#1b2740;border-radius:8px;}
+
+/* starfield backdrop */
+#stars{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.7;}
+
+.topbar{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;justify-content:space-between;align-items:center;
+  padding:18px clamp(18px,3.4vw,38px);background:linear-gradient(to bottom,rgba(4,6,11,.85),transparent);}
+.brand{display:flex;gap:12px;align-items:baseline;text-decoration:none;}
+.brand .disp{font-size:.72rem;letter-spacing:.28em;color:var(--star);}
+.brand .sub{font-family:"Space Mono",monospace;font-size:.62rem;color:var(--comet);letter-spacing:.1em;}
+.topnav{font-family:"Space Mono",monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--star-dim);display:flex;gap:22px;}
+.topnav a{text-decoration:none;transition:color .3s;}
+.topnav a:hover{color:var(--comet);}
+
+/* ---------- hero ---------- */
+.hero{position:relative;z-index:1;height:100svh;min-height:600px;overflow:hidden;}
+#rain{position:absolute;inset:0;width:100%;height:100%;display:block;}
+.hero-copy{position:absolute;z-index:3;left:clamp(18px,3.4vw,38px);top:clamp(84px,13vh,140px);max-width:520px;pointer-events:none;}
+.hero-copy::before{content:"";position:absolute;inset:-30px -50px -40px -30px;z-index:-1;
+  background:radial-gradient(70% 80% at 30% 35%, rgba(4,6,11,.8) 25%, transparent 72%);}
+.kick{font-family:"Space Mono",monospace;font-size:.62rem;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--star-dim);margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+.kick::before{content:"";width:24px;height:1px;background:var(--comet);}
+h1.disp{font-size:clamp(1.5rem,3.6vw,2.9rem);line-height:1.26;letter-spacing:.04em;color:#fff;
+  text-shadow:0 0 40px rgba(139,157,255,.35);}
+h1 .tint{color:var(--pulsar);}
+.lede{margin-top:20px;font-size:.95rem;color:var(--star-dim);max-width:44ch;font-weight:300;}
+.lede b{color:var(--star);font-weight:600;}
+
+/* observatory counter */
+.odometer{position:absolute;z-index:3;right:clamp(18px,3.4vw,38px);top:clamp(84px,13vh,140px);text-align:right;pointer-events:none;}
+.odo-cap{font-family:"Space Mono",monospace;font-size:.6rem;letter-spacing:.3em;color:var(--star-dim);text-transform:uppercase;}
+.odo-val{font-family:"Michroma",sans-serif;font-size:clamp(1.4rem,3vw,2.3rem);color:var(--comet);
+  letter-spacing:.06em;margin-top:6px;text-shadow:0 0 30px rgba(87,230,214,.45);font-variant-numeric:tabular-nums;}
+.odo-sub{font-family:"Space Mono",monospace;font-size:.6rem;color:var(--mute);letter-spacing:.14em;margin-top:8px;}
+.odo-sub b{color:var(--gold);font-weight:400;}
+
+/* tail-event log */
+#flarelog{position:absolute;z-index:3;right:clamp(18px,3.4vw,38px);top:calc(clamp(84px,13vh,140px) + 132px);
+  text-align:right;pointer-events:none;
+  font-family:"Space Mono",monospace;font-size:.62rem;letter-spacing:.06em;color:var(--star-dim);}
+#flarelog div{opacity:0;animation:fl .6s ease forwards;}
+@keyframes fl{from{opacity:0;transform:translateX(10px);}to{opacity:1;transform:none;}}
+#flarelog b{color:var(--flare);font-weight:400;}
+
+/* controls */
+.ctrl{position:absolute;z-index:4;left:50%;transform:translateX(-50%);bottom:36px;display:flex;gap:10px;align-items:center;}
+.cbtn{font-family:"Space Mono",monospace;font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;
+  background:rgba(10,16,32,.78);color:var(--star-dim);border:1px solid var(--line-2);border-radius:999px;
+  padding:10px 18px;cursor:pointer;transition:all .3s;backdrop-filter:blur(6px);}
+.cbtn:hover{color:var(--star);border-color:var(--comet);}
+.cbtn.active{background:var(--comet);color:var(--space);border-color:var(--comet);font-weight:700;}
+.hero-hint{position:absolute;z-index:3;left:50%;transform:translateX(-50%);bottom:88px;
+  font-family:"Space Mono",monospace;font-size:.58rem;letter-spacing:.26em;text-transform:uppercase;color:var(--mute);}
+
+/* ---------- sections ---------- */
+section{position:relative;z-index:1;border-top:1px solid var(--line);padding:clamp(64px,9vw,120px) clamp(18px,3.4vw,38px);}
+.inner{max-width:1080px;margin:0 auto;}
+.sec-head{display:flex;align-items:baseline;gap:18px;margin-bottom:26px;}
+.sec-num{font-family:"Space Mono",monospace;font-size:.62rem;color:var(--comet);letter-spacing:.3em;}
+h2.disp{font-size:clamp(1.3rem,3vw,2.1rem);letter-spacing:.05em;color:#fff;line-height:1.3;}
+section p{color:var(--star-dim);font-size:.95rem;max-width:60ch;margin-bottom:16px;}
+section p b{color:var(--star);font-weight:600;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,4vw,60px);align-items:start;}
+
+.panel{background:rgba(10,16,32,.5);border:1px solid var(--line);border-radius:12px;padding:22px;position:relative;}
+.panel-cap{font-family:"Space Mono",monospace;font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;color:var(--mute);margin-bottom:14px;display:flex;justify-content:space-between;}
+.panel-cap b{color:var(--comet);font-weight:400;}
+canvas.mini{width:100%;height:240px;display:block;border-radius:6px;}
+
+/* rho slider */
+.rho-row{display:flex;align-items:center;gap:16px;margin-top:16px;font-family:"Space Mono",monospace;font-size:.66rem;color:var(--star-dim);}
+input[type=range]{flex:1;appearance:none;-webkit-appearance:none;height:2px;background:linear-gradient(to right,var(--mute),var(--comet));border-radius:2px;outline-offset:6px;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;
+  background:var(--comet);box-shadow:0 0 14px rgba(87,230,214,.7);cursor:pointer;border:2px solid var(--space);}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--comet);cursor:pointer;border:2px solid var(--space);}
+.rho-val{color:var(--comet);min-width:70px;text-align:right;}
+
+/* instrument panel */
+.specs{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:34px;}
+@media(max-width:820px){.specs{grid-template-columns:1fr 1fr;}}
+@media(max-width:520px){.specs{grid-template-columns:1fr;}}
+.spec{background:var(--space-2);padding:22px;}
+.spec .k{font-family:"Space Mono",monospace;font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;color:var(--mute);}
+.spec .v{font-family:"Michroma",sans-serif;font-size:1.05rem;color:var(--star);margin-top:10px;letter-spacing:.04em;}
+.spec .v i{font-style:normal;color:var(--comet);}
+.spec .d{font-size:.78rem;color:var(--star-dim);margin-top:8px;line-height:1.6;}
+
+footer{position:relative;z-index:1;border-top:1px solid var(--line);padding:clamp(44px,6vw,70px) clamp(18px,3.4vw,38px);}
+.foot{max-width:1080px;margin:0 auto;display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between;
+  font-family:"Space Mono",monospace;font-size:.64rem;letter-spacing:.1em;color:var(--mute);}
+.foot a{color:var(--star-dim);text-decoration:none;transition:color .3s;}
+.foot a:hover{color:var(--comet);}
+.foot-links{display:flex;gap:24px;flex-wrap:wrap;}
+
+@media(max-width:820px){
+  .grid2{grid-template-columns:1fr;}
+  .odometer{top:78px;right:18px;}
+  .odo-val{font-size:1.15rem;}
+  .odo-sub{display:none;}
+  #flarelog{display:none;}
+  .hero-copy{max-width:88vw;top:150px;}
+  h1.disp{font-size:clamp(1.3rem,5.8vw,1.9rem);}
+  .lede{font-size:.82rem;}
+  .topnav{display:none;}
+  .cbtn{white-space:nowrap;padding:9px 13px;font-size:.55rem;letter-spacing:.12em;}
+  .ctrl{gap:7px;}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto;}
+  #flarelog div{animation:none;opacity:1;}
+}
+</style>
+</head>
+<body>
+<canvas id="stars" aria-hidden="true"></canvas>
+
+<header class="topbar">
+  <a class="brand" href="../"><span class="disp">FIELDSIM</span><span class="sub">// observatory</span></a>
+  <nav class="topnav" aria-label="Primary">
+    <a href="../">Gallery</a>
+    <a href="#lln">Convergence</a>
+    <a href="#copula">Correlated worlds</a>
+    <a href="#instrument">The instrument</a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero" aria-label="Live Monte Carlo outcome rain building a histogram">
+    <canvas id="rain"></canvas>
+    <div class="hero-copy">
+      <div class="kick">FieldSim · outcome engine · plate №2 — the simulator</div>
+      <h1 class="disp">EVERY SUNDAY,<br /><span class="tint">FIFTY THOUSAND</span><br />TIMES.</h1>
+      <p class="lede">
+        A projection is one guess. A distribution is every guess, weighted.
+        Each streak below is <b>one simulated world</b> falling into place —
+        the histogram isn't drawn, it's <b>earned</b>, one Sunday at a time.
+      </p>
+    </div>
+
+    <div class="odometer" aria-live="off">
+      <div class="odo-cap">Worlds simulated</div>
+      <div class="odo-val" id="odo">000,000</div>
+      <div class="odo-sub">running mean <b id="odoMean">—</b> · p99 flares <b id="odoFlares">0</b></div>
+    </div>
+
+    <div id="flarelog" aria-live="polite"></div>
+
+    <div class="ctrl" role="group" aria-label="Simulation controls">
+      <button class="cbtn active" id="btnRun" aria-pressed="true">Running</button>
+      <button class="cbtn" id="btnStorm">Storm ×20</button>
+      <button class="cbtn" id="btnReset">Reset the sky</button>
+    </div>
+  </section>
+
+  <section id="lln">
+    <div class="inner">
+      <div class="sec-head"><span class="sec-num">01</span><h2 class="disp">THE MEAN IS EARNED SLOWLY. THE TAIL IS EARNED NEVER.</h2></div>
+      <div class="grid2">
+        <div>
+          <p>
+            The law of large numbers is patient: after a few hundred worlds the running mean
+            still swings like a compass near a magnet; after fifty thousand it has settled to
+            within a rounding error of the projection. <b>That's why FieldSim never trusts a
+            small sample</b> — a thousand sims will lie to you about a player's mean, and lie
+            worse about his ceiling.
+          </p>
+          <p>
+            But watch the p99 line. It never settles the way the mean does — tail estimates
+            converge at a fraction of the rate, because worlds that far out arrive once in a
+            hundred Sundays. The rarer the event, the more worlds you owe it.
+            <b>Fifty thousand is the rent we pay to see the tail clearly.</b>
+          </p>
+        </div>
+        <div class="panel">
+          <div class="panel-cap"><span>Running estimate vs. worlds simulated</span><b id="llnN">n = 0</b></div>
+          <canvas class="mini" id="lln-canvas"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="copula">
+    <div class="inner">
+      <div class="sec-head"><span class="sec-num">02</span><h2 class="disp">WORLDS FALL IN PAIRS — THE COPULA TETHER.</h2></div>
+      <div class="grid2">
+        <div class="panel">
+          <div class="panel-cap"><span>QB × WR1 · same world, tethered draw</span><b>Gaussian copula</b></div>
+          <canvas class="mini" id="pair-canvas" style="height:280px;"></canvas>
+          <div class="rho-row">
+            <span>ρ = 0</span>
+            <input type="range" id="rho" min="0" max="90" value="62" aria-label="Correlation between quarterback and receiver" />
+            <span>ρ = .9</span>
+            <span class="rho-val" id="rhoVal">ρ = 0.62</span>
+          </div>
+        </div>
+        <div>
+          <p>
+            A quarterback and his receiver do not live in separate universes. When the passing
+            game erupts, <b>both</b> erupt — one touchdown is two stat lines. FieldSim draws
+            every player's world from a <b>Gaussian copula</b>: correlated normal scores under
+            the hood, each mapped back onto its own fitted marginal so no player ever loses
+            his personal distribution.
+          </p>
+          <p>
+            Drag the tether. At ρ = 0 the pair rains independently — a great QB world says
+            nothing about the WR. At ρ = 0.62 (a real same-team stack value) the streaks start
+            falling together: <b>ceilings arrive in bundles</b>. That bundle is why stacking
+            wins tournaments — you're not betting on two events, you're betting on one.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="instrument">
+    <div class="inner">
+      <div class="sec-head"><span class="sec-num">03</span><h2 class="disp">THE INSTRUMENT.</h2></div>
+      <p>Observatory hardware, as flown in production. Nothing on this page is a mockup of the
+        engine — the rain above runs the same inverse-CDF sampling the real simulator uses.</p>
+      <div class="specs">
+        <div class="spec"><div class="k">Worlds per contest</div><div class="v">50,000</div><div class="d">Correlated Monte-Carlo draws, batched and vectorized.</div></div>
+        <div class="spec"><div class="k">Marginals</div><div class="v"><i>Shifted lognormal</i></div><div class="d">Right-skewed, fit to mean, sd, ceiling and Boom/Bust probabilities.</div></div>
+        <div class="spec"><div class="k">Dependence</div><div class="v">Gaussian copula</div><div class="d">Team stacks, bring-backs, QB↔DST negatives — kept positive-semi-definite.</div></div>
+        <div class="spec"><div class="k">Field</div><div class="v">10,000 lineups</div><div class="d">Ownership-weighted entrants, exposure-calibrated to the slate.</div></div>
+        <div class="spec"><div class="k">Ranking</div><div class="v">ROI, not points</div><div class="d">Every lineup priced against a top-heavy GPP payout curve with duplication.</div></div>
+        <div class="spec"><div class="k">Verdict cadence</div><div class="v">~2 min</div><div class="d">Full 50k × 50k contest sim on the compute tier.</div></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="foot">
+    <span>FIFTY THOUSAND WORLDS — plate №2 of the FieldSim gallery.</span>
+    <span class="foot-links">
+      <a href="../outcomes/">← Prev: outcome space</a>
+      <a href="../">The gallery</a>
+      <a href="../correlation/">Next: the correlation engine →</a>
+    </span>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   FIFTY THOUSAND WORLDS — Monte Carlo as weather.
+   Outcome rain: each particle is one draw x = invCDF(u),
+   falling into a live histogram. Tail events (p>=.99) flare.
+   ============================================================ */
+(() => {
+"use strict";
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---------- shared distribution (alpha-WR shifted lognormal) ---------- */
+const X_MAX = 50;
+function slnPdf(x, shift, mu, sg){
+  const t = x - shift; if (t <= 1e-4) return 0;
+  const z = (Math.log(t) - mu) / sg;
+  return Math.exp(-.5*z*z)/(t*sg*Math.sqrt(2*Math.PI));
+}
+const GRID = 512;
+const pdf = new Float64Array(GRID), cdf = new Float64Array(GRID), xs = new Float64Array(GRID);
+{ let acc=0;
+  for (let i=0;i<GRID;i++){ xs[i]=i/(GRID-1)*X_MAX; pdf[i]=slnPdf(xs[i],2.5,Math.log(14.5),.52); acc+=pdf[i]; }
+  let c=0; for (let i=0;i<GRID;i++){ c+=pdf[i]/acc; cdf[i]=c; }
+}
+function invCDF(u){
+  let lo=0,hi=GRID-1;
+  while(lo<hi){ const m=(lo+hi)>>1; if(cdf[m]<u) lo=m+1; else hi=m; }
+  if (lo===0) return xs[0];
+  const c0=cdf[lo-1],c1=cdf[lo];
+  return xs[lo-1]+(xs[lo]-xs[lo-1])*((u-c0)/Math.max(c1-c0,1e-12));
+}
+const P99 = invCDF(.99);
+
+/* ---------- starfield ---------- */
+const starC = document.getElementById("stars"), sctx = starC.getContext("2d");
+function drawStars(){
+  const w = starC.width = innerWidth * devicePixelRatio;
+  const h = starC.height = innerHeight * devicePixelRatio;
+  starC.style.width = innerWidth+"px"; starC.style.height = innerHeight+"px";
+  sctx.clearRect(0,0,w,h);
+  const n = Math.floor(innerWidth*innerHeight/9000);
+  for (let i=0;i<n;i++){
+    const x=Math.random()*w, y=Math.random()*h, r=Math.random();
+    sctx.globalAlpha = .12 + r*.3;
+    sctx.fillStyle = r>.92 ? "#8b9dff" : "#c3d2ea";
+    sctx.beginPath(); sctx.arc(x,y,(r>.92?1.4:0.7)*devicePixelRatio,0,7); sctx.fill();
+  }
+  sctx.globalAlpha=1;
+}
+drawStars();
+
+/* ---------- outcome rain ---------- */
+const canvas = document.getElementById("rain"), ctx = canvas.getContext("2d");
+let W=0,H=0,DPR=1;
+const BINS = 110;
+let counts = new Float64Array(BINS);
+let total = 0, flares = 0, sum = 0;
+let running = true, storm = false;
+
+const drops = [];             // {x(bin), u, y, vy, hot}
+const MARGIN_B = 130;         // px above bottom for the axis/controls
+const TOP_PAD = 70;
+
+function resize(){
+  DPR = Math.min(devicePixelRatio, 2);
+  const r = canvas.getBoundingClientRect();
+  W = r.width; H = r.height;
+  canvas.width = W*DPR; canvas.height = H*DPR;
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+}
+resize();
+addEventListener("resize", () => { resize(); drawStars(); });
+
+const binX = b => (b+0.5)/BINS * (W*0.86) + W*0.07;
+const binW = () => (W*0.86)/BINS;
+
+function spawn(nPer){
+  for (let i=0;i<nPer;i++){
+    const u = Math.random();
+    const x = invCDF(u);
+    const b = Math.min(BINS-1, Math.floor(x/X_MAX*BINS));
+    drops.push({ b, u, x, y: -20 - Math.random()*80, vy: 3.2+Math.random()*2.2, hot: u>=.99 });
+  }
+}
+
+function histTopY(b, maxC){
+  const hMax = H*0.35;
+  return H - MARGIN_B - (counts[b]/maxC) * hMax;
+}
+
+const odo = document.getElementById("odo"), odoMean = document.getElementById("odoMean"),
+      odoFlares = document.getElementById("odoFlares"), flarelog = document.getElementById("flarelog");
+
+function fmt(n){ return n.toLocaleString("en-US",{minimumIntegerDigits:6,useGrouping:true}).replace(/^/,""); }
+
+function logFlare(x){
+  flares++;
+  const d = document.createElement("div");
+  d.innerHTML = `world №${total.toLocaleString()} — <b>${x.toFixed(1)} pts</b> · p99 flare`;
+  flarelog.prepend(d);
+  while (flarelog.children.length>3) flarelog.removeChild(flarelog.lastChild);
+}
+
+function tickRain(){
+  ctx.clearRect(0,0,W,H);
+  const maxC = Math.max(12, ...counts);
+
+  /* settled histogram — glowing columns */
+  const bw = binW();
+  for (let b=0;b<BINS;b++){
+    if (!counts[b]) continue;
+    const x = binX(b)-bw/2, top = histTopY(b, maxC), h = H-MARGIN_B-top;
+    const p = cdf[Math.min(GRID-1,Math.round((b+0.5)/BINS*(GRID-1)))];
+    const col = p>=.99 ? "255,107,94" : p>=.90 ? "255,210,122" : p>=.5 ? "139,157,255" : "114,132,163";
+    const g = ctx.createLinearGradient(0,top,0,H-MARGIN_B);
+    g.addColorStop(0, `rgba(${col},.95)`);
+    g.addColorStop(1, `rgba(${col},.12)`);
+    ctx.fillStyle = g;
+    ctx.fillRect(x, top, Math.max(bw-1.2,1), h);
+  }
+
+  /* baseline */
+  ctx.fillStyle = "rgba(195,210,234,.25)";
+  ctx.fillRect(W*0.07, H-MARGIN_B, W*0.86, 1);
+
+  /* axis ticks */
+  ctx.font = `10px "Space Mono", monospace`;
+  ctx.fillStyle = "rgba(114,132,163,.8)";
+  ctx.textAlign = "center";
+  for (let t=0;t<=X_MAX;t+=10){
+    const px = t/X_MAX*(W*0.86)+W*0.07;
+    ctx.fillRect(px, H-MARGIN_B+4, 1, 6);
+    ctx.fillText(String(t), px, H-MARGIN_B+24);
+  }
+  if (W>560){
+    ctx.textAlign = "right";
+    ctx.fillText("fantasy points →", W*0.93, H-MARGIN_B+44);
+    ctx.textAlign = "center";
+  }
+
+  /* falling drops as streaks */
+  if (running){
+    spawn(storm ? 20 : (reduceMotion ? 1 : 3));
+  }
+  for (let i=drops.length-1;i>=0;i--){
+    const d = drops[i];
+    const px = binX(d.b) + (Math.sin(d.y*.02+d.b)*2);
+    const floor = histTopY(d.b, maxC);
+    d.y += d.vy; d.vy += .12;
+    const trail = d.hot ? 60 : 26;
+    const grad = ctx.createLinearGradient(px, d.y-trail, px, d.y);
+    const c = d.hot ? "255,107,94" : "195,210,234";
+    grad.addColorStop(0, `rgba(${c},0)`);
+    grad.addColorStop(1, `rgba(${c},${d.hot?.95:.65})`);
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = d.hot ? 2 : 1.1;
+    ctx.beginPath(); ctx.moveTo(px, d.y-trail); ctx.lineTo(px, d.y); ctx.stroke();
+    if (d.hot){
+      ctx.fillStyle = `rgba(255,107,94,.9)`;
+      ctx.beginPath(); ctx.arc(px, d.y, 2.4, 0, 7); ctx.fill();
+    }
+    if (d.y >= floor){
+      counts[d.b]++; total++; sum += d.x;
+      if (d.hot && !reduceMotion) logFlare(d.x);
+      drops.splice(i,1);
+    }
+  }
+
+  odo.textContent = fmt(Math.min(total, 999999));
+  odoMean.textContent = total ? (sum/total).toFixed(2)+" pts" : "—";
+  odoFlares.textContent = String(flares);
+}
+
+/* ---------- controls ---------- */
+const btnRun = document.getElementById("btnRun"), btnStorm = document.getElementById("btnStorm"),
+      btnReset = document.getElementById("btnReset");
+btnRun.addEventListener("click", () => {
+  running = !running;
+  btnRun.textContent = running ? "Running" : "Paused";
+  btnRun.classList.toggle("active", running);
+  btnRun.setAttribute("aria-pressed", String(running));
+});
+btnStorm.addEventListener("click", () => {
+  storm = !storm;
+  btnStorm.classList.toggle("active", storm);
+});
+btnReset.addEventListener("click", () => {
+  counts = new Float64Array(BINS); total=0; sum=0; flares=0; drops.length=0;
+  flarelog.innerHTML=""; llnReset();
+});
+
+/* ---------- LLN panel ---------- */
+const llnC = document.getElementById("lln-canvas"), lctx = llnC.getContext("2d");
+let llnPts = [], llnSum=0, llnTot=0, llnCounts=new Float64Array(400), llnNext=25;
+const llnN = document.getElementById("llnN");
+function llnReset(){ llnPts=[]; llnSum=0; llnTot=0; llnCounts=new Float64Array(400); llnNext=25; }
+function llnSize(){
+  const r = llnC.getBoundingClientRect();
+  llnC.width = r.width*DPR; llnC.height = r.height*DPR;
+  lctx.setTransform(DPR,0,0,DPR,0,0);
+  return r;
+}
+function llnTick(){
+  // simulate a batch; record on a geometric grid so log-x history is permanent
+  if (llnTot < 1e6){
+    for (let i=0;i<40;i++){
+      const x = invCDF(Math.random());
+      llnSum += x; llnTot++;
+      llnCounts[Math.min(399, Math.floor(x/X_MAX*400))]++;
+      if (llnTot >= llnNext){
+        let need = llnTot*.99, acc=0, est=X_MAX;
+        for (let b=0;b<400;b++){ acc+=llnCounts[b]; if (acc>=need){ est=(b+0.5)/400*X_MAX; break; } }
+        llnPts.push([llnTot, llnSum/llnTot, est]);
+        llnNext = Math.max(llnNext+1, Math.ceil(llnNext*1.045));
+      }
+    }
+  }
+  const r = llnSize();
+  const w=r.width,h=r.height;
+  lctx.clearRect(0,0,w,h);
+  const N0=25, N1=Math.max(llnTot, 400);
+  const xOf = n => Math.log(n/N0)/Math.log(N1/N0) * (w*0.97);
+  const yOf = v => h*0.06 + (1 - (v-8)/(X_MAX-8)) * (h*0.80);
+  // n gridlines at decades
+  lctx.font=`9px "Space Mono",monospace`; lctx.textAlign="center";
+  for (const n of [100,1000,10000,100000,1000000]){
+    if (n>N1||n<N0) continue;
+    const gx=xOf(n);
+    lctx.fillStyle="rgba(195,210,234,.07)"; lctx.fillRect(gx,0,1,h*0.9);
+    lctx.fillStyle="rgba(114,132,163,.75)";
+    lctx.fillText("n=10"+(n===100?"²":n===1000?"³":n===10000?"⁴":n===100000?"⁵":"⁶"), gx, h*0.97);
+  }
+  // reference lines
+  const trueMean = 18.66;
+  lctx.setLineDash([4,5]);
+  lctx.strokeStyle="rgba(139,157,255,.35)";
+  lctx.beginPath(); lctx.moveTo(0,yOf(trueMean)); lctx.lineTo(w,yOf(trueMean)); lctx.stroke();
+  lctx.strokeStyle="rgba(255,107,94,.35)";
+  lctx.beginPath(); lctx.moveTo(0,yOf(P99)); lctx.lineTo(w,yOf(P99)); lctx.stroke();
+  lctx.setLineDash([]);
+  lctx.textAlign="left";
+  lctx.font=`10px "Space Mono",monospace`;
+  lctx.fillStyle="rgba(139,157,255,.85)"; lctx.fillText("running mean → true "+trueMean.toFixed(1), 8, yOf(trueMean)+14);
+  lctx.fillStyle="rgba(255,107,94,.85)"; lctx.fillText("running p99 → true "+P99.toFixed(1), 8, yOf(P99)-8);
+  const plot=(k,col)=>{
+    lctx.strokeStyle=col; lctx.lineWidth=1.5; lctx.beginPath();
+    llnPts.forEach((p,i)=>{ const x=xOf(p[0]), y=yOf(p[k]); i?lctx.lineTo(x,y):lctx.moveTo(x,y); });
+    lctx.stroke();
+  };
+  plot(1,"#8b9dff"); plot(2,"#ff6b5e");
+  llnN.textContent = "n = "+llnTot.toLocaleString();
+}
+
+/* ---------- correlated pair rain ---------- */
+const pairC = document.getElementById("pair-canvas"), pctx = pairC.getContext("2d");
+const rhoInput = document.getElementById("rho"), rhoVal = document.getElementById("rhoVal");
+let rho = .62;
+rhoInput.addEventListener("input", () => { rho = rhoInput.value/100; rhoVal.textContent = "ρ = "+rho.toFixed(2); });
+const pairs = [];  // {uQ, uW, y, vy}
+function gauss(){ let u=0,v=0; while(!u)u=Math.random(); while(!v)v=Math.random();
+  return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
+const Phi = z => 0.5*(1+erf(z/Math.SQRT2));
+function erf(x){ // Abramowitz-Stegun
+  const s=x<0?-1:1; x=Math.abs(x);
+  const t=1/(1+.3275911*x);
+  const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-.284496736)*t+.254829592)*t*Math.exp(-x*x);
+  return s*y;
+}
+function pairTick(){
+  const r = pairC.getBoundingClientRect();
+  pairC.width=r.width*DPR; pairC.height=r.height*DPR;
+  pctx.setTransform(DPR,0,0,DPR,0,0);
+  const w=r.width,h=r.height;
+  pctx.clearRect(0,0,w,h);
+  // two lanes
+  const laneQ = [w*0.06, w*0.44], laneW = [w*0.56, w*0.94];
+  pctx.font=`10px "Space Mono",monospace`; pctx.textAlign="center";
+  pctx.fillStyle="rgba(114,132,163,.9)";
+  pctx.fillText("QB percentile →", (laneQ[0]+laneQ[1])/2, h-8);
+  pctx.fillText("WR1 percentile →", (laneW[0]+laneW[1])/2, h-8);
+  pctx.fillStyle="rgba(195,210,234,.2)";
+  pctx.fillRect(laneQ[0], h-24, laneQ[1]-laneQ[0], 1);
+  pctx.fillRect(laneW[0], h-24, laneW[1]-laneW[0], 1);
+  // spawn
+  if (!reduceMotion || pairs.length<40){
+    const z1=gauss(), z2=rho*z1+Math.sqrt(1-rho*rho)*gauss();
+    pairs.push({uQ:Phi(z1), uW:Phi(z2), y:-10, vy:1.6+Math.random()});
+  }
+  for (let i=pairs.length-1;i>=0;i--){
+    const p=pairs[i];
+    p.y+=p.vy;
+    const xq=laneQ[0]+p.uQ*(laneQ[1]-laneQ[0]);
+    const xw=laneW[0]+p.uW*(laneW[1]-laneW[0]);
+    const hot=p.uQ>=.9&&p.uW>=.9;
+    const alpha=Math.max(0,1-p.y/(h-24));
+    // tether
+    pctx.strokeStyle=hot?`rgba(255,210,122,${.5*alpha})`:`rgba(87,230,214,${.16*alpha})`;
+    pctx.lineWidth=hot?1.4:1;
+    pctx.beginPath(); pctx.moveTo(xq,p.y); pctx.lineTo(xw,p.y); pctx.stroke();
+    // dots
+    pctx.fillStyle=`rgba(139,157,255,${.9*alpha})`;
+    pctx.beginPath(); pctx.arc(xq,p.y,2.2,0,7); pctx.fill();
+    pctx.fillStyle=hot?`rgba(255,210,122,${.95*alpha})`:`rgba(87,230,214,${.85*alpha})`;
+    pctx.beginPath(); pctx.arc(xw,p.y,2.2,0,7); pctx.fill();
+    if (p.y>h-24) pairs.splice(i,1);
+  }
+}
+
+/* ---------- master loop ---------- */
+let frame=0;
+function loop(){
+  requestAnimationFrame(loop);
+  if (document.hidden) return;
+  tickRain();
+  frame++;
+  if (frame%2===0){ llnTick(); pairTick(); }
+}
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
