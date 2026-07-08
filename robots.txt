@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://fieldsim-gallery.onrender.com/sitemap.xml

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://fieldsim-gallery.onrender.com/</loc><priority>1.0</priority></url>
+  <url><loc>https://fieldsim-gallery.onrender.com/outcomes/</loc><priority>0.9</priority></url>
+  <url><loc>https://fieldsim-gallery.onrender.com/monte-carlo/</loc><priority>0.8</priority></url>
+  <url><loc>https://fieldsim-gallery.onrender.com/correlation/</loc><priority>0.8</priority></url>
+  <url><loc>https://fieldsim-gallery.onrender.com/leverage/</loc><priority>0.8</priority></url>
+  <url><loc>https://fieldsim-gallery.onrender.com/payout/</loc><priority>0.8</priority></url>
+  <url><loc>https://fieldsim-gallery.onrender.com/field/</loc><priority>0.8</priority></url>
+  <url><loc>https://fieldsim-gallery.onrender.com/tails/</loc><priority>0.8</priority></url>
+  <url><loc>https://fieldsim-gallery.onrender.com/showdown/</loc><priority>0.8</priority></url>
+  <url><loc>https://fieldsim-gallery.onrender.com/duplication/</loc><priority>0.8</priority></url>
+  <url><loc>https://fieldsim-gallery.onrender.com/terminal/</loc><priority>0.8</priority></url>
+</urlset>
