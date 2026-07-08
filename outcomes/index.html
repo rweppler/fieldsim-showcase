@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OUTCOME SPACE — chance has a shape | FieldSim</title>
+<meta name="description" content="Forty-two thousand simulated fantasy outcomes hung under their own probability density. Scrub the curve to read percentiles, carve it with your cursor, and watch a normal distribution re-fit into the right-skewed shapes FieldSim actually uses." />
+<meta property="og:title" content="OUTCOME SPACE — chance has a shape" />
+<meta property="og:description" content="A living probability density: 42,000 particles, percentile scrubbing, and quantile-remap morphs between the distributions of NFL DFS." />
+<meta property="og:type" content="website" />
+<meta name="theme-color" content="#05070c" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2305070c'/%3E%3Cpath d='M4 26 C10 26 11 8 16 8 C21 8 22 26 28 26' stroke='%233fe39c' stroke-width='2.2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --abyss:#05070c; --abyss-2:#090d15; --panel:#0c111b;
+  --grain:#dce6f0; --grain-soft:#93a5ba; --grain-cold:#46566c;
+  --lev:#3fe39c; --lev-dim:#1d5c43; --amber:#ffb454;
+  --mute:#5e6d81; --line:rgba(220,230,240,.09); --line-2:rgba(220,230,240,.22);
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;}
+body{font-family:"IBM Plex Mono",ui-monospace,monospace;background:var(--abyss);color:var(--grain);
+  -webkit-font-smoothing:antialiased;line-height:1.6;overflow-x:hidden;}
+::selection{background:var(--lev);color:var(--abyss);}
+h1,h2,.serif{font-family:"Newsreader",Georgia,serif;font-weight:300;letter-spacing:-.01em;}
+a{color:inherit;}
+:focus-visible{outline:2px solid var(--lev);outline-offset:3px;border-radius:2px;}
+::-webkit-scrollbar{width:10px;}
+::-webkit-scrollbar-track{background:var(--abyss-2);}
+::-webkit-scrollbar-thumb{background:#22303f;border-radius:8px;}
+::-webkit-scrollbar-thumb:hover{background:var(--lev-dim);}
+
+/* ---------- top bar ---------- */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;justify-content:space-between;
+  align-items:center;padding:18px clamp(18px,3.4vw,38px);mix-blend-mode:screen;pointer-events:none;}
+.topbar a,.topbar span{pointer-events:auto;}
+.brand{display:flex;gap:10px;align-items:baseline;text-decoration:none;font-size:.78rem;letter-spacing:.14em;white-space:nowrap;}
+.brand b{font-weight:500;color:var(--grain);}
+.brand i{font-family:"Newsreader",serif;font-style:italic;color:var(--lev);font-size:.9rem;letter-spacing:0;}
+.topnav{font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:var(--mute);display:flex;gap:20px;}
+.topnav a{text-decoration:none;transition:color .3s;}
+.topnav a:hover{color:var(--lev);}
+
+/* ---------- hero ---------- */
+.hero{position:relative;height:100svh;min-height:560px;overflow:hidden;}
+#scene{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:crosshair;}
+.hero-poster{display:none;position:absolute;inset:0;}
+.vignette{position:absolute;inset:0;pointer-events:none;z-index:2;
+  background:radial-gradient(130% 100% at 50% 42%, transparent 46%, rgba(5,7,12,.72) 100%);}
+
+.hero-overlay{position:absolute;z-index:5;left:clamp(18px,3.4vw,38px);top:clamp(74px,11vh,120px);
+  max-width:min(560px,86vw);pointer-events:none;}
+.hero-overlay::before{content:"";position:absolute;inset:-40px -60px -50px -40px;z-index:-1;
+  background:radial-gradient(75% 85% at 32% 38%, rgba(5,7,12,.82) 30%, transparent 74%);}
+h1,.lede,.kicker{text-shadow:0 2px 18px rgba(5,7,12,.95),0 0 46px rgba(5,7,12,.8);}
+.kicker{display:flex;align-items:center;gap:10px;font-size:.68rem;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--mute);margin-bottom:18px;}
+.kicker .tick{width:22px;height:1px;background:var(--lev);}
+.kicker em{font-family:"Newsreader",serif;font-style:italic;text-transform:none;letter-spacing:.02em;
+  color:var(--grain-soft);font-size:.85rem;}
+h1{font-size:clamp(3rem,7.4vw,5.8rem);line-height:.98;color:var(--grain);font-weight:250;}
+h1 .it{font-style:italic;color:var(--lev);font-weight:300;}
+.lede{margin-top:22px;font-size:.82rem;color:var(--grain-soft);max-width:46ch;line-height:1.75;}
+.lede b{color:var(--grain);font-weight:500;}
+
+/* ---------- HUD ---------- */
+.hud{position:absolute;inset:0;z-index:6;pointer-events:none;font-size:.66rem;letter-spacing:.14em;}
+.hud-block{position:absolute;text-transform:uppercase;color:var(--mute);}
+.hud-cap{display:block;font-size:.6rem;letter-spacing:.22em;margin-bottom:5px;color:var(--mute);}
+.hud-val{color:var(--grain);letter-spacing:.06em;font-size:.78rem;}
+.hud-tr{top:clamp(74px,11vh,120px);right:clamp(18px,3.4vw,38px);text-align:right;}
+.hud-br{top:calc(clamp(74px,11vh,120px) + 128px);right:clamp(18px,3.4vw,38px);text-align:right;}
+.hud-br .hud-val{font-variant-numeric:tabular-nums;}
+.hud-stat{display:flex;gap:16px;justify-content:flex-end;text-transform:none;letter-spacing:.1em;
+  border-top:1px solid var(--line);padding-top:12px;}
+.hud-stat span b{display:block;color:var(--grain);font-weight:400;margin-top:3px;font-size:.76rem;font-variant-numeric:tabular-nums;}
+
+/* cursor readout chip + hairline */
+#hairline{position:absolute;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,transparent 8%,var(--line-2) 30%,var(--line-2) 78%,transparent 96%);
+  z-index:4;pointer-events:none;opacity:0;transition:opacity .35s;}
+#chip{position:absolute;z-index:7;pointer-events:none;opacity:0;transition:opacity .35s;transform:translate(-50%,0);
+  background:rgba(9,13,21,.86);border:1px solid var(--line-2);border-radius:6px;padding:9px 13px 8px;
+  backdrop-filter:blur(6px);min-width:148px;text-align:center;}
+#chip .c-pts{font-size:1.15rem;color:var(--grain);font-variant-numeric:tabular-nums;letter-spacing:.02em;}
+#chip .c-pts small{font-size:.6rem;color:var(--mute);letter-spacing:.18em;}
+#chip .c-pct{font-size:.66rem;letter-spacing:.2em;margin-top:3px;font-variant-numeric:tabular-nums;}
+#chip .c-zone{font-size:.58rem;letter-spacing:.26em;margin-top:4px;text-transform:uppercase;}
+
+/* axis */
+#axis{position:absolute;z-index:5;left:0;right:0;pointer-events:none;}
+#baseline{position:absolute;height:1px;background:linear-gradient(to right,transparent,var(--line-2) 8%,var(--line-2) 92%,transparent);}
+.ax-tick{position:absolute;transform:translateX(-50%);text-align:center;color:var(--grain-soft);
+  font-size:.62rem;letter-spacing:.14em;font-variant-numeric:tabular-nums;opacity:.8;}
+.ax-tick::before{content:"";display:block;width:1px;height:8px;background:var(--line-2);margin:0 auto 6px;}
+.ax-unit{position:absolute;transform:translateX(-100%);color:var(--mute);font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;top:34px;white-space:nowrap;}
+
+/* ---------- controls ---------- */
+.controls{position:absolute;z-index:8;left:50%;transform:translateX(-50%);bottom:78px;
+  display:flex;gap:8px;flex-wrap:wrap;justify-content:center;padding:0 14px;}
+.shape-btn{font-family:"IBM Plex Mono",monospace;font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;
+  background:rgba(9,13,21,.72);color:var(--grain-soft);border:1px solid var(--line);border-radius:999px;
+  padding:9px 16px;cursor:pointer;transition:all .35s var(--ease);backdrop-filter:blur(6px);}
+.shape-btn:hover{border-color:var(--lev-dim);color:var(--grain);}
+.shape-btn.is-active{background:var(--lev);border-color:var(--lev);color:var(--abyss);font-weight:500;}
+.shape-btn--auto{display:flex;align-items:center;gap:8px;}
+.auto-tick{width:6px;height:6px;border-radius:50%;background:var(--mute);transition:background .3s;}
+.shape-btn[aria-pressed="true"] .auto-tick{background:var(--lev);box-shadow:0 0 8px var(--lev);}
+
+.hint{position:absolute;z-index:8;left:50%;transform:translateX(-50%);bottom:44px;color:var(--mute);
+  font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;white-space:nowrap;}
+
+/* draw log */
+#drawlog{position:absolute;z-index:7;left:clamp(18px,3.4vw,38px);bottom:44px;pointer-events:none;
+  font-size:.62rem;letter-spacing:.1em;color:var(--mute);max-width:280px;}
+#drawlog div{opacity:0;animation:drawIn .5s var(--ease) forwards;}
+@keyframes drawIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+#drawlog b{color:var(--lev);font-weight:400;}
+#drawlog .amber{color:var(--amber);}
+
+/* ---------- sections ---------- */
+section{border-top:1px solid var(--line);padding:clamp(60px,9vw,110px) clamp(18px,3.4vw,38px);}
+.sec-inner{max-width:1060px;margin:0 auto;display:grid;grid-template-columns:minmax(120px,240px) 1fr;gap:clamp(24px,5vw,80px);}
+.sec-idx{font-size:.64rem;letter-spacing:.26em;color:var(--lev);text-transform:uppercase;padding-top:10px;}
+.sec-idx small{display:block;color:var(--mute);margin-top:8px;letter-spacing:.18em;line-height:1.8;}
+h2{font-size:clamp(1.9rem,4vw,3rem);line-height:1.06;margin-bottom:22px;color:var(--grain);font-weight:250;}
+h2 .it{font-style:italic;color:var(--lev);}
+section p{font-size:.82rem;color:var(--grain-soft);max-width:58ch;margin-bottom:16px;line-height:1.8;}
+section p b{color:var(--grain);font-weight:500;}
+section p em{font-family:"Newsreader",serif;font-style:italic;color:var(--grain);font-size:.95rem;}
+
+.ladder{margin-top:30px;border-top:1px solid var(--line);max-width:560px;}
+.lrow{display:grid;grid-template-columns:74px 1fr auto;gap:16px;align-items:baseline;
+  border-bottom:1px solid var(--line);padding:13px 0;font-size:.72rem;}
+.lrow .lp{color:var(--mute);letter-spacing:.12em;font-variant-numeric:tabular-nums;}
+.lrow .ln{color:var(--grain-soft);letter-spacing:.04em;}
+.lrow .lv{font-variant-numeric:tabular-nums;letter-spacing:.08em;}
+.z-bust{color:var(--grain-cold);} .z-med{color:var(--grain-soft);} .z-solid{color:var(--grain);}
+.z-boom{color:#9befc9;} .z-ceil{color:var(--lev);} .z-break{color:var(--amber);}
+
+.code{background:var(--abyss-2);border:1px solid var(--line);border-radius:8px;padding:20px 22px;
+  font-size:.72rem;line-height:1.85;overflow-x:auto;margin:20px 0;max-width:640px;color:var(--grain-soft);}
+.code .k{color:var(--lev);} .code .c{color:var(--mute);font-style:italic;} .code .n{color:var(--amber);}
+
+/* ---------- footer ---------- */
+footer{border-top:1px solid var(--line);padding:clamp(44px,6vw,70px) clamp(18px,3.4vw,38px);}
+.foot-inner{max-width:1060px;margin:0 auto;display:flex;flex-wrap:wrap;gap:22px;justify-content:space-between;
+  align-items:baseline;font-size:.68rem;letter-spacing:.12em;color:var(--mute);}
+.foot-inner a{text-decoration:none;color:var(--grain-soft);transition:color .3s;}
+.foot-inner a:hover{color:var(--lev);}
+.foot-links{display:flex;gap:26px;flex-wrap:wrap;}
+
+@media(max-width:760px){
+  .hero{min-height:100svh;}
+  .topnav a{display:none;}
+  .topnav a:first-child{display:inline;}
+  .kicker{font-size:.56rem;letter-spacing:.16em;}
+  .kicker em{display:none;}
+  .ax-unit{display:none;}
+  .hero-overlay{top:70px;right:18px;}
+  h1{font-size:clamp(2.4rem,11vw,3.4rem);}
+  .lede{font-size:.74rem;max-width:100%;}
+  .hud-tr{display:none;}
+  .hud-br{display:none;}
+  .controls{bottom:66px;gap:6px;}
+  .shape-btn{padding:8px 12px;font-size:.56rem;}
+  #drawlog{display:none;}
+  .hint{bottom:36px;font-size:.52rem;}
+  .sec-inner{grid-template-columns:1fr;gap:18px;}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto;}
+  #drawlog div{animation:none;opacity:1;}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="../"><b>FIELDSIM</b><i>outcome space</i></a>
+  <nav class="topnav" aria-label="Primary">
+    <a href="../">Gallery</a>
+    <a href="#why">Why not normal</a>
+    <a href="#how">How it's drawn</a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero" id="hero" aria-label="Interactive probability density of simulated fantasy outcomes">
+    <canvas id="scene"></canvas>
+    <div class="hero-poster" id="poster" aria-hidden="true"></div>
+    <div class="vignette" aria-hidden="true"></div>
+    <div id="hairline" aria-hidden="true"></div>
+    <div id="chip" aria-hidden="true">
+      <div class="c-pts"><span id="chipPts">—</span> <small>PTS</small></div>
+      <div class="c-pct" id="chipPct">—</div>
+      <div class="c-zone" id="chipZone">—</div>
+    </div>
+    <div id="axis" aria-hidden="true"><div id="baseline"></div><span class="ax-unit" id="axUnit">fantasy points →</span></div>
+
+    <div class="hero-overlay">
+      <div class="kicker"><span class="tick"></span> FieldSim · outcome engine · plate №1 — <em>the marginal</em></div>
+      <h1>Chance has<br /><span class="it">a shape.</span></h1>
+      <p class="lede">
+        Forty-two thousand simulated outcomes, hung under their own density.
+        <b>Move across the curve</b> to read the percentile ladder. <b>Carve it</b> —
+        it heals. <b>Click</b> to draw one future from wherever you're standing.
+        Then watch the same grains re-settle into the shapes we actually fit,
+        because football players are not normal.
+      </p>
+    </div>
+
+    <div class="hud" aria-hidden="true">
+      <div class="hud-block hud-tr">
+        <span class="hud-cap">Now fitting</span>
+        <span class="hud-val" id="hudShape">—</span>
+        <span class="hud-cap" style="margin-top:14px;">Grains</span>
+        <span class="hud-val" id="hudCount">—</span>
+      </div>
+      <div class="hud-block hud-br">
+        <div class="hud-stat">
+          <span>mean μ<b id="stMean">—</b></span>
+          <span>sd σ<b id="stSd">—</b></span>
+          <span>skew γ₁<b id="stSkew">—</b></span>
+          <span>p90<b id="stP90">—</b></span>
+        </div>
+      </div>
+    </div>
+
+    <div id="drawlog" aria-live="polite"></div>
+
+    <div class="controls" role="group" aria-label="Choose a distribution to fit">
+      <button class="shape-btn" data-s="0">Normal</button>
+      <button class="shape-btn" data-s="1">Alpha WR</button>
+      <button class="shape-btn" data-s="2">Volume RB</button>
+      <button class="shape-btn" data-s="3">TD-or-bust</button>
+      <button class="shape-btn" data-s="4">Slate breaker</button>
+      <button class="shape-btn shape-btn--auto" id="autoBtn" aria-pressed="true">
+        <span class="auto-tick" aria-hidden="true"></span> auto-fit
+      </button>
+    </div>
+    <p class="hint" id="hint">scrub the curve · carve it · click to draw an outcome</p>
+  </section>
+
+  <section id="why">
+    <div class="sec-inner">
+      <div class="sec-idx">01 / Doctrine<small>right-skewed<br/>shifted lognormal</small></div>
+      <div>
+        <h2>The bell curve is a <span class="it">polite fiction.</span></h2>
+        <p>
+          A normal distribution says a receiver is as likely to fall eight points short of
+          his projection as to land eight points past it. Football disagrees. A floor is
+          hard — <em>you cannot score minus eleven</em> — but a ceiling is soft: one broken
+          tackle, one blown coverage, and the same player triples his median. Outcomes pile
+          up left and streak out right.
+        </p>
+        <p>
+          So FieldSim never fits a normal. Every marginal is a <b>right-skewed shifted
+          lognormal</b>, fit to the projection, the volatility, the ceiling, <b>and</b> the
+          measured Boom/Bust probabilities — with the tail capped at realistic NFL maxima.
+          When you pressed <b>Normal</b> above, you were looking at the strawman. Every
+          other shape is the doctrine.
+        </p>
+        <div class="ladder" aria-label="Percentile ladder legend">
+          <div class="lrow"><span class="lp">&lt; p10</span><span class="ln">Bust — the hard floor</span><span class="lv z-bust">cold slate</span></div>
+          <div class="lrow"><span class="lp">p10–p50</span><span class="ln">Below median</span><span class="lv z-med">dim grain</span></div>
+          <div class="lrow"><span class="lp">p50–p75</span><span class="ln">Solid — projection met</span><span class="lv z-solid">ivory</span></div>
+          <div class="lrow"><span class="lp">p75–p90</span><span class="ln">Boom threshold</span><span class="lv z-boom">pale green</span></div>
+          <div class="lrow"><span class="lp">p90–p98</span><span class="ln">Ceiling — GPP territory</span><span class="lv z-ceil">leverage green</span></div>
+          <div class="lrow"><span class="lp">&gt; p98</span><span class="ln">Slate breaker</span><span class="lv z-break">amber</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how">
+    <div class="sec-inner">
+      <div class="sec-idx">02 / Method<small>quantile<br/>remapping</small></div>
+      <div>
+        <h2>Every grain keeps <span class="it">its rank.</span></h2>
+        <p>
+          Each particle is born with one uniform draw <b>u</b> and never lets it go. Its
+          horizontal home is the inverse-CDF of the current distribution at that <b>u</b> —
+          so when the shape changes, the particle doesn't teleport to a random address, it
+          <em>slides to the same percentile of the new curve</em>. The p94 grain stays the
+          p94 grain whether the fit is a tight volume-back or a slate-breaking punt.
+        </p>
+        <div class="code" role="img" aria-label="Code: quantile remapping">
+<span class="c">// one uniform draw per grain, fixed for life</span><br/>
+u[i] = random()                    <span class="c">// its percentile, forever</span><br/>
+x[i] = <span class="k">invCDF</span><sub>shape</sub>(u[i])          <span class="c">// home slides when the shape morphs</span><br/>
+y[i] = v[i] · <span class="k">pdf</span><sub>shape</sub>(x[i])       <span class="c">// stacked under the density</span><br/>
+<span class="c">// morph = rank-preserving remap — the same trick FieldSim's</span><br/>
+<span class="c">// latent layer uses to re-rank correlated sims onto fitted marginals</span>
+        </div>
+        <p>
+          This is not a decorative choice. It is the exact mechanism — <b>rank-remapping
+          onto a fitted marginal</b> — that FieldSim's correlation engine uses to make
+          fifty thousand correlated sims respect every player's own distribution. The
+          hero animation is the algorithm.
+        </p>
+        <p>
+          The cursor is unprojected through the camera onto the density's plane, so the
+          hole you carve has real depth; a spring pulls every grain home the moment you
+          leave. Damping sits at <b>0.68</b> at rest — crisp ink, not comet trails.
+        </p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="foot-inner">
+    <span>OUTCOME SPACE — plate №1 of the FieldSim gallery. Chance, hung under its own curve.</span>
+    <span class="foot-links">
+      <a href="../">The gallery ↗</a>
+      <a href="../monte-carlo/">Next plate: fifty thousand worlds ↗</a>
+    </span>
+  </div>
+</footer>
+
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+</script>
+<script type="module">
+import * as THREE from "three";
+
+/* ============================================================
+   OUTCOME SPACE — a probability density as particle matter.
+   Each grain holds a fixed uniform draw u; its home is
+   invCDF_shape(u), so shape morphs are rank-preserving
+   quantile remaps. Cursor = percentile scrubber + 3D repeller.
+   ============================================================ */
+
+const canvas = document.getElementById("scene");
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---------- distributions (x = fantasy points, 0..52) ---------- */
+const GRID_N = 512, X_MAX = 52;
+function normPdf(x, m, s){ const z=(x-m)/s; return Math.exp(-0.5*z*z)/(s*Math.sqrt(2*Math.PI)); }
+function slnPdf(x, shift, mu, sg){           // shifted lognormal
+  const t = x - shift; if (t <= 0.0001) return 0;
+  const z = (Math.log(t) - mu) / sg;
+  return Math.exp(-0.5*z*z) / (t * sg * Math.sqrt(2*Math.PI));
+}
+const SHAPES = [
+  { name:"NORMAL — the strawman", pdf:x=>normPdf(x,17,6.2) },
+  { name:"ALPHA WR — shifted lognormal", pdf:x=>slnPdf(x,2.5,Math.log(14.5),0.52) },
+  { name:"VOLUME RB — tight skew", pdf:x=>slnPdf(x,5,Math.log(11.5),0.36) },
+  { name:"TD-OR-BUST — punt mixture", pdf:x=>0.62*slnPdf(x,0.2,Math.log(3.6),0.55)+0.38*slnPdf(x,1.5,Math.log(13),0.5) },
+  { name:"SLATE BREAKER — heavy tail", pdf:x=>slnPdf(x,2.2,Math.log(9),0.72) },
+];
+/* precompute grid pdf / cdf / invCDF + moments for each shape */
+for (const s of SHAPES){
+  const xs=new Float64Array(GRID_N), pdf=new Float64Array(GRID_N), cdf=new Float64Array(GRID_N);
+  let acc=0;
+  for (let i=0;i<GRID_N;i++){ xs[i]=i/(GRID_N-1)*X_MAX; pdf[i]=s.pdf(xs[i]); }
+  for (let i=0;i<GRID_N;i++){ acc+=pdf[i]; cdf[i]=acc; }
+  for (let i=0;i<GRID_N;i++){ pdf[i]/=acc*(X_MAX/GRID_N); cdf[i]/=acc; }
+  let m=0,m2=0,m3=0;
+  for (let i=0;i<GRID_N;i++){ const w=pdf[i]*(X_MAX/GRID_N); m+=xs[i]*w; }
+  for (let i=0;i<GRID_N;i++){ const w=pdf[i]*(X_MAX/GRID_N); const d=xs[i]-m; m2+=d*d*w; m3+=d*d*d*w; }
+  s.xs=xs; s.gridPdf=pdf; s.cdf=cdf; s.mean=m; s.sd=Math.sqrt(m2); s.skew=m3/Math.pow(m2,1.5);
+  s.maxPdf=Math.max(...pdf);
+  s.inv=u=>{ let lo=0,hi=GRID_N-1;               // binary search invCDF
+    while(lo<hi){ const mid=(lo+hi)>>1; if(cdf[mid]<u) lo=mid+1; else hi=mid; }
+    if(lo===0) return xs[0];
+    const c0=cdf[lo-1],c1=cdf[lo];
+    return xs[lo-1]+(xs[lo]-xs[lo-1])*((u-c0)/Math.max(c1-c0,1e-12));
+  };
+  s.pctAt=x=>{ const i=Math.min(GRID_N-1,Math.max(0,Math.round(x/X_MAX*(GRID_N-1)))); return cdf[i]; };
+  s.pdfAt=x=>{ const i=Math.min(GRID_N-1,Math.max(0,Math.round(x/X_MAX*(GRID_N-1)))); return pdf[i]; };
+}
+
+/* ---------- world mapping ---------- */
+const PLANE_W = 22;                 // world width the x-axis maps to
+const BASE_Y = -5.0;                // curve baseline (world y)
+const CURVE_H = 9.2;                // world height of the tallest density
+const PLANE_SHIFT_X = 1.2;          // nudge the cloud right so the headline breathes
+const xToW = x => (x/X_MAX - 0.5) * PLANE_W;
+const wToX = w => (w/PLANE_W + 0.5) * X_MAX;
+
+/* ---------- renderer / fallback ---------- */
+let renderer;
+try{
+  renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
+  if (!renderer.getContext()) throw new Error("no gl");
+}catch(e){ fallback(); throw e; }
+function fallback(){
+  canvas.style.display="none";
+  const poster=document.getElementById("poster");
+  poster.style.display="block";
+  poster.innerHTML = `<svg viewBox="0 0 800 420" style="position:absolute;inset:0;width:100%;height:100%;" preserveAspectRatio="xMidYMid meet">
+    <path d="M40 380 C 200 380 240 90 330 90 C 470 90 520 380 760 380" fill="rgba(63,227,156,.12)" stroke="#3fe39c" stroke-width="2"/>
+  </svg>`;
+}
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+renderer.setClearColor(0x000000,0);
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(38,1,0.1,120);
+camera.position.set(0,0,26);
+
+/* ---------- particles ---------- */
+let N = 42000;
+if (window.innerWidth<700) N = 18000;
+
+const pos=new Float32Array(N*3), tgt=new Float32Array(N*3), vel=new Float32Array(N*3),
+      col=new Float32Array(N*3), seeds=new Float32Array(N),
+      U=new Float32Array(N), V=new Float32Array(N), homeZ=new Float32Array(N);
+
+const C = {
+  bust:new THREE.Color("#3d4c61"), med:new THREE.Color("#7f93aa"), solid:new THREE.Color("#dce6f0"),
+  boom:new THREE.Color("#9befc9"), ceil:new THREE.Color("#3fe39c"), brk:new THREE.Color("#ffb454"),
+};
+function zoneColor(u){
+  return u<.10?C.bust : u<.50?C.med : u<.75?C.solid : u<.90?C.boom : u<.98?C.ceil : C.brk;
+}
+for (let i=0;i<N;i++){
+  U[i]=Math.random(); V[i]=Math.random(); seeds[i]=Math.random();
+  homeZ[i]=(Math.random()-0.5)*0.9;
+  const r=15+Math.random()*9, th=Math.random()*Math.PI*2;
+  pos[i*3]=Math.cos(th)*r; pos[i*3+1]=(Math.random()-0.5)*22; pos[i*3+2]=(Math.random()-0.5)*7;
+  const c=zoneColor(U[i]);
+  col[i*3]=c.r; col[i*3+1]=c.g; col[i*3+2]=c.b;
+}
+const geo=new THREE.BufferGeometry();
+geo.setAttribute("position",new THREE.BufferAttribute(pos,3));
+geo.setAttribute("color",new THREE.BufferAttribute(col,3));
+function dotTexture(){
+  const s=64,c=document.createElement("canvas");c.width=c.height=s;
+  const g=c.getContext("2d");
+  const gr=g.createRadialGradient(s/2,s/2,0,s/2,s/2,s/2);
+  gr.addColorStop(0,"rgba(255,255,255,1)");gr.addColorStop(.5,"rgba(255,255,255,.85)");gr.addColorStop(1,"rgba(255,255,255,0)");
+  g.fillStyle=gr;g.beginPath();g.arc(s/2,s/2,s/2,0,Math.PI*2);g.fill();
+  return new THREE.CanvasTexture(c);
+}
+const mat=new THREE.PointsMaterial({
+  size:0.105, map:dotTexture(), vertexColors:true, transparent:true, opacity:.92,
+  depthWrite:false, sizeAttenuation:true, blending:THREE.AdditiveBlending,
+});
+const points=new THREE.Points(geo,mat);
+points.position.x=PLANE_SHIFT_X;
+scene.add(points);
+
+/* ---------- targets ---------- */
+let shapeIdx=0, morphing=false, morphStart=0;
+const MORPH_MS=1500;
+function setShape(k){
+  shapeIdx=(k+SHAPES.length)%SHAPES.length;
+  const s=SHAPES[shapeIdx];
+  const yScale=CURVE_H/s.maxPdf;
+  for (let i=0;i<N;i++){
+    const x=s.inv(U[i]);
+    tgt[i*3]=xToW(x);
+    tgt[i*3+1]=BASE_Y + V[i]*s.pdfAt(x)*yScale;
+    tgt[i*3+2]=homeZ[i];
+  }
+  morphStart=performance.now(); morphing=true;
+  document.getElementById("hudShape").textContent=s.name;
+  document.getElementById("stMean").textContent=s.mean.toFixed(1);
+  document.getElementById("stSd").textContent=s.sd.toFixed(1);
+  document.getElementById("stSkew").textContent=(s.skew>=0?"+":"")+s.skew.toFixed(2);
+  document.getElementById("stP90").textContent=s.inv(0.9).toFixed(1);
+  btns.forEach((b,i)=>b.classList.toggle("is-active",i===shapeIdx));
+  autoTimer=performance.now();
+}
+
+/* ---------- cursor: percentile scrubber + repeller ---------- */
+const pointer=new THREE.Vector2(-10,-10);
+let pointerActive=false;
+const ndc=new THREE.Vector2(), raycaster=new THREE.Raycaster();
+const plane=new THREE.Plane(new THREE.Vector3(0,0,1),0);
+const cursorWorld=new THREE.Vector3(999,999,0);
+const REPEL_R=3.0, REPEL_STR=2.4;
+function updateCursorWorld(){
+  const rect=canvas.getBoundingClientRect();
+  ndc.x=((pointer.x-rect.left)/rect.width)*2-1;
+  ndc.y=-((pointer.y-rect.top)/rect.height)*2+1;
+  raycaster.setFromCamera(ndc,camera);
+  raycaster.ray.intersectPlane(plane,cursorWorld);
+  cursorWorld.x-=PLANE_SHIFT_X;      // into the cloud's local frame
+}
+const hairline=document.getElementById("hairline"), chip=document.getElementById("chip");
+const chipPts=document.getElementById("chipPts"), chipPct=document.getElementById("chipPct"), chipZone=document.getElementById("chipZone");
+const ZONES=[
+  [.10,"BUST","#3d4c61"],[.50,"BELOW MEDIAN","#7f93aa"],[.75,"SOLID","#dce6f0"],
+  [.90,"BOOM","#9befc9"],[.98,"CEILING","#3fe39c"],[1.01,"SLATE BREAKER","#ffb454"],
+];
+function zoneOf(p){ for(const z of ZONES) if(p<z[0]) return z; return ZONES[5]; }
+function updateReadout(){
+  const rect=canvas.getBoundingClientRect();
+  const x=wToX(cursorWorld.x);
+  if (x<0||x>X_MAX||!pointerActive){ hairline.style.opacity="0"; chip.style.opacity="0"; return; }
+  const s=SHAPES[shapeIdx], p=s.pctAt(x), z=zoneOf(p);
+  chipPts.textContent=x.toFixed(1);
+  chipPct.textContent="p"+(p*100).toFixed(p>.99?1:0)+" · P(X ≤ x)";
+  chipPct.style.color=z[2]; chipZone.textContent=z[1]; chipZone.style.color=z[2];
+  chip.style.borderColor=z[2]+"55";
+  const px=pointer.x-rect.left;
+  hairline.style.left=px+"px"; hairline.style.opacity="1";
+  chip.style.left=Math.min(Math.max(px,90),rect.width-90)+"px";
+  chip.style.top=Math.max(pointer.y-rect.top-96,64)+"px";
+  chip.style.opacity="1";
+}
+canvas.addEventListener("pointermove",e=>{ pointer.set(e.clientX,e.clientY); pointerActive=true; });
+canvas.addEventListener("pointerleave",()=>{ pointerActive=false; cursorWorld.set(999,999,0); updateReadout(); });
+
+/* click = draw an outcome at the cursor percentile + ripple */
+let pulse=0; const pulseCenter=new THREE.Vector3();
+let drawCount=0;
+const drawlog=document.getElementById("drawlog");
+canvas.addEventListener("click",()=>{
+  updateCursorWorld();
+  pulseCenter.copy(cursorWorld); pulse=1;
+  const x=wToX(cursorWorld.x);
+  if (x>=0&&x<=X_MAX){
+    const s=SHAPES[shapeIdx], p=s.pctAt(x), z=zoneOf(p);
+    drawCount++;
+    const d=document.createElement("div");
+    const cls=p>=.98?"amber":"";
+    d.innerHTML=`draw №${String(drawCount).padStart(2,"0")} — <b class="${cls}">${x.toFixed(1)} pts</b> · p${(p*100).toFixed(0)} ${z[1].toLowerCase()}`;
+    drawlog.prepend(d);
+    while (drawlog.children.length>4) drawlog.removeChild(drawlog.lastChild);
+  }
+});
+
+/* ---------- shape buttons + auto ---------- */
+const btns=[...document.querySelectorAll(".shape-btn[data-s]")];
+btns.forEach((b,i)=>b.addEventListener("click",()=>setShape(i)));
+const autoBtn=document.getElementById("autoBtn");
+let auto=!reduceMotion, autoTimer=0; const AUTO_MS=5200;
+autoBtn.addEventListener("click",()=>{
+  auto=!auto; autoBtn.setAttribute("aria-pressed",String(auto)); autoTimer=performance.now();
+});
+
+/* ---------- axis ---------- */
+const axis=document.getElementById("axis");
+const AXIS_TICKS=[0,10,20,30,40,50];
+const tickEls=AXIS_TICKS.map(v=>{
+  const d=document.createElement("span"); d.className="ax-tick"; d.textContent=v; axis.appendChild(d); return d;
+});
+function layoutAxis(){
+  const rect=canvas.getBoundingClientRect();
+  camera.updateMatrixWorld(true);
+  camera.matrixWorldInverse.copy(camera.matrixWorld).invert();
+  const v=new THREE.Vector3();
+  v.set(0,BASE_Y-0.55,0).project(camera);
+  const topPx=(-v.y*0.5+0.5)*rect.height;
+  axis.style.top=topPx+"px";
+  const bl=document.getElementById("baseline");
+  const v0=new THREE.Vector3(xToW(0)+PLANE_SHIFT_X,BASE_Y,0).project(camera);
+  const v1=new THREE.Vector3(xToW(X_MAX)+PLANE_SHIFT_X,BASE_Y,0).project(camera);
+  const x0=(v0.x*0.5+0.5)*rect.width, x1=(v1.x*0.5+0.5)*rect.width;
+  bl.style.left=x0+"px"; bl.style.width=(x1-x0)+"px"; bl.style.top="0px";
+  document.getElementById("axUnit").style.left=x1+"px";
+  AXIS_TICKS.forEach((t,i)=>{
+    v.set(xToW(t)+PLANE_SHIFT_X,BASE_Y,0).project(camera);
+    tickEls[i].style.left=((v.x*0.5+0.5)*rect.width)+"px";
+    tickEls[i].style.top="6px";
+  });
+}
+
+/* ---------- resize ---------- */
+function resize(){
+  const rect=canvas.getBoundingClientRect();
+  const w=Math.max(rect.width,1), h=Math.max(rect.height,1);
+  renderer.setSize(w,h,false);
+  camera.aspect=w/h;
+  const vFov=camera.fov*Math.PI/180;
+  const needH=(CURVE_H+6)/(2*Math.tan(vFov/2));
+  const needW=(PLANE_W*0.60)/Math.tan(vFov/2)/camera.aspect;
+  camera.position.z=Math.max(needH,needW,17);
+  camera.updateProjectionMatrix();
+  layoutAxis();
+}
+window.addEventListener("resize",resize);
+
+/* ---------- loop ---------- */
+function easeInOut(t){ return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2; }
+document.getElementById("hudCount").textContent=N.toLocaleString();
+resize();
+setShape(0);
+
+let last=performance.now(), idle=0;
+function tick(now){
+  requestAnimationFrame(tick);
+  if (document.hidden){ last=now; return; }
+  const dt=Math.min((now-last)/1000,.05); last=now;
+  if (pointerActive){ updateCursorWorld(); updateReadout(); }
+
+  const gp=morphing?Math.min((now-morphStart)/MORPH_MS,1):1;
+  if (morphing&&gp>=1) morphing=false;
+
+  const cx=cursorWorld.x, cy=cursorWorld.y;
+  const active=pointerActive&&Math.abs(cx)<40;
+
+  for (let i=0;i<N;i++){
+    const ix=i*3;
+    let lp=1;
+    if (morphing){
+      const st=seeds[i]*0.42;
+      lp=easeInOut(THREE.MathUtils.clamp((gp-st)/(1-0.42),0,1));
+    }
+    const pull=morphing?(0.06+0.22*lp):0.20;
+    vel[ix]  +=(tgt[ix]-pos[ix])*pull;
+    vel[ix+1]+=(tgt[ix+1]-pos[ix+1])*pull;
+    vel[ix+2]+=(tgt[ix+2]-pos[ix+2])*pull;
+
+    if (active){
+      const rx=pos[ix]-cx, ry=pos[ix+1]-cy, d2=rx*rx+ry*ry;
+      if (d2<REPEL_R*REPEL_R){
+        const d=Math.sqrt(d2)+1e-4, f=1-d/REPEL_R;
+        vel[ix]  +=(rx/d)*f*REPEL_STR;
+        vel[ix+1]+=(ry/d)*f*REPEL_STR;
+        vel[ix+2]+=f*f*REPEL_STR*1.8*(seeds[i]>.5?1:-1);
+      }
+    }
+    if (pulse>.01){
+      const rx=pos[ix]-pulseCenter.x, ry=pos[ix+1]-pulseCenter.y;
+      const d=Math.sqrt(rx*rx+ry*ry)+1e-4;
+      if (d<8){
+        const f=pulse*(1-d/8)*0.9;
+        vel[ix]+=(rx/d)*f; vel[ix+1]+=(ry/d)*f; vel[ix+2]+=(Math.random()-.5)*f*1.4;
+      }
+    }
+    const damp=morphing?0.80:0.68;
+    vel[ix]*=damp; vel[ix+1]*=damp; vel[ix+2]*=damp*0.96;
+    pos[ix]+=vel[ix]; pos[ix+1]+=vel[ix+1]; pos[ix+2]+=vel[ix+2];
+  }
+  geo.attributes.position.needsUpdate=true;
+  if (pulse>.01) pulse*=0.86;
+
+  if (!reduceMotion){
+    idle+=dt*0.05;
+    points.rotation.y=Math.sin(idle)*0.045;
+    points.rotation.x=Math.cos(idle*0.7)*0.015;
+  }
+  if (auto&&now-autoTimer>AUTO_MS&&!morphing) setShape(shapeIdx+1);
+
+  renderer.render(scene,camera);
+}
+requestAnimationFrame(tick);
+
+/* hide hint after first interaction */
+let hinted=false;
+["pointermove","click"].forEach(ev=>canvas.addEventListener(ev,()=>{
+  if(!hinted){hinted=true;const h=document.getElementById("hint");h.style.transition="opacity .8s";h.style.opacity="0";}
+}));
+</script>
+</body>
+</html>
