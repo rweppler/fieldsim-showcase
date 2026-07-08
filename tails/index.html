@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NOT NORMAL — a two-ink manifesto on right-skewed football | FieldSim</title>
+<meta name="description" content="A risograph pamphlet against the bell curve: floors are concrete, ceilings are paper, and every FieldSim marginal is a shifted lognormal fit to boom and bust probabilities — never a normal distribution." />
+<meta property="og:title" content="NOT NORMAL — a two-ink manifesto" />
+<meta property="og:description" content="The case against modeling football players as bell curves, printed in riso blue and fluoro orange." />
+<meta property="og:type" content="website" />
+<meta name="theme-color" content="#f5f0e6" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23f5f0e6'/%3E%3Cpath d='M4 24 C10 24 11 10 15 10 C19 10 20 24 28 24' stroke='%232b49c7' stroke-width='2.4' fill='none'/%3E%3Cpath d='M6 22 L26 10 M6 10 L26 22' stroke='%23ff4f1f' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;700;800&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --paper:#f5f0e6; --blue:#2b49c7; --blue-soft:#4a63cf; --fluoro:#ff4f1f; --fluoro-deep:#e03a0e;
+  --ink:#241d14; --mix:#3a2440;
+  --line:rgba(43,73,199,.25);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--paper);color:var(--ink);font-family:"Space Grotesk",system-ui,sans-serif;
+  line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+::selection{background:var(--fluoro);color:var(--paper);}
+a{color:inherit;}
+:focus-visible{outline:3px solid var(--fluoro);outline-offset:3px;}
+.syne{font-family:"Syne",sans-serif;}
+::-webkit-scrollbar{width:11px;}
+::-webkit-scrollbar-track{background:#eae3d3;}
+::-webkit-scrollbar-thumb{background:var(--blue);border-radius:0;}
+
+/* paper grain */
+.grain{position:fixed;inset:0;z-index:40;pointer-events:none;opacity:.55;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");}
+
+/* registration marks */
+.regmark{position:fixed;width:26px;height:26px;z-index:41;pointer-events:none;opacity:.6;}
+.regmark svg{width:100%;height:100%;}
+.rm-tl{top:12px;left:12px;} .rm-tr{top:12px;right:12px;}
+.rm-bl{bottom:12px;left:12px;} .rm-br{bottom:12px;right:12px;}
+
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:18px clamp(18px,3.4vw,42px);
+  position:relative;z-index:30;}
+.brand{display:flex;gap:10px;align-items:baseline;text-decoration:none;}
+.brand .syne{font-weight:800;font-size:1rem;letter-spacing:.04em;color:var(--blue);}
+.brand small{font-size:.62rem;letter-spacing:.2em;color:var(--fluoro-deep);text-transform:uppercase;}
+.topnav{font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;display:flex;gap:20px;color:var(--blue);}
+.topnav a{text-decoration:none;border-bottom:2px solid transparent;}
+.topnav a:hover{border-color:var(--fluoro);}
+
+/* ---------- cover ---------- */
+.cover{position:relative;padding:clamp(20px,4vh,50px) clamp(18px,3.4vw,42px) clamp(50px,7vh,90px);overflow:hidden;}
+.issue-line{display:flex;justify-content:space-between;font-size:.64rem;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--blue);border-top:2px solid var(--blue);border-bottom:2px solid var(--blue);
+  padding:8px 2px;margin-bottom:clamp(20px,4vh,44px);}
+.issue-line b{color:var(--fluoro-deep);}
+.cover h1{font-family:"Syne",sans-serif;font-weight:800;text-transform:uppercase;
+  font-size:clamp(3.2rem,11.2vw,10.2rem);line-height:.88;letter-spacing:-.02em;position:relative;}
+.cover h1 .l1{display:block;color:var(--blue);}
+.cover h1 .l2{display:block;color:var(--fluoro);mix-blend-mode:multiply;
+  transform:translate(clamp(8px,2.2vw,32px),-0.16em);}
+.cover-sub{display:flex;gap:26px;align-items:flex-start;margin-top:clamp(10px,2vh,26px);flex-wrap:wrap;}
+.cover-sub p{max-width:44ch;font-size:.92rem;color:var(--ink);}
+.cover-sub p b{color:var(--fluoro-deep);}
+.stamp{font-family:"Syne",sans-serif;font-weight:700;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;
+  border:3px solid var(--fluoro);color:var(--fluoro-deep);padding:10px 16px;transform:rotate(4deg);
+  white-space:nowrap;}
+
+/* the two-curve hero plate */
+.plate{position:relative;margin-top:clamp(24px,5vh,54px);height:clamp(240px,38vh,400px);}
+.plate svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;}
+#curveBlue path{fill:rgba(43,73,199,.85);}
+#curveOrange{mix-blend-mode:multiply;}
+#curveOrange path{fill:rgba(255,79,31,.82);}
+#curveOrange{transition:transform .18s ease-out;}
+.plate-label{position:absolute;font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;}
+.pl-blue{color:var(--blue);top:6%;left:4%;}
+.pl-orange{color:var(--fluoro-deep);top:6%;right:4%;text-align:right;}
+.plate-hint{position:absolute;bottom:-30px;left:50%;transform:translateX(-50%);font-size:.6rem;
+  letter-spacing:.26em;text-transform:uppercase;color:rgba(36,29,20,.55);white-space:nowrap;}
+
+/* ---------- zine sections ---------- */
+section{padding:clamp(56px,8vw,104px) clamp(18px,3.4vw,42px);position:relative;z-index:2;}
+.rule-top{border-top:2px solid var(--blue);}
+.inner{max-width:1040px;margin:0 auto;}
+.sec-tag{display:inline-block;font-family:"Syne",sans-serif;font-weight:700;font-size:.68rem;
+  letter-spacing:.22em;text-transform:uppercase;color:var(--paper);background:var(--blue);padding:6px 12px;}
+h2{font-family:"Syne",sans-serif;font-weight:800;text-transform:uppercase;font-size:clamp(1.9rem,5vw,3.6rem);
+  line-height:.98;letter-spacing:-.01em;margin:18px 0 16px;color:var(--ink);max-width:22ch;}
+h2 .o{color:var(--fluoro);}
+h2 .b{color:var(--blue);}
+section p{font-size:.92rem;max-width:58ch;margin-bottom:14px;}
+section p b{color:var(--blue);font-weight:600;}
+section p .fl{color:var(--fluoro-deep);font-weight:600;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:clamp(26px,5vw,64px);align-items:start;}
+
+/* halftone ladder */
+.ladder{border:2px solid var(--blue);}
+.ladder-row{display:grid;grid-template-columns:120px 1fr 90px;gap:0;border-bottom:2px solid var(--blue);align-items:stretch;}
+.ladder-row:last-child{border-bottom:none;}
+.ladder-row .k{padding:12px 14px;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);
+  border-right:2px solid var(--blue);display:flex;align-items:center;}
+.ladder-row .bar{position:relative;background-image:radial-gradient(circle, var(--fluoro) 1.6px, transparent 1.7px);
+  background-size:7px 7px;background-position:0 0;}
+.ladder-row .bar i{position:absolute;top:0;bottom:0;right:0;background:var(--paper);display:block;}
+.ladder-row .v{padding:12px 14px;font-family:"Syne",sans-serif;font-weight:700;font-size:1rem;color:var(--fluoro-deep);
+  display:flex;align-items:center;justify-content:flex-end;font-variant-numeric:tabular-nums;}
+.ladder-cap{font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:rgba(36,29,20,.6);margin-top:10px;}
+
+/* recipe card */
+.recipe{border:3px solid var(--fluoro);padding:clamp(18px,3vw,30px);position:relative;background:var(--paper);}
+.recipe::after{content:"CUT ALONG NOTHING. THIS IS DOCTRINE.";position:absolute;top:-11px;right:14px;
+  background:var(--paper);color:var(--fluoro-deep);font-size:.56rem;letter-spacing:.2em;padding:0 8px;}
+.recipe h3{font-family:"Syne",sans-serif;font-weight:800;text-transform:uppercase;font-size:1.15rem;color:var(--fluoro-deep);margin-bottom:14px;}
+.step{display:grid;grid-template-columns:34px 1fr;gap:12px;margin-bottom:12px;align-items:baseline;}
+.step .n{font-family:"Syne",sans-serif;font-weight:800;color:var(--paper);background:var(--blue);width:26px;height:26px;
+  display:grid;place-items:center;font-size:.8rem;}
+.step p{margin:0;font-size:.82rem;max-width:none;}
+.step code{background:rgba(43,73,199,.1);border:1px solid var(--line);padding:1px 6px;font-family:ui-monospace,monospace;font-size:.78em;color:var(--blue);}
+
+/* poster tape */
+.poster{border-top:2px solid var(--blue);border-bottom:2px solid var(--blue);overflow:hidden;white-space:nowrap;background:var(--paper);}
+.poster-inner{display:inline-block;animation:pr 26s linear infinite;font-family:"Syne",sans-serif;font-weight:800;
+  text-transform:uppercase;font-size:clamp(2.2rem,7vw,5rem);padding:14px 0;letter-spacing:-.01em;}
+.poster-inner span{margin:0 28px;}
+.poster-inner .o{color:var(--fluoro);mix-blend-mode:multiply;}
+.poster-inner .b{color:var(--blue);}
+.poster-inner .x{-webkit-text-stroke:2.5px var(--blue);color:transparent;}
+@keyframes pr{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+@media(prefers-reduced-motion:reduce){.poster-inner{animation:none;}}
+
+footer{padding:clamp(38px,6vw,64px) clamp(18px,3.4vw,42px);}
+.foot{max-width:1040px;margin:0 auto;display:flex;flex-wrap:wrap;gap:18px;justify-content:space-between;
+  font-size:.66rem;letter-spacing:.14em;color:rgba(36,29,20,.6);text-transform:uppercase;}
+.foot a{color:var(--blue);text-decoration:none;border-bottom:2px solid transparent;}
+.foot a:hover{border-color:var(--fluoro);}
+.foot-links{display:flex;gap:22px;flex-wrap:wrap;}
+
+@media(max-width:800px){
+  .topnav{display:none;}
+  .grid2{grid-template-columns:1fr;}
+  .cover h1 .l2{transform:translate(14px,-0.1em);}
+  .ladder-row{grid-template-columns:86px 1fr 74px;}
+  .pl-blue{top:-4%;left:0;}
+  .pl-orange{top:auto;bottom:14%;right:0;}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto;}#curveOrange{transition:none;}}
+</style>
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+<div class="regmark rm-tl" aria-hidden="true"><svg viewBox="0 0 26 26"><circle cx="13" cy="13" r="8" fill="none" stroke="#2b49c7" stroke-width="1.4"/><path d="M13 0v26 M0 13h26" stroke="#2b49c7" stroke-width="1.2"/></svg></div>
+<div class="regmark rm-tr" aria-hidden="true"><svg viewBox="0 0 26 26"><circle cx="13" cy="13" r="8" fill="none" stroke="#ff4f1f" stroke-width="1.4"/><path d="M13 0v26 M0 13h26" stroke="#ff4f1f" stroke-width="1.2"/></svg></div>
+<div class="regmark rm-bl" aria-hidden="true"><svg viewBox="0 0 26 26"><circle cx="13" cy="13" r="8" fill="none" stroke="#ff4f1f" stroke-width="1.4"/><path d="M13 0v26 M0 13h26" stroke="#ff4f1f" stroke-width="1.2"/></svg></div>
+<div class="regmark rm-br" aria-hidden="true"><svg viewBox="0 0 26 26"><circle cx="13" cy="13" r="8" fill="none" stroke="#2b49c7" stroke-width="1.4"/><path d="M13 0v26 M0 13h26" stroke="#2b49c7" stroke-width="1.2"/></svg></div>
+
+<header class="topbar">
+  <a class="brand" href="../"><span class="syne">FIELDSIM</span><small>riso dept. — plate №7</small></a>
+  <nav class="topnav" aria-label="Primary">
+    <a href="../">Gallery</a>
+    <a href="#evidence">The evidence</a>
+    <a href="#recipe">The recipe</a>
+  </nav>
+</header>
+
+<main>
+  <section class="cover" style="padding-top:10px;">
+    <div class="issue-line">
+      <span>FieldSim pamphlet — <b>two inks, one argument</b></span>
+      <span>Issue №7 · printed in riso blue &amp; fluoro orange</span>
+    </div>
+    <h1 aria-label="Not Normal">
+      <span class="l1">NOT</span>
+      <span class="l2">NORMAL</span>
+    </h1>
+    <div class="cover-sub">
+      <p>
+        Every projection system hands you a mean. The bell curve then whispers a lie:
+        that a player misses high as often as he misses low, by the same amount.
+        Football does not work that way, and <b>neither does this engine</b> —
+        every FieldSim marginal is a <span class="fl">right-skewed shifted lognormal</span>,
+        fit to the boom and the bust, tails capped at what an NFL Sunday can physically pay.
+      </p>
+      <span class="stamp">Bell curves refused at the door</span>
+    </div>
+
+    <div class="plate" id="plate" aria-label="A symmetric blue curve overprinted by a right-skewed orange curve">
+      <span class="plate-label pl-blue">Plate 1 — the assumption (normal)</span>
+      <span class="plate-label pl-orange">Plate 2 — the reality (skewed)</span>
+      <svg viewBox="0 0 1000 320" preserveAspectRatio="none" aria-hidden="true">
+        <g id="curveBlue"><path d="" /></g>
+        <g id="curveOrange"><path d="" /></g>
+      </svg>
+      <span class="plate-hint">move the pointer — the plates never quite register</span>
+    </div>
+  </section>
+
+  <section class="rule-top" id="floors">
+    <div class="inner grid2">
+      <div>
+        <span class="sec-tag">Argument 01</span>
+        <h2>The floor is <span class="b">concrete.</span> The ceiling is <span class="o">paper.</span></h2>
+      </div>
+      <div>
+        <p>
+          A running back cannot score minus eleven. The floor of a football Sunday is poured
+          concrete: zero targets, a lost fumble, a benching — the damage bottoms out fast.
+          The ceiling is different material. One broken tackle is fifteen points. A blown
+          coverage is six more. <b>The distance from median to disaster is short; the distance
+          from median to miracle is a country mile.</b>
+        </p>
+        <p>
+          Pile up ten thousand real box scores and the shape is unmistakable: mass crowded
+          against the floor, a long paper tail streaming right. A normal distribution splits
+          its errors evenly. Football doesn't split anything evenly —
+          <span class="fl">it hoards downside and rations upside.</span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="rule-top" id="evidence">
+    <div class="inner grid2">
+      <div>
+        <span class="sec-tag">Argument 02</span>
+        <h2>Read a receiver's <span class="o">quantiles</span> out loud.</h2>
+        <p style="margin-top:6px;">
+          WR1, projected 16.8. If he were normal, p95 and p5 would sit the same distance from
+          the median. Instead the ladder below is what fifty thousand fitted sims actually
+          say — <b>the top rung is 2.4× the median; the bottom rung is a goose egg.</b>
+          Try folding that in half. It doesn't fold.
+        </p>
+      </div>
+      <div>
+        <div class="ladder" role="table" aria-label="Quantile ladder for a WR1">
+          <div class="ladder-row"><span class="k">p99 — slate breaker</span><span class="bar"><i style="width:8%;"></i></span><span class="v">44.6</span></div>
+          <div class="ladder-row"><span class="k">p95 — ceiling</span><span class="bar"><i style="width:26%;"></i></span><span class="v">35.9</span></div>
+          <div class="ladder-row"><span class="k">p75 — boom</span><span class="bar"><i style="width:55%;"></i></span><span class="v">21.7</span></div>
+          <div class="ladder-row"><span class="k">p50 — median</span><span class="bar"><i style="width:69%;"></i></span><span class="v">14.9</span></div>
+          <div class="ladder-row"><span class="k">p25</span><span class="bar"><i style="width:80%;"></i></span><span class="v">9.6</span></div>
+          <div class="ladder-row"><span class="k">p5 — bust</span><span class="bar"><i style="width:91%;"></i></span><span class="v">4.1</span></div>
+          <div class="ladder-row"><span class="k">p1 — the egg</span><span class="bar"><i style="width:96%;"></i></span><span class="v">1.8</span></div>
+        </div>
+        <p class="ladder-cap">halftone bar = fantasy points at that percentile · mean 16.8 sits ABOVE the median — the tail drags it up</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="rule-top" id="recipe">
+    <div class="inner grid2">
+      <div>
+        <span class="sec-tag">Argument 03</span>
+        <h2>The <span class="b">recipe</span>, since you'll ask.</h2>
+        <p style="margin-top:6px;">
+          This is the actual fitting procedure inside the engine — not a sketch of one.
+          Five observable numbers go in; one honest distribution comes out. The thresholds
+          that define "boom" and "bust" are <b>calibrated from the slate itself</b> —
+          the folk rule of "5× value" is mathematically impossible for this data,
+          so the engine refuses to hardcode it.
+        </p>
+        <span class="stamp" style="display:inline-block;margin-top:10px;transform:rotate(-3deg);">Players are never modeled as normal</span>
+      </div>
+      <div class="recipe">
+        <h3>Shifted lognormal, house cut</h3>
+        <div class="step"><span class="n">1</span><p>Take the slate's <code>projection</code>, <code>std dev</code>, <code>ceiling</code>, and measured <code>Boom%</code> / <code>Bust%</code>.</p></div>
+        <div class="step"><span class="n">2</span><p>Auto-calibrate the boom/bust thresholds from the data — never from folklore.</p></div>
+        <div class="step"><span class="n">3</span><p>Fit <code>X = shift + LogNormal(μ, σ)</code> so mean, sd AND both tail probabilities match at once.</p></div>
+        <div class="step"><span class="n">4</span><p>Cap the far tail at realistic NFL maxima — no 90-point receivers, even at p99.99.</p></div>
+        <div class="step"><span class="n">5</span><p>Hand the marginal to the copula. Rank-remap every correlated sim back onto it, so dependence never distorts the fit.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="poster" aria-hidden="true">
+    <div class="poster-inner" id="poster"></div>
+  </div>
+</main>
+
+<footer>
+  <div class="foot">
+    <span>NOT NORMAL — plate №7 of the FieldSim gallery. Printed loud, registered loosely.</span>
+    <span class="foot-links">
+      <a href="../field/">← Prev: the ten-thousand</a>
+      <a href="../">The gallery</a>
+      <a href="../showdown/">Next: captain theory →</a>
+    </span>
+  </div>
+</footer>
+
+<script>
+(() => {
+"use strict";
+/* ---------- the two curves ---------- */
+function normPath(m, s, yBase, yScale){
+  let d = "M 0 "+yBase;
+  for (let x=0; x<=1000; x+=10){
+    const t = x/1000*50;
+    const y = yBase - Math.exp(-0.5*Math.pow((t-m)/s,2))/(s*Math.sqrt(2*Math.PI)) * yScale;
+    d += ` L ${x} ${y.toFixed(1)}`;
+  }
+  return d + ` L 1000 ${yBase} Z`;
+}
+function slnPath(shift, mu, sg, yBase, yScale){
+  let d = "M 0 "+yBase;
+  for (let x=0; x<=1000; x+=10){
+    const t = x/1000*50 - shift;
+    let v = 0;
+    if (t>0.001){
+      const z=(Math.log(t)-mu)/sg;
+      v = Math.exp(-.5*z*z)/(t*sg*Math.sqrt(2*Math.PI));
+    }
+    const y = yBase - v*yScale;
+    d += ` L ${x} ${y.toFixed(1)}`;
+  }
+  return d + ` L 1000 ${yBase} Z`;
+}
+const YB = 300;
+document.querySelector("#curveBlue path").setAttribute("d", normPath(17, 6.4, YB, 4400));
+document.querySelector("#curveOrange path").setAttribute("d", slnPath(2.5, Math.log(13.5), .56, YB, 3400));
+
+/* pointer misregistration: the orange plate drifts */
+const plate = document.getElementById("plate");
+const orange = document.getElementById("curveOrange");
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+if (!reduceMotion){
+  plate.addEventListener("pointermove", e => {
+    const r = plate.getBoundingClientRect();
+    const fx = (e.clientX - r.left)/r.width - .5;
+    const fy = (e.clientY - r.top)/r.height - .5;
+    orange.style.transform = `translate(${(fx*30+14).toFixed(1)}px, ${(fy*10-4).toFixed(1)}px)`;
+  });
+  plate.addEventListener("pointerleave", () => { orange.style.transform = "translate(14px,-4px)"; });
+  orange.style.transform = "translate(14px,-4px)";
+}
+
+/* poster tape */
+const words = ["SKEW IS THE SIGNAL","FLOORS LIE LOW","CEILINGS FLY","MEDIAN ≠ MEAN"];
+const cls = ["b","o","x","o"];
+const seg = words.map((w,i)=>`<span class="${cls[i%4]}">${w}</span>`).join("✂");
+document.getElementById("poster").innerHTML = seg+"✂"+seg;
+})();
+</script>
+</body>
+</html>
