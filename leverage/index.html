@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CHALK &amp; LEVERAGE — own what the field won't | FieldSim</title>
+<meta name="description" content="An editorial on the only law of GPPs: within every projection decile, ownership and ROI run negative. Tilt the seesaw yourself — set a player's field ownership and watch his tournament equity move the other way." />
+<meta property="og:title" content="CHALK &amp; LEVERAGE — own what the field won't" />
+<meta property="og:description" content="The ownership seesaw, the decile law, and the arithmetic of being early instead of alone." />
+<meta property="og:type" content="website" />
+<meta name="theme-color" content="#efefea" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23efefea'/%3E%3Cpath d='M6 20 L26 12' stroke='%23111512' stroke-width='2.4' stroke-linecap='round'/%3E%3Ccircle cx='9' cy='19' r='3.4' fill='%23e8a020'/%3E%3Ccircle cx='23' cy='13' r='3.4' fill='%230b9e5b'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter+Tight:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Spline+Sans+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --paper:#efefea; --paper-2:#e6e6df; --ink:#12150f;
+  --chalk:#e8a020; --chalk-deep:#c9860e; --lev:#0b9e5b; --lev-deep:#077a45;
+  --gray:#8b8d84; --line:rgba(18,21,15,.14); --line-2:rgba(18,21,15,.4);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--paper);color:var(--ink);font-family:"Inter Tight",system-ui,sans-serif;
+  line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+::selection{background:var(--ink);color:var(--paper);}
+a{color:inherit;}
+:focus-visible{outline:3px solid var(--lev);outline-offset:3px;}
+.anton{font-family:"Anton",sans-serif;font-weight:400;}
+.mono{font-family:"Spline Sans Mono",monospace;}
+::-webkit-scrollbar{width:11px;}
+::-webkit-scrollbar-track{background:var(--paper-2);}
+::-webkit-scrollbar-thumb{background:var(--ink);border-radius:0;}
+
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:18px clamp(18px,3.4vw,44px);
+  border-bottom:2px solid var(--ink);position:sticky;top:0;background:var(--paper);z-index:60;}
+.brand{text-decoration:none;display:flex;align-items:baseline;gap:10px;}
+.brand .anton{font-size:1rem;letter-spacing:.06em;}
+.brand small{font-family:"Spline Sans Mono",monospace;font-size:.6rem;letter-spacing:.18em;color:var(--gray);}
+.topnav{font-family:"Spline Sans Mono",monospace;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;display:flex;gap:22px;}
+.topnav a{text-decoration:none;border-bottom:2px solid transparent;padding-bottom:2px;transition:border-color .25s;}
+.topnav a:hover{border-color:var(--lev);}
+
+/* ---------- hero ---------- */
+.hero{padding:clamp(30px,5vh,60px) clamp(18px,3.4vw,44px) 0;position:relative;overflow:hidden;}
+.hero-kick{font-family:"Spline Sans Mono",monospace;font-size:.64rem;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--gray);display:flex;gap:12px;align-items:center;}
+.hero-kick::before{content:"";width:28px;height:2px;background:var(--ink);}
+.hero-h{margin-top:14px;}
+.hero-h .row{display:flex;align-items:baseline;gap:clamp(12px,2.4vw,30px);flex-wrap:wrap;}
+h1{font-family:"Anton",sans-serif;font-size:clamp(3.4rem,12.5vw,11rem);line-height:.92;letter-spacing:.005em;
+  text-transform:uppercase;}
+h1 .chalkw{color:var(--chalk);}
+h1 .levw{color:var(--lev);}
+.hero-note{font-size:clamp(.9rem,1.4vw,1.05rem);max-width:44ch;color:#3c4038;margin:26px 0 0;font-weight:400;}
+.hero-note b{font-weight:600;color:var(--ink);}
+.hero-meta{display:flex;gap:34px;margin:30px 0 40px;font-family:"Spline Sans Mono",monospace;font-size:.66rem;
+  letter-spacing:.1em;color:var(--gray);flex-wrap:wrap;}
+.hero-meta b{display:block;color:var(--ink);font-size:.95rem;margin-top:4px;letter-spacing:.02em;}
+.hero-meta .up{color:var(--lev-deep);}
+.hero-meta .down{color:var(--chalk-deep);}
+
+/* ownership tape */
+.tape{border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);background:var(--ink);color:var(--paper);
+  overflow:hidden;white-space:nowrap;padding:10px 0;}
+.tape-inner{display:inline-block;animation:tape 38s linear infinite;font-family:"Spline Sans Mono",monospace;
+  font-size:.72rem;letter-spacing:.14em;}
+.tape-inner span{margin:0 18px;}
+.tape .hi{color:#ffd27a;}
+.tape .lo{color:#7ce8b4;}
+@keyframes tape{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+@media(prefers-reduced-motion:reduce){.tape-inner{animation:none;}}
+
+/* ---------- seesaw ---------- */
+section{padding:clamp(64px,9vw,120px) clamp(18px,3.4vw,44px);}
+.sec-kick{font-family:"Spline Sans Mono",monospace;font-size:.62rem;letter-spacing:.3em;text-transform:uppercase;color:var(--gray);}
+h2{font-family:"Anton",sans-serif;font-size:clamp(2rem,5.2vw,4rem);line-height:1;text-transform:uppercase;
+  margin:12px 0 18px;letter-spacing:.01em;}
+h2 .lev{color:var(--lev);} h2 .chalk{color:var(--chalk);}
+.lede2{max-width:56ch;color:#3c4038;font-size:.95rem;}
+.lede2 b{color:var(--ink);font-weight:600;}
+
+.saw-wrap{max-width:1080px;margin:40px auto 0;}
+.saw-stage{position:relative;height:340px;}
+.beam{position:absolute;left:50%;top:150px;width:min(760px,88%);height:0;transform:translateX(-50%) rotate(0deg);
+  transition:transform .6s cubic-bezier(.34,1.4,.44,1);}
+.beam-bar{position:absolute;left:0;right:0;top:-5px;height:10px;background:var(--ink);border-radius:2px;}
+.pan{position:absolute;top:-140px;width:190px;text-align:center;}
+.pan-left{left:-20px;} .pan-right{right:-20px;}
+.pan .anton{font-size:1.5rem;letter-spacing:.03em;}
+.pan-left .anton{color:var(--chalk-deep);}
+.pan-right .anton{color:var(--lev-deep);}
+.pan .big{font-family:"Anton",sans-serif;font-size:3.4rem;line-height:1;margin-top:6px;}
+.pan .cap{font-family:"Spline Sans Mono",monospace;font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gray);margin-top:6px;}
+.pan::after{content:"";position:absolute;left:50%;bottom:-58px;transform:translateX(-50%);width:2px;height:52px;background:var(--ink);}
+.fulcrum{position:absolute;left:50%;top:150px;transform:translateX(-50%);width:0;height:0;
+  border-left:34px solid transparent;border-right:34px solid transparent;border-bottom:64px solid var(--ink);}
+.verdict{position:absolute;left:50%;top:236px;transform:translateX(-50%) rotate(-4deg);
+  font-family:"Anton",sans-serif;font-size:1.4rem;letter-spacing:.06em;padding:10px 22px;border:3px solid;
+  text-transform:uppercase;background:var(--paper);transition:all .4s;white-space:nowrap;}
+.saw-controls{max-width:640px;margin:26px auto 0;text-align:center;}
+.saw-controls label{font-family:"Spline Sans Mono",monospace;font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gray);}
+.own-val{font-family:"Anton",sans-serif;font-size:2rem;display:block;margin:6px 0 10px;}
+input[type=range]{width:100%;appearance:none;-webkit-appearance:none;height:4px;border-radius:2px;
+  background:linear-gradient(to right,var(--lev) 0%,var(--lev) 30%,var(--chalk) 70%,var(--chalk) 100%);}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;
+  background:var(--paper);border:4px solid var(--ink);cursor:grab;}
+input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--paper);border:4px solid var(--ink);cursor:grab;}
+.saw-read{display:flex;justify-content:center;gap:clamp(18px,4vw,54px);margin-top:22px;font-family:"Spline Sans Mono",monospace;
+  font-size:.64rem;letter-spacing:.12em;color:var(--gray);text-transform:uppercase;flex-wrap:wrap;}
+.saw-read b{display:block;font-size:1rem;color:var(--ink);margin-top:4px;letter-spacing:.02em;}
+
+/* ---------- deciles ---------- */
+.dec-wrap{max-width:1080px;margin:40px auto 0;}
+#deciles{width:100%;height:300px;display:block;}
+.dec-cap{font-family:"Spline Sans Mono",monospace;font-size:.62rem;letter-spacing:.16em;color:var(--gray);
+  text-transform:uppercase;margin-top:14px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.dec-cap b{color:var(--lev-deep);}
+
+/* ---------- manifesto ---------- */
+.manifesto{border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);padding:0;overflow:hidden;}
+.mani-row{display:flex;white-space:nowrap;overflow:hidden;border-bottom:1px solid var(--line);}
+.mani-row:last-child{border-bottom:none;}
+.mani-inner{display:inline-block;font-family:"Anton",sans-serif;font-size:clamp(2rem,6vw,4.6rem);
+  text-transform:uppercase;padding:12px 0;animation:tape 30s linear infinite;}
+.mani-row:nth-child(2) .mani-inner{animation-duration:44s;animation-direction:reverse;}
+.mani-inner span{margin:0 30px;}
+.mani-inner .o{-webkit-text-stroke:2px var(--ink);color:transparent;}
+.mani-inner .g{color:var(--lev);}
+.mani-inner .a{color:var(--chalk);}
+@media(prefers-reduced-motion:reduce){.mani-inner{animation:none;}}
+
+footer{padding:clamp(40px,6vw,70px) clamp(18px,3.4vw,44px);}
+.foot{display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between;font-family:"Spline Sans Mono",monospace;
+  font-size:.64rem;letter-spacing:.12em;color:var(--gray);}
+.foot a{text-decoration:none;color:var(--ink);border-bottom:2px solid var(--line-2);}
+.foot a:hover{border-color:var(--lev);}
+.foot-links{display:flex;gap:24px;flex-wrap:wrap;}
+
+@media(max-width:760px){
+  .topnav{display:none;}
+  .saw-stage{height:300px;transform:scale(.82);transform-origin:top center;margin-bottom:-40px;}
+  .pan{width:140px;}
+  .pan .big{font-size:2.4rem;}
+  .hero-meta{gap:20px;}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto;}.beam{transition:none;}}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="../"><span class="anton">FIELDSIM</span><small>PLATE №4 — LEVERAGE</small></a>
+  <nav class="topnav" aria-label="Primary">
+    <a href="../">Gallery</a>
+    <a href="#seesaw">The seesaw</a>
+    <a href="#law">The decile law</a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero" style="padding-bottom:0;">
+    <div class="hero-kick">FieldSim · outcome engine · plate №4 — ownership</div>
+    <div class="hero-h">
+      <h1><span class="row"><span>OWN WHAT</span></span>
+          <span class="row"><span>THE <span class="chalkw">FIELD</span></span></span>
+          <span class="row"><span class="levw">WON'T.</span></span></h1>
+    </div>
+    <p class="hero-note">
+      Every point of projection you buy at high ownership, you share. Every point you buy
+      alone, you keep. GPPs are not a forecasting contest — they are an <b>auction for
+      scarcity</b>, and the price is posted in ownership percent.
+    </p>
+    <div class="hero-meta">
+      <div>Field size<b>10,000 entries</b></div>
+      <div>Chalk premium<b class="down">−31% ROI at 35% owned</b></div>
+      <div>Leverage rebate<b class="up">+58% ROI at 3% owned</b></div>
+      <div>Law<b>corr(own, ROI) &lt; 0</b></div>
+    </div>
+  </section>
+
+  <div class="tape" aria-hidden="true">
+    <div class="tape-inner" id="tape"></div>
+  </div>
+
+  <section id="seesaw">
+    <span class="sec-kick">01 — the instrument</span>
+    <h2>The <span class="chalk">ownership</span> seesaw</h2>
+    <p class="lede2">
+      Set one player's projected field ownership. Nothing else about him changes — same
+      projection, same ceiling, same salary. Watch what the crowd does to his
+      <b>tournament equity</b>. The seesaw is not a metaphor; it's the engine's arithmetic:
+      duplication climbs with the square of popularity, and shared prizes are smaller prizes.
+    </p>
+
+    <div class="saw-wrap">
+      <div class="saw-stage" aria-hidden="true">
+        <div class="fulcrum"></div>
+        <div class="beam" id="beam">
+          <div class="beam-bar"></div>
+          <div class="pan pan-left">
+            <div class="anton">OWNED</div>
+            <div class="big" id="ownBig">18%</div>
+            <div class="cap">of the field</div>
+          </div>
+          <div class="pan pan-right">
+            <div class="anton">KEPT</div>
+            <div class="big" id="roiBig">+4%</div>
+            <div class="cap">expected ROI</div>
+          </div>
+        </div>
+        <div class="verdict" id="verdict" style="border-color:var(--gray);color:var(--gray);">FAIRLY PRICED</div>
+      </div>
+      <div class="saw-controls">
+        <label for="own">Projected field ownership</label>
+        <span class="own-val" id="ownVal">18.0%</span>
+        <input type="range" id="own" min="5" max="400" value="129" aria-label="Projected field ownership, 0.5 to 40 percent" />
+        <div class="saw-read">
+          <span>Expected copies<b id="dupes">1.9 per field</b></span>
+          <span>Prize kept if he hits<b id="kept">54%</b></span>
+          <span>Leverage vs field<b id="levScore">×1.0</b></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="law" style="background:var(--paper-2);border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);">
+    <span class="sec-kick">02 — the invariant</span>
+    <h2>The decile <span class="lev">law</span></h2>
+    <p class="lede2">
+      Sort ten thousand simulated lineups into deciles by projected score, so that every
+      panel below compares lineups of <b>equal quality</b>. Then, inside each panel, plot
+      ownership against realized ROI. The engine enforces what tournament history keeps
+      proving: <b>the slope is negative in every single decile</b>. Skill picks the decile.
+      Ownership picks who gets paid for it.
+    </p>
+    <div class="dec-wrap">
+      <canvas id="deciles" aria-label="Ten small scatter plots, one per projection decile, each showing a negative slope between ownership and ROI"></canvas>
+      <div class="dec-cap">
+        <span>x — lineup joint ownership · y — realized ROI</span>
+        <span>slope printed per decile · <b>10/10 negative</b></span>
+      </div>
+    </div>
+  </section>
+
+  <div class="manifesto" aria-hidden="true">
+    <div class="mani-row"><div class="mani-inner" id="mani1"></div></div>
+    <div class="mani-row"><div class="mani-inner" id="mani2"></div></div>
+  </div>
+</main>
+
+<footer>
+  <div class="foot">
+    <span>CHALK &amp; LEVERAGE — plate №4 of the FieldSim gallery.</span>
+    <span class="foot-links">
+      <a href="../correlation/">← Prev: the stack schematic</a>
+      <a href="../">The gallery</a>
+      <a href="../payout/">Next: the payout cliff →</a>
+    </span>
+  </div>
+</footer>
+
+<script>
+(() => {
+"use strict";
+/* ---------- ownership tape ---------- */
+const NAMES = [
+  ["J. CHASE","24.1"],["C. LAMB","21.8"],["T. HILL","19.4"],["A. BROWN","17.2"],
+  ["J. JEFFERSON","16.9"],["S. BARKLEY","15.5"],["B. ROBINSON","13.8"],["D. HENRY","12.4"],
+  ["G. KITTLE","9.6"],["D. MOORE","7.3"],["Z. FLOWERS","5.1"],["R. ODUNZE","3.8"],
+  ["J. WILLIAMS","2.9"],["T. BENSON","1.7"],["K. TURPIN","0.9"],
+];
+const tape = document.getElementById("tape");
+const seg = NAMES.map(([n,o]) => {
+  const hot = parseFloat(o) >= 15;
+  return `<span>${n} <span class="${hot?"hi":"lo"}">${o}%${hot?" ▲ crowd":" ▼ alone"}</span></span>`;
+}).join("·");
+tape.innerHTML = seg + "·" + seg;   // doubled for the -50% loop
+
+/* ---------- seesaw model ----------
+   toy but honest shapes:
+   dupes λ grows superlinearly with ownership;
+   kept share = 1/(1+expected co-owners at the top);
+   ROI = base ceiling equity * kept - rake                     */
+const own = document.getElementById("own");
+const els = {
+  ownVal: document.getElementById("ownVal"), ownBig: document.getElementById("ownBig"),
+  roiBig: document.getElementById("roiBig"), dupes: document.getElementById("dupes"),
+  kept: document.getElementById("kept"), lev: document.getElementById("levScore"),
+  beam: document.getElementById("beam"), verdict: document.getElementById("verdict"),
+};
+function update(){
+  const pct = own.value/10;                        // 0.5 .. 40
+  /* calibrated to the hero's claims: +58% at 3%, -31% at 35%, fair ≈ 12.9% */
+  const roi = 124.9 * Math.exp(-pct/10.17) - 35;
+  const copies = Math.max(1, Math.pow(pct/6, 1.5));  // expected copies of the modal build
+  const kept = 1/copies;
+  const fairPct = 12.9;
+  const tilt = Math.max(-11, Math.min(11, (pct - fairPct) * 0.62));
+  els.beam.style.transform = `translateX(-50%) rotate(${tilt}deg)`;
+  els.ownVal.textContent = pct.toFixed(1)+"%";
+  els.ownBig.textContent = pct.toFixed(0)+"%";
+  els.roiBig.textContent = (roi>=0?"+":"")+roi.toFixed(0)+"%";
+  els.roiBig.style.color = roi>=0 ? "var(--lev-deep)" : "var(--chalk-deep)";
+  els.dupes.textContent = copies.toFixed(1)+" per field";
+  els.kept.textContent = (kept*100).toFixed(0)+"%";
+  els.lev.textContent = "×"+(fairPct/pct).toFixed(2);
+  const v = els.verdict;
+  if (pct < 10){ v.textContent="LEVERAGE PLAY"; v.style.borderColor="var(--lev)"; v.style.color="var(--lev-deep)"; }
+  else if (pct < 16){ v.textContent="FAIRLY PRICED"; v.style.borderColor="var(--gray)"; v.style.color="var(--gray)"; }
+  else if (pct < 27){ v.textContent="CHALK TAX"; v.style.borderColor="var(--chalk)"; v.style.color="var(--chalk-deep)"; }
+  else { v.textContent="MASS-OWNED. GOOD LUCK."; v.style.borderColor="var(--chalk-deep)"; v.style.color="var(--chalk-deep)"; }
+}
+own.addEventListener("input", update);
+update();
+
+/* ---------- decile small multiples ---------- */
+const c = document.getElementById("deciles"), ctx = c.getContext("2d");
+let seededT = 1234;
+function rnd(){ seededT = (seededT*16807)%2147483647; return (seededT-1)/2147483646; }
+function draw(prog){
+  const DPR = Math.min(devicePixelRatio,2);
+  const r = c.getBoundingClientRect();
+  c.width = r.width*DPR; c.height = r.height*DPR;
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  const w=r.width, h=r.height;
+  ctx.clearRect(0,0,w,h);
+  const cols = w > 720 ? 10 : 5;
+  const rows = cols===10 ? 1 : 2;
+  const pw = w/cols, ph = h/rows;
+  seededT = 1234;
+  ctx.font = `10px "Spline Sans Mono", monospace`;
+  for (let d=0; d<10; d++){
+    const cx0 = (d%cols)*pw, cy0 = Math.floor(d/cols)*ph;
+    const pad = 12;
+    const x0=cx0+pad, y0=cy0+22, x1=cx0+pw-pad, y1=cy0+ph-26;
+    // frame
+    ctx.strokeStyle="rgba(18,21,15,.25)"; ctx.lineWidth=1;
+    ctx.strokeRect(x0,y0,x1-x0,y1-y0);
+    // decile label
+    ctx.fillStyle="rgba(18,21,15,.55)";
+    ctx.textAlign="left";
+    ctx.fillText("D"+(d+1), x0, cy0+14);
+    // points: negative slope + noise; higher deciles higher ROI intercept
+    const slope = -(0.5 + rnd()*0.35);
+    const n = 26;
+    const nShow = Math.max(0, Math.min(n, Math.ceil(n*prog*1.55 - d*1.55)));
+    for (let i=0;i<n;i++){
+      const ox = rnd(), noise = (rnd()-0.5)*0.5;
+      if (i>=nShow) { continue; }
+      const oy = 0.5 + slope*(ox-0.5) + noise;      // 0..1
+      const px = x0 + ox*(x1-x0), py = y1 - oy*(y1-y0);
+      const hot = ox>0.7;
+      ctx.fillStyle = hot ? "rgba(232,160,32,.85)" : "rgba(11,158,91,.8)";
+      ctx.beginPath(); ctx.arc(px,py,2.3,0,7); ctx.fill();
+    }
+    // regression line (drawn after dots appear)
+    if (nShow >= n*0.65){
+      ctx.strokeStyle="rgba(18,21,15,.85)"; ctx.lineWidth=1.6;
+      ctx.beginPath();
+      ctx.moveTo(x0, y1 - (0.5+slope*(-0.5))*(y1-y0));
+      ctx.lineTo(x1, y1 - (0.5+slope*(0.5))*(y1-y0));
+      ctx.stroke();
+      ctx.fillStyle="rgba(18,21,15,.7)";
+      ctx.textAlign="right";
+      ctx.fillText("β "+slope.toFixed(2), x1-2, y1+16);
+    }
+  }
+}
+let prog = 0, target = 0;
+const io = new IntersectionObserver(es => { es.forEach(e => { if (e.isIntersecting) target = 1; }); }, {threshold:.25});
+io.observe(c);
+(function anim(){
+  requestAnimationFrame(anim);
+  if (Math.abs(target-prog) > 0.0005){
+    prog += (target-prog)*0.045;
+    if (target-prog < 0.01) prog = target;
+    draw(prog);
+  }
+})();
+draw(0);
+addEventListener("resize", () => draw(prog));
+
+/* ---------- manifesto tapes ---------- */
+const m1 = ["CEILING OVER FLOOR","BE EARLY, NOT ALONE","THE CROWD PAYS THE RAKE","OWN THE VARIANCE"];
+const m2 = ["DUPLICATION IS A TAX","PROJECTION IS PUBLIC","LEVERAGE IS PRIVATE","FADE THE OBVIOUS"];
+function fill(el, arr, cls){
+  const seg = arr.map((t,i)=>`<span class="${cls[i%cls.length]}">${t}</span>`).join("—");
+  el.innerHTML = seg + "—" + seg;
+}
+fill(document.getElementById("mani1"), m1, ["o","g","o","a"]);
+fill(document.getElementById("mani2"), m2, ["a","o","g","o"]);
+})();
+</script>
+</body>
+</html>
