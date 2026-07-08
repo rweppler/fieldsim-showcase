@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>THE PAYOUT CLIFF — a topography of prize money | FieldSim</title>
+<meta name="description" content="Fly the payout curve of a 10,000-entry GPP as alpine terrain: a long min-cash plain, a brutal switchback at the final table, and one summit holding 17% of the prize pool. Scroll to climb from rank 10,000 to rank 1." />
+<meta property="og:title" content="THE PAYOUT CLIFF — a topography of prize money" />
+<meta property="og:description" content="Top-heavy payouts rendered as a 3D mountain. Scroll from the cash line to the summit." />
+<meta property="og:type" content="website" />
+<meta name="theme-color" content="#eef1ea" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23eef1ea'/%3E%3Cpath d='M4 26 L13 10 L18 18 L22 8 L28 26 Z' fill='none' stroke='%2322352c' stroke-width='2' stroke-linejoin='round'/%3E%3Ccircle cx='22' cy='8' r='2.4' fill='%23e85d3d'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..800&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --paper:#eef1ea; --paper-2:#e3e8df; --ink:#22352c; --ink-soft:#48594f; --ink-mute:#7d8c82;
+  --contour:#9db4a6; --glow:#e85d3d; --glow-deep:#c74426;
+  --line:rgba(34,53,44,.16); --line-2:rgba(34,53,44,.38);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--paper);color:var(--ink);font-family:"Bricolage Grotesque",system-ui,sans-serif;
+  line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+::selection{background:var(--glow);color:var(--paper);}
+a{color:inherit;}
+:focus-visible{outline:2px solid var(--glow);outline-offset:3px;border-radius:2px;}
+.mono{font-family:"IBM Plex Mono",monospace;}
+::-webkit-scrollbar{width:11px;}
+::-webkit-scrollbar-track{background:var(--paper-2);}
+::-webkit-scrollbar-thumb{background:var(--ink);border-radius:10px;border:3px solid var(--paper-2);}
+
+.topbar{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;justify-content:space-between;align-items:center;
+  padding:16px clamp(18px,3.4vw,40px);background:linear-gradient(to bottom,rgba(238,241,234,.92),rgba(238,241,234,0));}
+.brand{display:flex;gap:10px;align-items:baseline;text-decoration:none;}
+.brand b{font-weight:700;font-size:.95rem;letter-spacing:.1em;}
+.brand small{font-family:"IBM Plex Mono",monospace;font-size:.6rem;letter-spacing:.16em;color:var(--ink-mute);}
+.topnav{font-family:"IBM Plex Mono",monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;display:flex;gap:20px;color:var(--ink-soft);}
+.topnav a{text-decoration:none;}
+.topnav a:hover{color:var(--glow-deep);}
+
+/* ---------- the flight ---------- */
+#flight{height:520svh;position:relative;}
+.stage{position:sticky;top:0;height:100svh;overflow:hidden;}
+#terrain{position:absolute;inset:0;width:100%;height:100%;display:block;}
+.stage-veil{position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(120% 90% at 50% 40%, transparent 55%, rgba(238,241,234,.85) 100%);}
+
+.hero-copy{position:absolute;left:clamp(18px,3.4vw,44px);top:clamp(76px,11vh,130px);max-width:520px;z-index:5;pointer-events:none;}
+.kick{font-family:"IBM Plex Mono",monospace;font-size:.62rem;letter-spacing:.26em;text-transform:uppercase;
+  color:var(--ink-mute);display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.kick::before{content:"";width:26px;height:1px;background:var(--glow);}
+h1{font-size:clamp(2.5rem,6vw,4.8rem);font-weight:640;line-height:1.0;letter-spacing:-.025em;
+  font-variation-settings:"opsz" 96;}
+h1 em{font-style:italic;color:var(--glow-deep);font-weight:500;}
+.lede{margin-top:18px;font-size:clamp(.9rem,1.3vw,1.02rem);color:var(--ink-soft);max-width:42ch;}
+.lede b{color:var(--ink);font-weight:640;}
+.fade-out{transition:opacity .5s, transform .5s;}
+
+/* altimeter HUD */
+.altimeter{position:absolute;right:clamp(18px,3.4vw,44px);top:clamp(76px,11vh,130px);z-index:5;text-align:right;pointer-events:none;}
+.altimeter::before{content:"";position:absolute;inset:-24px -30px -26px -40px;z-index:-1;
+  background:radial-gradient(80% 90% at 70% 40%, rgba(238,241,234,.9) 35%, transparent 75%);}
+.alt-cap{font-family:"IBM Plex Mono",monospace;font-size:.6rem;letter-spacing:.26em;text-transform:uppercase;color:var(--ink-mute);}
+.alt-rank{font-size:clamp(2.2rem,4.6vw,3.6rem);font-weight:700;letter-spacing:-.02em;line-height:1.05;font-variant-numeric:tabular-nums;}
+.alt-prize{font-family:"IBM Plex Mono",monospace;font-size:clamp(1rem,1.8vw,1.4rem);color:var(--glow-deep);margin-top:4px;font-variant-numeric:tabular-nums;}
+.alt-note{font-family:"IBM Plex Mono",monospace;font-size:.62rem;letter-spacing:.14em;color:var(--ink-mute);margin-top:8px;text-transform:uppercase;}
+
+/* waypoint card */
+.waypoint{position:absolute;left:clamp(18px,3.4vw,44px);bottom:clamp(70px,10vh,110px);z-index:5;pointer-events:none;
+  border-left:3px solid var(--glow);padding:10px 18px 12px 16px;max-width:340px;
+  background:rgba(238,241,234,.88);backdrop-filter:blur(3px);
+  transition:opacity .5s, transform .5s;}
+.wp-name{font-weight:700;font-size:1.1rem;letter-spacing:-.01em;}
+.wp-sub{font-family:"IBM Plex Mono",monospace;font-size:.66rem;color:var(--ink-soft);margin-top:4px;line-height:1.7;}
+.scroll-cue{position:absolute;left:50%;transform:translateX(-50%);bottom:26px;z-index:5;
+  font-family:"IBM Plex Mono",monospace;font-size:.58rem;letter-spacing:.3em;text-transform:uppercase;color:var(--ink-mute);
+  display:flex;align-items:center;gap:10px;}
+.scroll-cue::after{content:"";width:1px;height:26px;background:var(--ink-mute);
+  animation:cue 1.6s ease-in-out infinite;}
+@keyframes cue{0%,100%{transform:scaleY(.4);opacity:.4;}50%{transform:scaleY(1);opacity:1;}}
+@media(prefers-reduced-motion:reduce){.scroll-cue::after{animation:none;}}
+
+/* ---------- route card ---------- */
+section{padding:clamp(64px,9vw,120px) clamp(18px,3.4vw,44px);border-top:1px solid var(--line);}
+.inner{max-width:1040px;margin:0 auto;}
+.sec-kick{font-family:"IBM Plex Mono",monospace;font-size:.62rem;letter-spacing:.28em;text-transform:uppercase;color:var(--ink-mute);}
+h2{font-size:clamp(1.8rem,4vw,3rem);font-weight:640;letter-spacing:-.02em;line-height:1.05;margin:12px 0 18px;}
+h2 em{font-style:italic;color:var(--glow-deep);font-weight:500;}
+section p{color:var(--ink-soft);font-size:.95rem;max-width:60ch;margin-bottom:15px;}
+section p b{color:var(--ink);font-weight:640;}
+
+.route{margin-top:34px;border-top:1px solid var(--line-2);}
+.camp{display:grid;grid-template-columns:110px 1fr auto auto;gap:18px;align-items:baseline;
+  border-bottom:1px solid var(--line);padding:16px 0;font-size:.9rem;}
+.camp .c-rank{font-family:"IBM Plex Mono",monospace;font-size:.72rem;color:var(--ink-mute);letter-spacing:.08em;}
+.camp .c-name{font-weight:640;}
+.camp .c-name small{display:block;font-weight:400;color:var(--ink-soft);font-size:.78rem;}
+.camp .c-prize{font-family:"IBM Plex Mono",monospace;color:var(--glow-deep);font-variant-numeric:tabular-nums;}
+.camp .c-share{font-family:"IBM Plex Mono",monospace;font-size:.72rem;color:var(--ink-mute);font-variant-numeric:tabular-nums;}
+.camp.summit .c-name{color:var(--glow-deep);}
+.camp.summit{background:linear-gradient(to right,rgba(232,93,61,.07),transparent);}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,5vw,70px);align-items:start;}
+.stat-strip{display:flex;gap:clamp(20px,4vw,54px);flex-wrap:wrap;margin-top:26px;}
+.stat-strip div{font-family:"IBM Plex Mono",monospace;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-mute);}
+.stat-strip b{display:block;font-family:"Bricolage Grotesque",sans-serif;font-size:1.7rem;color:var(--ink);
+  font-weight:700;letter-spacing:-.02em;margin-top:6px;text-transform:none;}
+.stat-strip .hot b{color:var(--glow-deep);}
+
+footer{border-top:1px solid var(--line);padding:clamp(40px,6vw,70px) clamp(18px,3.4vw,44px);}
+.foot{max-width:1040px;margin:0 auto;display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between;
+  font-family:"IBM Plex Mono",monospace;font-size:.64rem;letter-spacing:.12em;color:var(--ink-mute);}
+.foot a{color:var(--ink-soft);text-decoration:none;border-bottom:1px solid var(--line-2);}
+.foot a:hover{color:var(--glow-deep);border-color:var(--glow);}
+.foot-links{display:flex;gap:22px;flex-wrap:wrap;}
+
+@media(max-width:780px){
+  .topnav{display:none;}
+  .grid2{grid-template-columns:1fr;}
+  .hero-copy{max-width:82vw;}
+  .altimeter{top:auto;bottom:clamp(60px,9vh,100px);}
+  .alt-rank{font-size:1.9rem;}
+  .waypoint{bottom:calc(clamp(60px,9vh,100px) + 150px);max-width:76vw;}
+  .camp{grid-template-columns:70px 1fr auto;}
+  .camp .c-share{display:none;}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto;}}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="../"><b>FIELDSIM</b><small>PLATE №5 — PAYOUTS</small></a>
+  <nav class="topnav" aria-label="Primary">
+    <a href="../">Gallery</a>
+    <a href="#route">Route card</a>
+    <a href="#why">Why top-heavy</a>
+  </nav>
+</header>
+
+<main>
+  <div id="flight" aria-label="Scroll-driven flight along the payout curve">
+    <div class="stage">
+      <canvas id="terrain"></canvas>
+      <div class="stage-veil" aria-hidden="true"></div>
+
+      <div class="hero-copy fade-out" id="heroCopy">
+        <div class="kick">FieldSim · outcome engine · plate №5 — the prize surface</div>
+        <h1>Most of the money lives on <em>one ledge.</em></h1>
+        <p class="lede">
+          This is a real 10,000-entry GPP payout curve, drawn as terrain. Height is prize.
+          <b>Scroll to fly the route</b> — from the plains where half the field busts, past
+          the min-cash flats, up the switchbacks of the final table, to a summit that pays
+          <b>3,000 entry fees at once</b>.
+        </p>
+      </div>
+
+      <div class="altimeter" aria-hidden="false">
+        <div class="alt-cap">Finishing rank</div>
+        <div class="alt-rank" id="altRank">№ 10,000</div>
+        <div class="alt-prize" id="altPrize">$0</div>
+        <div class="alt-note" id="altNote">below the cash line</div>
+      </div>
+
+      <div class="waypoint" id="waypoint" style="opacity:0;">
+        <div class="wp-name" id="wpName"></div>
+        <div class="wp-sub" id="wpSub"></div>
+      </div>
+
+      <div class="scroll-cue" id="cue">scroll to climb</div>
+    </div>
+  </div>
+
+  <section id="route">
+    <div class="inner">
+      <span class="sec-kick">01 — the route card</span>
+      <h2>Camps on the <em>prize mountain</em></h2>
+      <div class="grid2">
+        <div>
+          <p>
+            A DraftKings-style GPP doesn't pay a slope, it pays a <b>staircase carved into a
+            cliff face</b>. Twenty percent of entries cash, and the bottom half of those barely
+            double the entry fee — that's the long, flat approach march. The real mountain
+            begins around the final table.
+          </p>
+          <p>
+            FieldSim prices every simulated lineup against this exact staircase.
+            A lineup's worth isn't its points — it's <b>where those points land on this
+            terrain</b>, fifty thousand Sundays in a row, prizes split with every duplicate
+            standing on the same ledge.
+          </p>
+          <div class="stat-strip">
+            <div>Field<b>10,000</b></div>
+            <div>Entry<b>$20</b></div>
+            <div>Prize pool<b>$180,000</b></div>
+            <div class="hot">To the summit<b>17%</b></div>
+          </div>
+        </div>
+        <div class="route" role="table" aria-label="Payout waypoints">
+          <div class="camp"><span class="c-rank">№ 2,000</span><span class="c-name">The cash line<small>base camp — survival, not profit</small></span><span class="c-prize">$30</span><span class="c-share">×1.5</span></div>
+          <div class="camp"><span class="c-rank">№ 500</span><span class="c-name">The foothills<small>a good Sunday, a bad ROI story</small></span><span class="c-prize">$60</span><span class="c-share">×3</span></div>
+          <div class="camp"><span class="c-rank">№ 100</span><span class="c-name">The shelf<small>where variance starts paying rent</small></span><span class="c-prize">$250</span><span class="c-share">×12.5</span></div>
+          <div class="camp"><span class="c-rank">№ 10</span><span class="c-name">The switchbacks<small>final table — air gets thin</small></span><span class="c-prize">$2,500</span><span class="c-share">×125</span></div>
+          <div class="camp summit"><span class="c-rank">№ 1</span><span class="c-name">The summit<small>one lineup, one ledge, one flag</small></span><span class="c-prize">$30,000</span><span class="c-share">×1,500</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="why" style="background:var(--paper-2);">
+    <div class="inner">
+      <span class="sec-kick">02 — the doctrine</span>
+      <h2>Top-heavy terrain makes <em>variance an asset</em></h2>
+      <div class="grid2">
+        <div>
+          <p>
+            On flat terrain — a 50/50, a double-up — the smart play is the safe play: take the
+            highest floor and walk. On a cliff, floors are worthless. <b>The distance between
+            rank 100 and rank 1 is a hundredfold</b>, and no floor climbs it. Only ceilings do.
+          </p>
+          <p>
+            This is why every FieldSim ranking is denominated in <b>ROI against this curve</b>,
+            never in mean points. A lineup that wins the week 0.8% of the time can be worth
+            more than one that cashes twice as often — because the summit pays for a season
+            of approach marches.
+          </p>
+        </div>
+        <div>
+          <p>
+            And it's why duplication is priced in. Stand on the summit with three copies of
+            your lineup and the flag is worth a third. The engine gives every field lineup an
+            expected copy count and <b>splits each ledge among everyone standing on it</b> —
+            chalk pays a mountain toll precisely where the mountain is steepest.
+          </p>
+          <p>
+            The result: an entry-weighted mean ROI of exactly <b>−rake</b>, conserved to a
+            rounding error. The mountain gives nothing away; it only redistributes — from the
+            crowded ledges to the empty ones.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="foot">
+    <span>THE PAYOUT CLIFF — plate №5 of the FieldSim gallery. Prize money, drawn to elevation.</span>
+    <span class="foot-links">
+      <a href="../leverage/">← Prev: chalk &amp; leverage</a>
+      <a href="../">The gallery</a>
+      <a href="../field/">Next: the ten-thousand →</a>
+    </span>
+  </div>
+</footer>
+
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+</script>
+<script type="module">
+import * as THREE from "three";
+/* ============================================================
+   THE PAYOUT CLIFF — prize curve as scroll-flight terrain.
+   x = log(rank) from 10,000 -> 1 ; height = log(prize).
+   Camera tracks scroll; a ridge of wireframe terrain carries
+   the staircase profile with lateral mountain noise.
+   ============================================================ */
+const canvas = document.getElementById("terrain");
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---- payout staircase ---- */
+const FIELD = 10000;
+const STEPS = [   // [rank_from, prize] descending
+  [1,30000],[2,15000],[3,10000],[4,6000],[5,4000],[6,3000],[8,2500],[10,2000],
+  [15,1500],[20,1000],[30,700],[45,500],[65,350],[100,250],[150,180],[250,120],
+  [400,80],[650,60],[1000,45],[1500,36],[2000,30],
+];
+function prizeAt(rank){
+  if (rank>2000) return 0;
+  for (let i=STEPS.length-1;i>=0;i--) if (rank>=STEPS[i][0]) return STEPS[i][1];
+  return STEPS[0][1];
+}
+/* rank <-> flight parameter t in [0,1]: t=0 rank 10000, t=1 rank 1 */
+const rankOf = t => Math.max(1, Math.round(Math.pow(10, 4*(1-t))));
+const RIDGE_LEN = 240;                 // world units along the ridge
+const xOfT = t => (t-0.5)*RIDGE_LEN;
+const hOfPrize = p => p<=0 ? 0 : (Math.log10(p)-0.8) * 14;   // $30 -> ~9.7, $30k -> ~52
+
+/* ---- renderer ---- */
+let renderer;
+try{
+  renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+  if (!renderer.getContext()) throw new Error("no gl");
+}catch(e){
+  canvas.style.display="none";
+  throw e;
+}
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setClearColor(0x000000,0);
+const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(0xeef1ea, 60, 210);
+const camera = new THREE.PerspectiveCamera(46, 1, .1, 500);
+
+/* ---- terrain mesh ---- */
+const SEG_X = 300, SEG_Z = 40, DEPTH = 130;
+const geo = new THREE.PlaneGeometry(RIDGE_LEN, DEPTH, SEG_X, SEG_Z);
+geo.rotateX(-Math.PI/2);
+const pos = geo.attributes.position;
+function noise2(x,z){   // cheap value noise via sines
+  return Math.sin(x*.31+z*.17)*Math.cos(x*.12-z*.23) + Math.sin(x*.053+1.7)*Math.sin(z*.11+.4)*1.6;
+}
+for (let i=0;i<pos.count;i++){
+  const x = pos.getX(i), z = pos.getZ(i);
+  const t = x/RIDGE_LEN + 0.5;
+  const rank = rankOf(t);
+  const base = hOfPrize(prizeAt(rank));
+  /* ridge cross-section: peak at z=0 falling off to the sides.
+     the plain stays calm; roughness grows with elevation */
+  const lateral = Math.exp(-Math.pow(z/26,2));
+  const rocks = noise2(x,z) * (0.5 + base*.09) * (0.3+lateral*.7);
+  pos.setY(i, base*lateral + rocks);
+}
+geo.computeVertexNormals();
+
+const solid = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({color:0xe7ece3}));
+scene.add(solid);
+const wire = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({color:0x22352c, wireframe:true, transparent:true, opacity:.26}));
+wire.position.y += .06;
+scene.add(wire);
+
+/* contour rings: horizontal line loops at fixed heights */
+const contours = new THREE.Group();
+for (let h=4; h<=52; h+=6){
+  const pts=[];
+  for (let x=-RIDGE_LEN/2; x<=RIDGE_LEN/2; x+=1.2){
+    const t = x/RIDGE_LEN+.5, base = hOfPrize(prizeAt(rankOf(t)));
+    if (base<=h-3) continue;
+    /* solve lateral where base*lateral = h approx -> z */
+    const l = Math.min(1, h/Math.max(base,.001));
+    const z = 26*Math.sqrt(Math.max(0,-Math.log(Math.max(l, 1e-6))));
+    pts.push(new THREE.Vector3(x, h+.4, z), new THREE.Vector3(x, h+.4, -z));
+  }
+  if (pts.length<4) continue;
+  const g = new THREE.BufferGeometry().setFromPoints(pts);
+  contours.add(new THREE.LineSegments(g, new THREE.LineBasicMaterial({color:0x9db4a6, transparent:true, opacity:.5})));
+}
+scene.add(contours);
+
+/* summit flag */
+const flag = new THREE.Group();
+const poleH = 10;
+const pole = new THREE.Mesh(new THREE.CylinderGeometry(.14,.14,poleH), new THREE.MeshBasicMaterial({color:0x22352c}));
+pole.position.y = poleH/2;
+flag.add(pole);
+const cloth = new THREE.Mesh(new THREE.ConeGeometry(2.2, 4.4, 3), new THREE.MeshBasicMaterial({color:0xe85d3d}));
+cloth.rotation.z = Math.PI/2; cloth.position.set(2.1, poleH-2, 0);
+flag.add(cloth);
+const summitH = hOfPrize(30000);
+flag.position.set(xOfT(1), summitH, 0);
+scene.add(flag);
+
+/* cash-line marker: a dashed vertical wall of thin lines at rank 2000 */
+{
+  const tCash = 1 - Math.log10(2000)/4;
+  const x = xOfT(tCash);
+  const pts=[];
+  for (let z=-40; z<=40; z+=4){ pts.push(new THREE.Vector3(x, 0, z), new THREE.Vector3(x, 16, z)); }
+  const g = new THREE.BufferGeometry().setFromPoints(pts);
+  scene.add(new THREE.LineSegments(g, new THREE.LineBasicMaterial({color:0xe85d3d, transparent:true, opacity:.35})));
+}
+
+/* ---- waypoints for the HUD ---- */
+const WAYPOINTS = [
+  {t:0.00, name:"The approach march", sub:"ranks 10,000 → 2,001 — 80% of the field. Zero dollars. This plain is where projections go to die."},
+  {t:1-Math.log10(2000)/4, name:"Base camp — the cash line", sub:"rank 2,000 · $30. You survived. You have not yet been paid for the risk."},
+  {t:1-Math.log10(500)/4, name:"The foothills", sub:"rank 500 · $60. Triple-up. A fine Sunday that changes nothing."},
+  {t:1-Math.log10(100)/4, name:"The shelf", sub:"rank 100 · $250. First real ledge — ×12.5. Ceilings start mattering here."},
+  {t:1-Math.log10(10)/4, name:"The switchbacks", sub:"rank 10 · $2,500. Final table. Every step up here is worth the whole approach."},
+  {t:0.97, name:"The summit ridge", sub:"rank 1 · $30,000 — 17% of the pool on a ledge one lineup wide. Duplicates split the flag."},
+];
+
+/* ---- scroll-driven camera ---- */
+const flight = document.getElementById("flight");
+const altRank = document.getElementById("altRank"), altPrize = document.getElementById("altPrize"),
+      altNote = document.getElementById("altNote"), heroCopy = document.getElementById("heroCopy"),
+      waypoint = document.getElementById("waypoint"), wpName = document.getElementById("wpName"),
+      wpSub = document.getElementById("wpSub"), cue = document.getElementById("cue");
+let curWp = -1;
+function flightT(){
+  const r = flight.getBoundingClientRect();
+  const total = r.height - innerHeight;
+  return Math.min(1, Math.max(0, -r.top/total));
+}
+function fmtMoney(v){ return v<=0 ? "$0" : "$"+v.toLocaleString(); }
+function update(){
+  const t = flightT();
+  const rank = rankOf(t);
+  const prize = prizeAt(rank);
+  altRank.textContent = "№ "+rank.toLocaleString();
+  altPrize.textContent = fmtMoney(prize);
+  altNote.textContent = prize<=0 ? "below the cash line" : "×"+(prize/20).toLocaleString(undefined,{maximumFractionDigits:1})+" the entry fee";
+  /* camera: chase position alongside the ridge */
+  const x = xOfT(t);
+  const h = hOfPrize(prize);
+  const camH = 16 + h*1.05;
+  camera.position.set(x - 26, camH + 9, 54 - t*16);
+  camera.lookAt(x + 14, h*0.75 + 4, 0);
+  /* hero copy fades after 8% */
+  const fade = t<0.06 ? 1 : Math.max(0, 1 - (t-0.06)/0.06);
+  heroCopy.style.opacity = String(fade);
+  heroCopy.style.transform = `translateY(${(1-fade)*-16}px)`;
+  cue.style.opacity = String(Math.max(0, 1-t*14));
+  /* waypoint card */
+  let wi = 0;
+  for (let i=0;i<WAYPOINTS.length;i++) if (t >= WAYPOINTS[i].t - 0.015) wi = i;
+  if (wi !== curWp){
+    curWp = wi;
+    wpName.textContent = WAYPOINTS[wi].name;
+    wpSub.textContent = WAYPOINTS[wi].sub;
+    waypoint.style.opacity = "1";
+    waypoint.style.transform = "none";
+    if (!reduceMotion){
+      waypoint.animate([{opacity:0, transform:"translateY(10px)"},{opacity:1, transform:"none"}],{duration:450,easing:"cubic-bezier(.22,.61,.36,1)"});
+    }
+  }
+}
+addEventListener("scroll", update, {passive:true});
+
+function resize(){
+  const r = canvas.getBoundingClientRect();
+  renderer.setSize(r.width, r.height, false);
+  camera.aspect = r.width/r.height;
+  camera.updateProjectionMatrix();
+}
+addEventListener("resize", resize);
+resize();
+
+let last = 0;
+(function tick(now){
+  requestAnimationFrame(tick);
+  if (document.hidden) return;
+  /* gentle flag sway */
+  if (!reduceMotion){
+    flag.rotation.y = Math.sin(now*.0012)*.3;
+  }
+  update();
+  renderer.render(scene, camera);
+})(0);
+</script>
+</body>
+</html>
