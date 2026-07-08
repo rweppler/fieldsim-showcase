@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CAPTAIN THEORY — the 1.5× problem under the floodlights | FieldSim</title>
+<meta name="description" content="DraftKings Captain Mode in one interactive: hand any player the 1.5× armband and watch his points AND salary multiply. The captain dial shows why the obvious captain busts your cap — and why captain odds are tail data." />
+<meta property="og:title" content="CAPTAIN THEORY — the 1.5× problem" />
+<meta property="og:description" content="One game, six players, one armband. An interactive on the strangest multiplier in DFS." />
+<meta property="og:type" content="website" />
+<meta name="theme-color" content="#060a12" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23060a12'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='monospace' font-weight='bold' font-size='13' fill='%23ffc300'%3E1.5%3C/text%3E%3Cpath d='M5 6 L16 3 L27 6' stroke='%2339d2ff' stroke-width='1.6' fill='none'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --night:#060a12; --night-2:#0a1220; --turf:#0d1626;
+  --flood:#eef4ff; --flood-dim:#93a7c4; --mute:#4e6076;
+  --volt:#39d2ff; --sodium:#ffc300; --alarm:#ff4757; --grass:#37d67a;
+  --line:rgba(238,244,255,.1); --line-2:rgba(238,244,255,.25);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--night);color:var(--flood);font-family:"Chakra Petch",system-ui,sans-serif;
+  line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+::selection{background:var(--sodium);color:var(--night);}
+a{color:inherit;}
+:focus-visible{outline:2px solid var(--volt);outline-offset:3px;}
+.mono{font-family:"IBM Plex Mono",monospace;}
+::-webkit-scrollbar{width:10px;}
+::-webkit-scrollbar-track{background:var(--night-2);}
+::-webkit-scrollbar-thumb{background:#20334d;border-radius:8px;}
+
+/* floodlight beams */
+.floods{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.beam{position:absolute;top:-30%;width:44vw;height:150%;opacity:.13;filter:blur(28px);
+  background:linear-gradient(to bottom, rgba(238,244,255,.9), transparent 70%);}
+.beam.b1{left:-8vw;transform:rotate(16deg);}
+.beam.b2{right:-8vw;transform:rotate(-16deg);}
+.beam.b3{left:38vw;width:26vw;opacity:.07;transform:rotate(2deg);}
+
+.topbar{position:relative;z-index:30;display:flex;justify-content:space-between;align-items:center;
+  padding:16px clamp(18px,3.4vw,40px);}
+.brand{display:flex;gap:10px;align-items:center;text-decoration:none;}
+.brand b{font-weight:700;font-size:.95rem;letter-spacing:.18em;}
+.brand .bug{font-family:"IBM Plex Mono",monospace;font-size:.58rem;letter-spacing:.14em;color:var(--night);
+  background:var(--sodium);padding:3px 8px;border-radius:3px;font-weight:500;}
+.topnav{font-family:"IBM Plex Mono",monospace;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--flood-dim);display:flex;gap:20px;}
+.topnav a{text-decoration:none;}
+.topnav a:hover{color:var(--sodium);}
+
+/* broadcast bug */
+.livebug{position:fixed;top:14px;right:clamp(18px,3.4vw,40px);z-index:40;display:flex;align-items:center;gap:8px;
+  font-family:"IBM Plex Mono",monospace;font-size:.56rem;letter-spacing:.22em;color:var(--flood-dim);
+  background:rgba(10,18,32,.8);border:1px solid var(--line-2);padding:6px 12px;border-radius:999px;backdrop-filter:blur(4px);}
+.livebug .dot{width:7px;height:7px;border-radius:50%;background:var(--alarm);animation:blink 1.4s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.25;}}
+@media(prefers-reduced-motion:reduce){.livebug .dot{animation:none;}}
+
+/* ---------- hero ---------- */
+.hero{position:relative;z-index:2;padding:clamp(40px,7vh,80px) clamp(18px,3.4vw,40px) clamp(30px,5vh,60px);
+  text-align:center;}
+.kick{font-family:"IBM Plex Mono",monospace;font-size:.62rem;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--mute);display:flex;justify-content:center;gap:12px;align-items:center;}
+.kick i{width:26px;height:1px;background:var(--volt);display:inline-block;}
+h1{font-weight:700;text-transform:uppercase;line-height:.95;margin:20px 0 6px;
+  font-size:clamp(2.6rem,7.4vw,5.8rem);letter-spacing:.01em;}
+h1 .x{color:var(--sodium);text-shadow:0 0 60px rgba(255,195,0,.55);}
+h1 .thin{font-weight:300;color:var(--flood-dim);}
+.hero .dek{max-width:60ch;margin:14px auto 0;color:var(--flood-dim);font-size:.92rem;}
+.hero .dek b{color:var(--flood);font-weight:600;}
+.hero .dek .s{color:var(--sodium);}
+
+/* LED ticker */
+.ticker{border-top:1px solid var(--line-2);border-bottom:1px solid var(--line-2);
+  background:rgba(10,18,32,.65);overflow:hidden;white-space:nowrap;position:relative;z-index:2;}
+.ticker-inner{display:inline-block;animation:tk 30s linear infinite;padding:9px 0;
+  font-family:"IBM Plex Mono",monospace;font-size:.68rem;letter-spacing:.18em;color:var(--sodium);}
+.ticker-inner b{color:var(--volt);font-weight:400;}
+.ticker-inner span{margin:0 20px;}
+@keyframes tk{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+@media(prefers-reduced-motion:reduce){.ticker-inner{animation:none;}}
+
+/* ---------- captain dial ---------- */
+section{position:relative;z-index:2;padding:clamp(56px,8vw,104px) clamp(18px,3.4vw,40px);}
+.inner{max-width:1080px;margin:0 auto;}
+.sec-kick{font-family:"IBM Plex Mono",monospace;font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;color:var(--mute);}
+h2{font-weight:700;text-transform:uppercase;font-size:clamp(1.7rem,4vw,2.8rem);line-height:1.05;
+  margin:12px 0 14px;letter-spacing:.01em;}
+h2 .v{color:var(--volt);} h2 .s{color:var(--sodium);}
+section p{color:var(--flood-dim);font-size:.9rem;max-width:60ch;margin-bottom:14px;}
+section p b{color:var(--flood);font-weight:600;}
+
+.dial-wrap{margin-top:30px;border:1px solid var(--line-2);border-radius:14px;background:rgba(10,18,32,.6);
+  backdrop-filter:blur(6px);overflow:hidden;}
+.dial-head{display:flex;justify-content:space-between;gap:14px;padding:14px 20px;border-bottom:1px solid var(--line);
+  font-family:"IBM Plex Mono",monospace;font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--mute);flex-wrap:wrap;}
+.dial-head b{color:var(--flood);}
+.roster{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--line);}
+.pcard{background:var(--night-2);padding:18px 12px 14px;text-align:center;cursor:pointer;border:none;
+  font-family:"Chakra Petch",sans-serif;color:var(--flood);position:relative;transition:background .3s;}
+.pcard:hover{background:#0e1930;}
+.pcard .arm{position:absolute;top:8px;left:50%;transform:translateX(-50%);font-family:"IBM Plex Mono",monospace;
+  font-size:.52rem;letter-spacing:.2em;color:var(--night);background:var(--sodium);padding:2px 8px;border-radius:3px;
+  opacity:0;transition:opacity .25s;font-weight:500;}
+.pcard.cpt .arm{opacity:1;}
+.pcard.cpt{background:linear-gradient(to bottom, rgba(255,195,0,.14), rgba(10,18,32,.2));box-shadow:inset 0 0 0 1.5px var(--sodium);}
+.pcard .pos{font-family:"IBM Plex Mono",monospace;font-size:.56rem;letter-spacing:.18em;color:var(--volt);margin-top:10px;}
+.pcard .nm{font-weight:600;font-size:.88rem;margin-top:4px;line-height:1.2;}
+.pcard .sal{font-family:"IBM Plex Mono",monospace;font-size:.68rem;color:var(--flood-dim);margin-top:6px;font-variant-numeric:tabular-nums;}
+.pcard .pts{font-family:"IBM Plex Mono",monospace;font-size:.62rem;color:var(--mute);margin-top:2px;font-variant-numeric:tabular-nums;}
+.pcard.cpt .sal{color:var(--sodium);}
+.pcard.cpt .pts{color:var(--sodium);}
+
+.capbar-zone{padding:18px 20px 20px;}
+.capbar-cap{display:flex;justify-content:space-between;font-family:"IBM Plex Mono",monospace;font-size:.62rem;
+  letter-spacing:.16em;color:var(--mute);text-transform:uppercase;margin-bottom:8px;}
+.capbar-cap b{font-variant-numeric:tabular-nums;}
+.capbar{height:16px;border:1px solid var(--line-2);border-radius:99px;position:relative;overflow:hidden;}
+.capbar .fill{position:absolute;left:0;top:0;bottom:0;border-radius:99px;
+  background:linear-gradient(to right,var(--volt),var(--grass));transition:width .5s cubic-bezier(.22,.61,.36,1), background .3s;}
+.capbar.over .fill{background:linear-gradient(to right,var(--sodium),var(--alarm));}
+.capbar .capline{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--flood);right:0;}
+.dial-read{display:flex;gap:clamp(16px,4vw,44px);margin-top:16px;font-family:"IBM Plex Mono",monospace;
+  font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);flex-wrap:wrap;}
+.dial-read b{display:block;font-family:"Chakra Petch",sans-serif;font-size:1.25rem;color:var(--flood);margin-top:4px;letter-spacing:.02em;font-variant-numeric:tabular-nums;}
+.dial-read .verd b{transition:color .3s;}
+
+/* doctrine cards */
+.doctrine{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:30px;}
+.doc{background:var(--night-2);padding:22px;}
+.doc h3{font-size:.95rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;color:var(--volt);}
+.doc h3 .n{color:var(--sodium);font-family:"IBM Plex Mono",monospace;font-size:.62rem;margin-right:8px;}
+.doc p{font-size:.78rem;margin:0;max-width:none;}
+
+footer{position:relative;z-index:2;border-top:1px solid var(--line);padding:clamp(38px,6vw,64px) clamp(18px,3.4vw,40px);}
+.foot{max-width:1080px;margin:0 auto;display:flex;flex-wrap:wrap;gap:18px;justify-content:space-between;
+  font-family:"IBM Plex Mono",monospace;font-size:.62rem;letter-spacing:.12em;color:var(--mute);}
+.foot a{color:var(--flood-dim);text-decoration:none;}
+.foot a:hover{color:var(--sodium);}
+.foot-links{display:flex;gap:22px;flex-wrap:wrap;}
+
+@media(max-width:900px){
+  .roster{grid-template-columns:repeat(3,1fr);}
+  .topnav{display:none;}
+}
+@media(max-width:520px){
+  .roster{grid-template-columns:repeat(2,1fr);}
+  .livebug{display:none;}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto;}.capbar .fill{transition:none;}}
+</style>
+</head>
+<body>
+<div class="floods" aria-hidden="true"><div class="beam b1"></div><div class="beam b2"></div><div class="beam b3"></div></div>
+<div class="livebug" aria-hidden="true"><span class="dot"></span> LIVE FROM THE SIM</div>
+
+<header class="topbar">
+  <a class="brand" href="../"><b>FIELDSIM</b><span class="bug">SHOWDOWN</span></a>
+  <nav class="topnav" aria-label="Primary">
+    <a href="../">Gallery</a>
+    <a href="#dial">The captain dial</a>
+    <a href="#doctrine">Doctrine</a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero" style="padding-bottom:26px;">
+    <div class="kick"><i></i> FieldSim · outcome engine · plate №8 — single game <i></i></div>
+    <h1>One game.<br /><span class="x">1.5×</span> <span class="thin">changes everything.</span></h1>
+    <p class="dek">
+      DraftKings Captain Mode: six roster spots, both teams, and one armband that multiplies a
+      player's points <b>and his salary</b> by 1.5. The armband is not a bonus —
+      it's a <span class="s">price</span>. FieldSim runs a fully separate engine for this
+      format, because almost nothing from the main slate survives the multiplier.
+    </p>
+  </section>
+
+  <div class="ticker" aria-hidden="true"><div class="ticker-inner" id="ticker"></div></div>
+
+  <section id="dial" style="padding-top:clamp(40px,6vw,70px);">
+    <div class="inner">
+      <span class="sec-kick">01 — the instrument</span>
+      <h2>Hand someone <span class="s">the armband</span></h2>
+      <p>
+        A real six-man build from a Chiefs–Bills sim. Tap a player to captain him.
+        His projection multiplies by 1.5 — and so does his cap hit. <b>Watch the salary
+        bar</b>: the best player is rarely an affordable captain, and that tension is the
+        entire format.
+      </p>
+
+      <div class="dial-wrap">
+        <div class="dial-head">
+          <span>KAN @ BUF · O/U 54.5 · $50,000 CAP</span>
+          <span>CPT scores ×1.5 · CPT costs ×1.5 · <b>5 flex ride along</b></span>
+        </div>
+        <div class="roster" id="roster" role="group" aria-label="Tap a player to make him captain"></div>
+        <div class="capbar-zone">
+          <div class="capbar-cap"><span>Salary committed</span><b id="salLabel">—</b></div>
+          <div class="capbar" id="capbar"><div class="fill" id="capfill"></div><div class="capline"></div></div>
+          <div class="dial-read">
+            <span>Projected total<b id="projTotal">—</b></span>
+            <span>Cap remaining<b id="capLeft">—</b></span>
+            <span>CPT optimal rate<b id="cptOpt">—</b></span>
+            <span class="verd">Verdict<b id="verdict">—</b></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="doctrine" style="background:rgba(10,18,32,.4);border-top:1px solid var(--line);">
+    <div class="inner">
+      <span class="sec-kick">02 — showdown doctrine</span>
+      <h2>What the <span class="v">single-game engine</span> knows</h2>
+      <p>Every rule below is measured, not vibes — burned in from calibration passes that
+        made the boards worse before they made them better.</p>
+      <div class="doctrine">
+        <div class="doc"><h3><span class="n">D-01</span>Captain odds are tail data</h3>
+          <p>The feed's CPT Optimal% is the probability a player captains the salary-best lineup.
+          FieldSim tunes each player's tail weight until its own sims reproduce that ladder —
+          the market's captain odds become the distribution's tails.</p></div>
+        <div class="doc"><h3><span class="n">D-02</span>Hot hands get more skew</h3>
+          <p>At fixed mean and variance, raising tail weight <b>lowers</b> the p85–p95 region
+          that decides optimal captaincy. TD-or-bust punts get more skew; volume alphas get
+          less. Two earlier tunings assumed the opposite and made every board worse.</p></div>
+        <div class="doc"><h3><span class="n">D-03</span>Six-man builds herd hard</h3>
+          <p>Punt captains stud their five flex spots — that's the whole point of punting the
+          slot. The field generator herds those templates near-greedily, so "unique" cheap
+          captains duplicate six ways, not 1.4.</p></div>
+        <div class="doc"><h3><span class="n">D-04</span>Dupes and win odds are one draw</h3>
+          <p>A construction's duplication rate is measured from the generator's own process —
+          the same distribution that sets its win odds. Pricing them separately is how punt
+          DSTs end up faking 1,000% ROI.</p></div>
+        <div class="doc"><h3><span class="n">D-05</span>Budgets, not pairs</h3>
+          <p>A per-sim scoring budget with lumpy within-team shares drives the rank dependence —
+          six near-independent medians can't quietly stack into a winning cheap-captain build.</p></div>
+        <div class="doc"><h3><span class="n">D-06</span>Both ladders, always</h3>
+          <p>CPT and FLEX are tracked as different assets everywhere — two ownership ladders,
+          slot-aware exposures, and exports headed <code style="font-family:'IBM Plex Mono',monospace;font-size:.9em;color:var(--volt);">CPT,FLEX,FLEX,FLEX,FLEX,FLEX</code>.</p></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="foot">
+    <span>CAPTAIN THEORY — plate №8 of the FieldSim gallery. Lights on, armband priced.</span>
+    <span class="foot-links">
+      <a href="../tails/">← Prev: not normal</a>
+      <a href="../">The gallery</a>
+      <a href="../duplication/">Next: the duplication tax →</a>
+    </span>
+  </div>
+</footer>
+
+<script>
+(() => {
+"use strict";
+/* ---------- captain dial ---------- */
+const PLAYERS = [
+  { nm:"J. Allen",   pos:"QB · BUF", sal:10400, pts:22.6, opt:26.4 },
+  { nm:"P. Mahomes", pos:"QB · KAN", sal:10000, pts:21.4, opt:22.8 },
+  { nm:"R. Rice",    pos:"WR · KAN", sal:8200,  pts:16.8, opt:14.9 },
+  { nm:"J. Cook",    pos:"RB · BUF", sal:7200,  pts:15.1, opt:11.2 },
+  { nm:"T. Kelce",   pos:"TE · KAN", sal:6600,  pts:13.9, opt:9.6 },
+  { nm:"H. Butker",  pos:"K · KAN",  sal:2600,  pts:7.9,  opt:4.1 },
+];
+const CAP = 50000;
+const baseSal = PLAYERS.reduce((s,p)=>s+p.sal,0);   // 51,400 — over cap until you pick wisely? no:
+/* flex-sum = total − cpt gets 1.0x; committed = base + 0.5*cpt.sal */
+let cpt = 2;   // default: Rice
+
+const roster = document.getElementById("roster");
+const cards = PLAYERS.map((p,i)=>{
+  const b = document.createElement("button");
+  b.className = "pcard";
+  b.setAttribute("aria-pressed","false");
+  b.innerHTML = `<span class="arm">CPT 1.5×</span><div class="pos">${p.pos}</div><div class="nm">${p.nm}</div>
+    <div class="sal" data-r="sal"></div><div class="pts" data-r="pts"></div>`;
+  b.addEventListener("click", ()=>{ cpt = i; update(); });
+  roster.appendChild(b);
+  return b;
+});
+
+const salLabel=document.getElementById("salLabel"), capfill=document.getElementById("capfill"),
+      capbar=document.getElementById("capbar"), projTotal=document.getElementById("projTotal"),
+      capLeft=document.getElementById("capLeft"), cptOpt=document.getElementById("cptOpt"),
+      verdict=document.getElementById("verdict");
+
+function money(v){ return "$"+v.toLocaleString(); }
+function update(){
+  let sal=0, pts=0;
+  PLAYERS.forEach((p,i)=>{
+    const isC = i===cpt;
+    sal += isC ? p.sal*1.5 : p.sal;
+    pts += isC ? p.pts*1.5 : p.pts;
+    cards[i].classList.toggle("cpt", isC);
+    cards[i].setAttribute("aria-pressed", String(isC));
+    cards[i].querySelector('[data-r="sal"]').textContent = money(isC? p.sal*1.5 : p.sal);
+    cards[i].querySelector('[data-r="pts"]').textContent = (isC? (p.pts*1.5).toFixed(1) : p.pts.toFixed(1))+" pts";
+  });
+  const over = sal>CAP;
+  salLabel.textContent = money(sal)+" / "+money(CAP);
+  capfill.style.width = Math.min(100, sal/CAP*100)+"%";
+  capbar.classList.toggle("over", over);
+  projTotal.textContent = pts.toFixed(1)+" pts";
+  capLeft.textContent = over ? "−$"+(sal-CAP).toLocaleString() : money(CAP-sal);
+  capLeft.style.color = over ? "var(--alarm)" : "";
+  cptOpt.textContent = PLAYERS[cpt].opt.toFixed(1)+"%";
+  const v = over ? ["ILLEGAL — SHED SALARY","var(--alarm)"]
+    : PLAYERS[cpt].opt>20 ? ["THE CHALK ARMBAND","var(--sodium)"]
+    : PLAYERS[cpt].opt>8 ? ["PLAYABLE","var(--grass)"]
+    : ["PUNT — MIND THE HERD","var(--volt)"];
+  verdict.textContent = v[0];
+  verdict.style.color = v[1];
+}
+update();
+
+/* ---------- ticker: CPT optimal ladder ---------- */
+const seg = PLAYERS.map(p=>`<span>${p.nm.toUpperCase()} <b>CPT-OPT ${p.opt.toFixed(1)}%</b></span>`).join("◆") +
+  "◆<span>THE ARMBAND SCORES ×1.5 <b>AND COSTS ×1.5</b></span>◆";
+document.getElementById("ticker").innerHTML = seg + seg;
+})();
+</script>
+</body>
+</html>
