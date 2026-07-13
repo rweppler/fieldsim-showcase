@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SimSlate — homepage concept 06 · The Aurora</title>
+<meta name="description" content="SimSlate homepage redesign concept: correlated outcomes as northern lights. Every curtain is one player's range of Sundays — and they move together, because Sundays are correlated." />
+<meta name="robots" content="noindex" />
+<meta name="theme-color" content="#030710" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23030710'/%3E%3Cpath d='M6 24 C9 14 11 10 12 8 M13 25 C16 16 18 12 19 9 M20 26 C23 18 25 14 26 11' stroke='%2359f2c4' stroke-width='2.4' fill='none' stroke-linecap='round' opacity='.9'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Manrope:wght@200;300;400;600&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --night:#030710; --night-2:#060b18; --panel:#0a1122;
+  --ice:#d9e6f5; --ice-dim:#7f91ab; --mute:#495a74;
+  --teal:#59f2c4; --indigo:#8b9dff; --violet:#c78bff; --rose:#ff7d9c; --gold:#ffd27a;
+  --line:rgba(217,230,245,.10); --line-2:rgba(217,230,245,.24);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--night);color:var(--ice);font-family:"Manrope",system-ui,sans-serif;
+  font-weight:300;line-height:1.7;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+::selection{background:var(--teal);color:var(--night);}
+a{color:inherit;}
+:focus-visible{outline:2px solid var(--teal);outline-offset:3px;border-radius:2px;}
+.disp{font-family:"Syne",sans-serif;font-weight:800;}
+.mono{font-family:"Space Mono",monospace;}
+::-webkit-scrollbar{width:10px;}
+::-webkit-scrollbar-track{background:var(--night-2);}
+::-webkit-scrollbar-thumb{background:#182642;border-radius:8px;}
+
+#stars{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.75;}
+
+/* ---------- nav ---------- */
+.nav{position:fixed;top:0;left:0;right:0;z-index:50;
+  background:linear-gradient(to bottom,rgba(3,7,16,.92) 55%,transparent);}
+.nav-top{display:flex;justify-content:space-between;align-items:center;padding:16px clamp(18px,3.4vw,38px) 8px;}
+.wordmark{font-family:"Syne",sans-serif;font-weight:800;font-size:1.2rem;letter-spacing:.02em;text-decoration:none;color:#fff;}
+.wordmark em{font-style:normal;background:linear-gradient(100deg,var(--teal),var(--indigo));
+  -webkit-background-clip:text;background-clip:text;color:transparent;}
+.nav-auth{display:flex;gap:10px;align-items:center;}
+.btn{font-family:"Space Mono",monospace;font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;
+  text-decoration:none;border-radius:999px;padding:10px 20px;transition:all .25s;display:inline-block;white-space:nowrap;}
+.btn--ghost{color:var(--ice-dim);border:1px solid var(--line-2);}
+.btn--ghost:hover{color:#fff;border-color:var(--teal);}
+.btn--solid{background:linear-gradient(100deg,var(--teal),#4cd3ff);color:var(--night);border:none;font-weight:700;}
+.btn--solid:hover{box-shadow:0 0 26px rgba(89,242,196,.45);}
+.nav-links{display:flex;gap:26px;align-items:center;padding:6px clamp(18px,3.4vw,38px) 14px;
+  font-family:"Space Mono",monospace;font-size:.76rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ice-dim);
+  overflow-x:auto;scrollbar-width:none;}
+.nav-links::-webkit-scrollbar{display:none;}
+.nav-links a{text-decoration:none;transition:color .3s;white-space:nowrap;}
+.nav-links a:hover{color:var(--teal);}
+.nav-links a.prod{color:var(--ice);}
+.nav-links a.prod::before{content:"▸ ";color:var(--teal);}
+.nav-sep{width:1px;height:12px;background:var(--line-2);flex:none;}
+
+/* ---------- hero ---------- */
+.hero{position:relative;z-index:1;height:100svh;min-height:660px;overflow:hidden;}
+#aurora{position:absolute;inset:0;width:100%;height:100%;display:block;}
+.hero-veil{position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:linear-gradient(to bottom, rgba(3,7,16,.42) 0%, transparent 30%, transparent 62%, rgba(3,7,16,.9) 100%);}
+.hero-copy{position:absolute;z-index:3;left:clamp(18px,3.4vw,38px);bottom:clamp(90px,14vh,150px);max-width:640px;}
+.kick{font-family:"Space Mono",monospace;font-size:.62rem;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--ice-dim);margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+.kick::before{content:"";width:26px;height:1px;background:var(--teal);}
+h1.disp{font-size:clamp(1.9rem,4.2vw,3.3rem);line-height:1.04;letter-spacing:-.015em;color:#fff;
+  text-shadow:0 2px 40px rgba(3,7,16,.9);}
+h1 .grad{background:linear-gradient(100deg,var(--teal) 10%,var(--indigo) 55%,var(--violet) 95%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;}
+.lede{margin-top:22px;font-size:1.02rem;color:var(--ice-dim);max-width:52ch;
+  text-shadow:0 1px 14px rgba(3,7,16,.95);}
+.lede b{color:var(--ice);font-weight:600;}
+.hero-cta{margin-top:30px;display:flex;gap:12px;flex-wrap:wrap;}
+.btn--big{font-size:.72rem;padding:14px 30px;}
+
+.hero-note{position:absolute;z-index:3;right:clamp(18px,3.4vw,38px);bottom:clamp(90px,14vh,150px);
+  text-align:right;pointer-events:none;max-width:300px;
+  font-family:"Space Mono",monospace;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--mute);line-height:2.1;}
+.hero-note b{color:var(--teal);font-weight:400;}
+.hero-note i{color:var(--violet);font-style:normal;}
+.rho-badge{position:absolute;z-index:3;right:clamp(18px,3.4vw,38px);top:clamp(112px,16vh,180px);
+  text-align:right;pointer-events:none;font-family:"Space Mono",monospace;}
+.rho-badge .cap{font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;color:var(--mute);}
+.rho-badge .val{font-family:"Syne",sans-serif;font-weight:800;font-size:clamp(1.5rem,3vw,2.4rem);
+  background:linear-gradient(100deg,var(--teal),var(--indigo));-webkit-background-clip:text;background-clip:text;color:transparent;
+  margin-top:6px;}
+
+/* ---------- sections ---------- */
+section{position:relative;z-index:1;border-top:1px solid var(--line);padding:clamp(64px,9vw,120px) clamp(18px,3.4vw,38px);}
+.inner{max-width:1120px;margin:0 auto;}
+.eyebrow{font-family:"Space Mono",monospace;font-size:.62rem;letter-spacing:.28em;text-transform:uppercase;color:var(--teal);display:block;margin-bottom:16px;}
+h2.disp{font-size:clamp(1.7rem,3.8vw,2.9rem);line-height:1.05;letter-spacing:-.015em;color:#fff;max-width:21ch;}
+h2 .grad{background:linear-gradient(100deg,var(--teal),var(--indigo));-webkit-background-clip:text;background-clip:text;color:transparent;}
+section p{color:var(--ice-dim);font-size:.98rem;max-width:62ch;margin-bottom:16px;}
+section p b{color:var(--ice);font-weight:600;}
+
+/* stat rail */
+.rail{border-top:1px solid var(--line);background:rgba(6,11,24,.6);}
+.rail-inner{max-width:1120px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(14px,3vw,40px);
+  padding:36px clamp(18px,3.4vw,38px);}
+.rail-num{font-family:"Syne",sans-serif;font-weight:800;font-size:clamp(1.6rem,3vw,2.4rem);color:#fff;line-height:1;letter-spacing:-.01em;}
+.rail-num i{font-style:normal;background:linear-gradient(100deg,var(--teal),var(--indigo));
+  -webkit-background-clip:text;background-clip:text;color:transparent;}
+.rail-label{font-family:"Space Mono",monospace;font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;color:var(--mute);margin-top:10px;line-height:1.8;}
+@media(max-width:820px){.rail-inner{grid-template-columns:1fr 1fr;row-gap:26px;}}
+
+/* phases — glass panels with aurora edge */
+.phases{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:40px;}
+.phase{position:relative;background:rgba(10,17,34,.62);border:1px solid var(--line);border-radius:18px;padding:32px 30px;overflow:hidden;
+  backdrop-filter:blur(4px);}
+.phase::before{content:"";position:absolute;inset:0 0 auto 0;height:2px;
+  background:linear-gradient(90deg,var(--teal),var(--indigo),transparent);}
+.phase .pk{font-family:"Space Mono",monospace;font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);}
+.phase h3{font-family:"Syne",sans-serif;font-weight:700;font-size:1.35rem;letter-spacing:-.01em;color:#fff;margin:10px 0 12px;}
+.phase p{font-size:.92rem;margin:0 0 20px;}
+.phase svg{width:100%;height:auto;display:block;}
+@media(max-width:860px){.phases{grid-template-columns:1fr;}}
+
+/* duality */
+.duality{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:40px;}
+.duality>div{border-radius:18px;padding:34px 30px;border:1px solid var(--line);background:rgba(10,17,34,.62);position:relative;overflow:hidden;}
+.duality>div::before{content:"";position:absolute;inset:0 0 auto 0;height:2px;}
+.duality .chalk-side::before{background:linear-gradient(90deg,var(--gold),transparent);}
+.duality .lev-side::before{background:linear-gradient(90deg,var(--teal),transparent);}
+.duality .big{font-family:"Syne",sans-serif;font-weight:800;font-size:2.4rem;line-height:1;letter-spacing:-.01em;}
+.duality h3{font-family:"Syne",sans-serif;font-weight:700;font-size:1.1rem;margin:14px 0 12px;}
+.duality p{font-size:.92rem;margin:0;}
+.gold{color:var(--gold);}
+.teal{color:var(--teal);}
+@media(max-width:760px){.duality{grid-template-columns:1fr;}}
+
+/* teasers + lab */
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:40px;}
+.card{background:rgba(10,17,34,.62);border:1px solid var(--line);border-radius:18px;padding:30px;text-decoration:none;
+  display:flex;flex-direction:column;gap:10px;transition:all .3s;}
+.card:hover{border-color:rgba(89,242,196,.5);transform:translateY(-4px);}
+.card .pk{font-family:"Space Mono",monospace;font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;color:var(--mute);}
+.card h3{font-family:"Syne",sans-serif;font-weight:700;font-size:1.2rem;letter-spacing:-.01em;color:#fff;line-height:1.4;}
+.card p{font-size:.9rem;margin:0;}
+.card .go{margin-top:auto;padding-top:16px;font-family:"Space Mono",monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);}
+@media(max-width:760px){.cards{grid-template-columns:1fr;}}
+
+.lab-list{border-top:1px solid var(--line-2);margin-top:40px;}
+.lab-row{--tint:var(--teal);
+  display:grid;grid-template-columns:70px 1fr auto;gap:clamp(14px,2.6vw,30px);align-items:center;
+  padding:clamp(18px,2.8vh,26px) 8px;border-bottom:1px solid var(--line);text-decoration:none;transition:background .35s;}
+.lab-row:hover{background:linear-gradient(to right,rgba(89,242,196,.05),transparent 70%);}
+.lab-row .no{font-family:"Space Mono",monospace;font-size:.62rem;color:var(--mute);letter-spacing:.14em;}
+.lab-row:hover .no{color:var(--tint);}
+.lab-row h3{font-family:"Syne",sans-serif;font-weight:700;font-size:clamp(1rem,2vw,1.25rem);letter-spacing:-.01em;color:#fff;transition:color .3s;}
+.lab-row:hover h3{color:var(--tint);}
+.lab-row .t p{color:var(--ice-dim);font-size:.85rem;margin:4px 0 0;max-width:62ch;}
+.lab-row .tag{font-family:"Space Mono",monospace;font-size:.56rem;letter-spacing:.18em;color:var(--mute);text-transform:uppercase;text-align:right;white-space:nowrap;}
+@media(max-width:820px){.lab-row{grid-template-columns:44px 1fr;}.lab-row .tag{display:none;}}
+
+/* waitlist + cta */
+.wl{background:rgba(6,11,24,.7);}
+.wl-inner{max-width:720px;margin:0 auto;text-align:center;}
+.wl h2{margin:0 auto;}
+.wl-form{display:flex;gap:10px;justify-content:center;margin-top:28px;flex-wrap:wrap;}
+.wl-form input{font-family:"Space Mono",monospace;font-size:.74rem;color:var(--ice);
+  background:rgba(10,17,34,.8);border:1px solid var(--line-2);border-radius:999px;padding:13px 22px;min-width:270px;}
+.wl-form input::placeholder{color:var(--mute);}
+.wl-form input:focus{outline:none;border-color:var(--teal);}
+.wl-form .btn{cursor:pointer;}
+.cta{text-align:center;}
+.cta h2{margin:0 auto;}
+
+footer{position:relative;z-index:1;border-top:1px solid var(--line);padding:clamp(44px,6vw,70px) clamp(18px,3.4vw,38px);}
+.foot{max-width:1120px;margin:0 auto;display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between;
+  font-family:"Space Mono",monospace;font-size:.62rem;letter-spacing:.1em;color:var(--mute);}
+.foot a{color:var(--ice-dim);text-decoration:none;transition:color .3s;}
+.foot a:hover{color:var(--teal);}
+.foot-links{display:flex;gap:22px;flex-wrap:wrap;}
+.foot-legal{width:100%;font-size:.6rem;line-height:1.8;}
+
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .7s ease, transform .7s ease;}
+.reveal.in{opacity:1;transform:none;}
+
+@media(max-width:820px){
+  h1.disp{font-size:clamp(1.9rem,8.6vw,2.7rem);}
+  .lede{font-size:.9rem;}
+  .hero-note{display:none;}
+  .rho-badge{display:none;}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto;}
+  .reveal{opacity:1;transform:none;transition:none;}
+}
+</style>
+</head>
+<body>
+<canvas id="stars" aria-hidden="true"></canvas>
+
+<header class="nav">
+  <div class="nav-top">
+    <a class="wordmark" href="https://simslate.com/">Sim<em>Slate</em></a>
+    <span class="nav-auth">
+      <a class="btn btn--ghost" href="https://simslate.com/app/">Sign in</a>
+      <a class="btn btn--solid" href="https://simslate.com/app/?signup=1">Join now</a>
+    </span>
+  </div>
+  <nav class="nav-links" aria-label="Site">
+    <a class="prod" href="https://simslate.com/app/">The Simulator</a>
+    <a class="prod" href="https://simslate.com/builder/">Lineup Builder</a>
+    <span class="nav-sep" aria-hidden="true"></span>
+    <a href="https://simslate.com/methodology/">Methodology</a>
+    <a href="https://simslate.com/edge/">The Edge</a>
+    <a href="#lab">The Lab</a>
+    <a href="https://simslate.com/tools/dupe-calculator/">Dupe Tax Calculator</a>
+  </nav>
+</header>
+
+<main>
+  <!-- ============ HERO: the aurora of correlated outcomes ============ -->
+  <section class="hero" aria-label="Correlated outcome curtains shimmering as northern lights" style="border-top:none;padding:0;">
+    <canvas id="aurora"></canvas>
+    <div class="hero-veil" aria-hidden="true"></div>
+    <div class="rho-badge" aria-hidden="true">
+      <div class="cap">Slate correlation</div>
+      <div class="val" id="rhoVal">ρ 0.00</div>
+    </div>
+    <div class="hero-copy">
+      <div class="kick">NFL · DraftKings · GPP</div>
+      <h1 class="disp">No player booms alone.<br /><span class="grad">Sundays move together.</span></h1>
+      <p class="lede">
+        Each curtain above is one player's range of Sundays — and they surge in unison,
+        because a Gaussian copula ties stacks and game environments together. SimSlate builds
+        the <b>10,000-lineup field</b> you'll face, runs <b>50,000 correlated simulations</b>,
+        and ranks your lineups by <b>expected ROI</b> — not by adding up projections.
+      </p>
+      <div class="hero-cta">
+        <a class="btn btn--solid btn--big" href="https://simslate.com/app/">Run the sim</a>
+        <a class="btn btn--ghost btn--big" href="https://simslate.com/methodology/">Read the methodology</a>
+      </div>
+    </div>
+    <div class="hero-note" aria-hidden="true">
+      one curtain = <b>one player's outcomes</b><br />
+      the surge you're watching = <i>a stack going off</i>
+    </div>
+  </section>
+
+  <!-- ============ STAT RAIL ============ -->
+  <div class="rail" aria-label="Engine at a glance">
+    <div class="rail-inner">
+      <div class="reveal"><div class="rail-num">50,000</div><div class="rail-label">correlated slate simulations</div></div>
+      <div class="reveal"><div class="rail-num">10,000</div><div class="rail-label">ownership-true field lineups</div></div>
+      <div class="reveal"><div class="rail-num">&lt;2<i>%</i></div><div class="rail-label">exposure vs projected ownership</div></div>
+      <div class="reveal"><div class="rail-num"><i>0</i></div><div class="rail-label">players modeled as a bell curve</div></div>
+    </div>
+  </div>
+
+  <!-- ============ TWO PHASES ============ -->
+  <section>
+    <div class="inner">
+      <span class="eyebrow">How it works — two phases, one contest</span>
+      <h2 class="disp">Your lineup is a distribution, <span class="grad">not a number.</span></h2>
+      <p class="mono" style="font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-top:14px;">Because one number never won a milly</p>
+
+      <div class="phases">
+        <article class="phase reveal">
+          <span class="pk">Phase 01 · Contest generator</span>
+          <h3>Build the field you'll face</h3>
+          <p>Projected ownership is treated as ground truth — never renormalized, never smoothed.
+          The generator fills 10,000 valid DraftKings rosters and calibrates until every player's
+          exposure lands within a hard tolerance band of their projection. Scarce positions fill
+          first, so the salary squeeze lands where real fields feel it.</p>
+          <svg viewBox="0 0 340 120" role="img" aria-label="Generated exposure matching projected ownership within a band">
+            <g font-family="Space Mono, monospace" font-size="8" fill="#495a74"><text x="0" y="10" letter-spacing="2">EXPOSURE VS PROJECTION</text></g>
+            <rect x="8"   y="44" width="30" height="58" rx="3" fill="#59f2c4" opacity=".6"/><line x1="5"  y1="41" x2="41"  y2="41" stroke="#ffd27a" stroke-width="2"/>
+            <rect x="56"  y="32" width="30" height="70" rx="3" fill="#59f2c4" opacity=".48"/><line x1="53" y1="35" x2="89"  y2="35" stroke="#ffd27a" stroke-width="2"/>
+            <rect x="104" y="60" width="30" height="42" rx="3" fill="#59f2c4" opacity=".42"/><line x1="101" y1="58" x2="137" y2="58" stroke="#ffd27a" stroke-width="2"/>
+            <rect x="152" y="74" width="30" height="28" rx="3" fill="#59f2c4" opacity=".36"/><line x1="149" y1="76" x2="185" y2="76" stroke="#ffd27a" stroke-width="2"/>
+            <rect x="200" y="52" width="30" height="50" rx="3" fill="#59f2c4" opacity=".46"/><line x1="197" y1="50" x2="233" y2="50" stroke="#ffd27a" stroke-width="2"/>
+            <rect x="248" y="82" width="30" height="20" rx="3" fill="#59f2c4" opacity=".32"/><line x1="245" y1="84" x2="281" y2="84" stroke="#ffd27a" stroke-width="2"/>
+            <rect x="296" y="66" width="30" height="36" rx="3" fill="#59f2c4" opacity=".4"/><line x1="293" y1="64" x2="329" y2="64" stroke="#ffd27a" stroke-width="2"/>
+            <line x1="0" y1="102" x2="340" y2="102" stroke="rgba(217,230,245,.16)"/>
+            <g font-family="Space Mono, monospace" font-size="7" fill="#495a74"><text x="8" y="116">■ GENERATED</text><text x="96" y="116" fill="#ffd27a">— PROJECTED</text></g>
+          </svg>
+        </article>
+
+        <article class="phase reveal">
+          <span class="pk">Phase 02 · Contest simulator</span>
+          <h3>Play the tournament 50,000×</h3>
+          <p>Every player gets a right-skewed distribution fitted to mean, volatility, ceiling and
+          boom/bust odds. A Gaussian copula ties stacks and game environments together, then the
+          engine scores the full field 50,000 times, pays a top-heavy GPP curve — duplication
+          splitting prizes — and reports each lineup's ROI.</p>
+          <svg viewBox="0 0 340 120" role="img" aria-label="Simulated outcome paths fanning to a payout verdict">
+            <g font-family="Space Mono, monospace" font-size="8" fill="#495a74"><text x="0" y="10" letter-spacing="2">50,000 OUTCOMES → ROI</text></g>
+            <g stroke-width="1.2" fill="none">
+              <path d="M8 62 C 100 56, 190 30, 310 16" stroke="#59f2c4" opacity=".9"/>
+              <path d="M8 62 C 100 59, 190 44, 310 36" stroke="#59f2c4" opacity=".55"/>
+              <path d="M8 62 C 100 61, 190 55, 310 50" stroke="#59f2c4" opacity=".35"/>
+              <path d="M8 62 C 100 63, 190 64, 310 66" stroke="#7f91ab" opacity=".5"/>
+              <path d="M8 62 C 100 65, 190 74, 310 82" stroke="#7f91ab" opacity=".4"/>
+              <path d="M8 62 C 100 68, 190 86, 310 98" stroke="#7f91ab" opacity=".3"/>
+            </g>
+            <circle cx="8" cy="62" r="3" fill="#fff"/>
+            <g font-family="Space Mono, monospace" font-size="7">
+              <text x="318" y="19" fill="#59f2c4">1st</text>
+              <text x="318" y="39" fill="#59f2c4">cash</text>
+              <text x="318" y="101" fill="#7f91ab">dead</text>
+            </g>
+          </svg>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CHALK VS LEVERAGE ============ -->
+  <section>
+    <div class="inner">
+      <span class="eyebrow">Why ROI, not projection</span>
+      <h2 class="disp">Chalk splits the prize. <span class="grad">Leverage keeps it.</span></h2>
+      <div class="duality reveal">
+        <div class="chalk-side">
+          <div class="big gold">m &gt; 1</div>
+          <h3 class="gold">The chalk tax</h3>
+          <p>Popular lineups get duplicated. SimSlate models expected duplicates for every field
+          lineup from joint ownership, so a chalky build that "wins" shares first place — and its
+          simulated ROI shows the dilution before you pay entry fees to find out.</p>
+        </div>
+        <div class="lev-side">
+          <div class="big teal">corr &lt; 0</div>
+          <h3 class="teal">The leverage guarantee</h3>
+          <p>Within every projected-score decile, simulated ROI is verified to correlate negatively
+          with ownership. Lower-owned paths to the same score are worth more — that's the math of
+          top-heavy payouts, and the engine won't ship a sim where it doesn't hold.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TEASERS ============ -->
+  <section>
+    <div class="inner">
+      <span class="eyebrow">Go deeper</span>
+      <h2 class="disp">Behind the lights.</h2>
+      <div class="cards">
+        <a class="card reveal" href="https://simslate.com/methodology/">
+          <span class="pk">Statistical methodology</span>
+          <h3>Shifted lognormals, copulas, and calibrated thresholds</h3>
+          <p>How every marginal is fitted, why boom/bust thresholds are learned from the data
+          instead of hardcoded, and how the payout curve stays honest to the rake.</p>
+          <span class="go">Read the methodology →</span>
+        </a>
+        <a class="card reveal" href="https://simslate.com/edge/">
+          <span class="pk">The edge</span>
+          <h3>AI where it helps. Statistics where it counts.</h3>
+          <p>What separates a contest simulator from a lineup optimizer, and the design rules
+          that keep SimSlate from adding noise to your signal.</p>
+          <span class="go">See what's different →</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ THE LAB ============ -->
+  <section id="lab">
+    <div class="inner">
+      <span class="eyebrow">The lab — the engine, made touchable</span>
+      <h2 class="disp">Don't take the math's <span class="grad">word for it.</span></h2>
+      <p style="margin-top:14px;">Four working exhibits built straight from the engine's statistics — no mockups,
+      every dot computed live in your browser.</p>
+      <div class="lab-list">
+        <a class="lab-row reveal" href="https://simslate.com/lab/outcomes/" style="--tint:#59f2c4;">
+          <span class="no">№ 01</span>
+          <span class="t"><h3>Outcome Space</h3><p>42,000 particles hang under a living probability density. Scrub percentiles and carve the curve.</p></span>
+          <span class="tag">3D particles</span>
+        </a>
+        <a class="lab-row reveal" href="https://simslate.com/lab/monte-carlo/" style="--tint:#8b9dff;">
+          <span class="no">№ 02</span>
+          <span class="t"><h3>Fifty Thousand Worlds</h3><p>Simulated Sundays fall as meteor rain and earn the histogram one world at a time.</p></span>
+          <span class="tag">Live Monte Carlo</span>
+        </a>
+        <a class="lab-row reveal" href="https://simslate.com/lab/correlation/" style="--tint:#ffd27a;">
+          <span class="no">№ 03</span>
+          <span class="t"><h3>The Stack Schematic</h3><p>Drag any player's Sunday up or down and watch conditional expectation ripple through every wire.</p></span>
+          <span class="tag">Draggable blueprint</span>
+        </a>
+        <a class="lab-row reveal" href="https://simslate.com/lab/showdown/" style="--tint:#c78bff;">
+          <span class="no">№ 04</span>
+          <span class="t"><h3>Captain Theory</h3><p>Hand any player the armband and watch 1.5× salary math spend the cap to the very last dollar.</p></span>
+          <span class="tag">Captain dial</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FIELD REPORT ============ -->
+  <section class="wl">
+    <div class="wl-inner">
+      <span class="eyebrow">The Field Report</span>
+      <h2 class="disp">Leverage notes, weekly.</h2>
+      <p style="margin:14px auto 0;">One email a week during the season: where the field is over-concentrated,
+      where the sim sees leverage, and the dupe traps to avoid — from real engine runs. Free, starts with Week 1.</p>
+      <form class="wl-form" onsubmit="return false;">
+        <input type="email" name="email" placeholder="you@example.com" autocomplete="email" required />
+        <button class="btn btn--solid" type="submit">Get the Field Report</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ============ CTA ============ -->
+  <section class="cta">
+    <div class="inner">
+      <span class="eyebrow">Sunday is a sample size of one</span>
+      <h2 class="disp">Simulate the other <span class="grad">49,999.</span></h2>
+      <p style="margin:14px auto 28px;">Load the slate, generate the field, and know your lineups' ROI before lock.</p>
+      <a class="btn btn--solid btn--big" href="https://simslate.com/app/">Launch the simulator</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="foot">
+    <span class="disp" style="font-size:1rem;color:#fff;">Sim<span style="background:linear-gradient(100deg,var(--teal),var(--indigo));-webkit-background-clip:text;background-clip:text;color:transparent;">Slate</span></span>
+    <span class="foot-links">
+      <a href="https://simslate.com/methodology/">Methodology</a>
+      <a href="https://simslate.com/edge/">The Edge</a>
+      <a href="#lab">The Lab</a>
+      <a href="https://simslate.com/tools/dupe-calculator/">Dupe Calculator</a>
+      <a href="https://simslate.com/app/">Simulator</a>
+      <a href="https://simslate.com/builder/">Lineup Builder</a>
+    </span>
+    <span class="foot-legal">SimSlate is a research tool. It does not guarantee profit. Play responsibly.
+    Not affiliated with DraftKings. Homepage concept 06 — “The Aurora.”</span>
+  </div>
+</footer>
+
+<script>
+(() => {
+"use strict";
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---------- starfield ---------- */
+const starC = document.getElementById("stars"), sctx = starC.getContext("2d");
+function drawStars(){
+  const w = starC.width = innerWidth * devicePixelRatio;
+  const h = starC.height = innerHeight * devicePixelRatio;
+  starC.style.width = innerWidth+"px"; starC.style.height = innerHeight+"px";
+  sctx.clearRect(0,0,w,h);
+  const n = Math.floor(innerWidth*innerHeight/8500);
+  for (let i=0;i<n;i++){
+    const x=Math.random()*w, y=Math.random()*h, r=Math.random();
+    sctx.globalAlpha = .12 + r*.32;
+    sctx.fillStyle = r>.93 ? "#8b9dff" : "#d9e6f5";
+    sctx.beginPath(); sctx.arc(x,y,(r>.93?1.4:0.7)*devicePixelRatio,0,7); sctx.fill();
+  }
+  sctx.globalAlpha=1;
+}
+drawStars();
+
+/* ---------- aurora curtains ---------- */
+const cv = document.getElementById("aurora"), ctx = cv.getContext("2d");
+let W=0,H=0,DPR=1;
+function resize(){
+  DPR = Math.min(devicePixelRatio||1, 2);
+  const r = cv.getBoundingClientRect();
+  W = r.width; H = r.height;
+  cv.width = W*DPR; cv.height = H*DPR;
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+}
+resize();
+addEventListener("resize", () => { resize(); drawStars(); });
+
+/* value noise */
+function hash(n){ const s = Math.sin(n)*43758.5453; return s - Math.floor(s); }
+function noise1(x){
+  const i = Math.floor(x), f = x - i;
+  const u = f*f*(3-2*f);
+  return hash(i)*(1-u) + hash(i+1)*u;
+}
+
+/* Curtains: each has its own phase (the marginal) but shares a game driver
+   (the copula). rho controls how much of each curtain's motion is shared. */
+const CURTAINS = [
+  { hue:[89,242,196],  seed: 11.3, xoff: 0.00, w: 1.00, yoff: 0.00 },   // teal
+  { hue:[139,157,255], seed: 47.9, xoff: 0.18, w: 0.92, yoff: 0.06 },   // indigo
+  { hue:[199,139,255], seed: 83.1, xoff: 0.40, w: 0.85, yoff: 0.11 },   // violet
+  { hue:[89,242,196],  seed:129.7, xoff: 0.62, w: 0.95, yoff: 0.03 },   // teal 2
+  { hue:[139,157,255], seed:173.3, xoff: 0.83, w: 0.88, yoff: 0.09 },   // indigo 2
+];
+const RHO = 0.62;
+let t = 0;
+let px = 0.5;  // pointer wind
+addEventListener("pointermove", e => { px = e.clientX / Math.max(W,1); }, {passive:true});
+
+const rhoVal = document.getElementById("rhoVal");
+let rhoShown = 0;
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  ctx.globalCompositeOperation = "lighter";
+
+  // shared game driver
+  const game = noise1(t*0.35) * 0.9 + noise1(t*0.13+7.7) * 0.6;
+
+  const STEP = 5;
+  for (const c of CURTAINS){
+    const baseX = c.xoff * W;
+    const width = W * 0.44 * c.w;
+    for (let sx = -width/2; sx <= width/2; sx += STEP){
+      const x = baseX + sx + Math.sin(t*0.4 + c.seed + sx*0.004) * 26 * (px*2-1+0.4);
+      const u = sx/width + 0.5;
+      // own motion + shared motion (the copula mix)
+      const own    = noise1(sx*0.012 + c.seed + t*0.5);
+      const shared = game * (0.55 + 0.45*noise1(sx*0.01 + t*0.3));
+      const e = (1-RHO)*own + RHO*shared;             // curtain energy 0..~1.4
+      const topY = H*(0.04 + c.yoff) + (1-e) * H*0.26 + Math.sin(u*Math.PI)* -H*0.03;
+      const len  = H*0.24 + e * H*0.44 * (0.5 + Math.sin(u*Math.PI)*0.5);
+      const alpha = (0.16 + e*0.30) * (0.30 + Math.sin(u*Math.PI)*0.70);
+      const g = ctx.createLinearGradient(0, topY, 0, topY+len);
+      g.addColorStop(0,  `rgba(${c.hue[0]},${c.hue[1]},${c.hue[2]},0)`);
+      g.addColorStop(.28,`rgba(${c.hue[0]},${c.hue[1]},${c.hue[2]},${alpha.toFixed(3)})`);
+      g.addColorStop(1,  `rgba(${c.hue[0]},${c.hue[1]},${c.hue[2]},0)`);
+      ctx.fillStyle = g;
+      ctx.fillRect(x, topY, STEP*0.9, len);
+    }
+  }
+  // soft horizon bloom under the curtains
+  const bloom = ctx.createLinearGradient(0, H*0.45, 0, H*0.9);
+  bloom.addColorStop(0, "rgba(89,242,196,0)");
+  bloom.addColorStop(.45, "rgba(89,242,196,.045)");
+  bloom.addColorStop(1, "rgba(89,242,196,0)");
+  ctx.fillStyle = bloom;
+  ctx.fillRect(0, H*0.45, W, H*0.45);
+  ctx.globalCompositeOperation = "source-over";
+
+  // live rho readout drifts around the true mix
+  const shown = RHO + Math.sin(t*0.7)*0.03;
+  if (Math.abs(shown-rhoShown) > 0.005){ rhoShown = shown; rhoVal.textContent = "ρ " + shown.toFixed(2); }
+
+  t += reduceMotion ? 0 : 0.016;
+}
+
+function loop(){
+  requestAnimationFrame(loop);
+  if (document.hidden) return;
+  draw();
+}
+draw();
+if (!reduceMotion) requestAnimationFrame(loop);
+
+/* scroll reveal */
+const els = document.querySelectorAll(".reveal");
+if (!("IntersectionObserver" in window)) els.forEach(e => e.classList.add("in"));
+else {
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => { if (en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); } });
+  }, { threshold: .15 });
+  els.forEach(e => io.observe(e));
+}
+})();
+</script>
+</body>
+</html>

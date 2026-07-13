@@ -47,8 +47,8 @@ a{color:inherit;}
 .btn--ghost:hover{color:#fff;border-color:var(--comet);}
 .btn--solid{background:var(--comet);color:var(--space);border:1px solid var(--comet);font-weight:700;}
 .btn--solid:hover{box-shadow:0 0 22px rgba(87,230,214,.45);}
-.nav-links{display:flex;gap:22px;align-items:center;padding:4px clamp(18px,3.4vw,38px) 12px;
-  font-family:"Space Mono",monospace;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--star-dim);
+.nav-links{display:flex;gap:26px;align-items:center;padding:6px clamp(18px,3.4vw,38px) 14px;
+  font-family:"Space Mono",monospace;font-size:.76rem;letter-spacing:.14em;text-transform:uppercase;color:var(--star-dim);
   overflow-x:auto;scrollbar-width:none;}
 .nav-links::-webkit-scrollbar{display:none;}
 .nav-links a{text-decoration:none;transition:color .3s;white-space:nowrap;}
@@ -72,6 +72,7 @@ h1 .tint{color:var(--pulsar);}
 h1 .tint2{color:var(--comet);}
 .lede{margin-top:22px;font-size:.98rem;color:var(--star-dim);max-width:47ch;font-weight:300;}
 .lede b{color:var(--star);font-weight:600;}
+.lede--sub{margin-top:14px;font-size:.8rem;color:var(--mute);max-width:44ch;}
 .hero-cta{margin-top:30px;display:flex;gap:12px;flex-wrap:wrap;pointer-events:auto;}
 .btn--big{font-size:.7rem;padding:13px 26px;}
 
@@ -234,14 +235,15 @@ footer{position:relative;z-index:1;border-top:1px solid var(--line);padding:clam
     <canvas id="rain"></canvas>
     <div class="hero-copy">
       <div class="kick">NFL · DraftKings · GPP</div>
-      <h1 class="disp">EVERY SUNDAY,<br /><span class="tint">FIFTY THOUSAND</span><br />TIMES — <span class="tint2">BEFORE LOCK.</span></h1>
+      <h1 class="disp">EVERY SUNDAY,<br /><span class="tint">FIFTY THOUSAND</span><br /><span class="tint2">TIMES.</span></h1>
       <p class="lede">
-        SimSlate rebuilds the whole tournament before kickoff: a <b>10,000-lineup field</b> drawn
+        SimSlate rebuilds the whole tournament before lock: a <b>10,000-lineup field</b> drawn
         from projected ownership, then <b>50,000 correlated simulations</b> of the slate.
-        Each streak falling behind this headline is one simulated world — the distribution
-        isn't drawn, it's <b>earned</b>. Lineups are ranked by ROI against that field,
-        not by adding up projections.
+        Lineups are ranked by <b>expected ROI</b> against that field — not by adding
+        up projections.
       </p>
+      <p class="lede lede--sub">Each streak falling behind this headline is one simulated
+      world. The distribution isn't drawn — it's <b>earned</b>.</p>
       <div class="hero-cta">
         <a class="btn btn--solid btn--big" href="https://simslate.com/app/">Run the sim</a>
         <a class="btn btn--ghost btn--big" href="https://simslate.com/methodology/">Read the methodology</a>
@@ -268,7 +270,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--line);padding:clam
     <div class="rail-inner">
       <div class="rail-cell reveal"><div class="rail-num">50,000</div><div class="rail-label">correlated slate simulations</div></div>
       <div class="rail-cell reveal"><div class="rail-num">10,000</div><div class="rail-label">ownership-true field lineups</div></div>
-      <div class="rail-cell reveal"><div class="rail-num">≤3<i>pts</i></div><div class="rail-label">exposure vs projected ownership</div></div>
+      <div class="rail-cell reveal"><div class="rail-num">&lt;2<i>%</i></div><div class="rail-label">exposure vs projected ownership</div></div>
       <div class="rail-cell reveal"><div class="rail-num"><i>0</i></div><div class="rail-label">players modeled as a bell curve</div></div>
     </div>
   </div>
@@ -519,8 +521,11 @@ function resize(){
 resize();
 addEventListener("resize", () => { resize(); drawStars(); });
 
-const binX = b => (b+0.5)/BINS * (W*0.86) + W*0.07;
-const binW = () => (W*0.86)/BINS;
+/* plot window: clear of the copy column on wide screens */
+const plotX0 = () => W>900 ? W*0.36 : W*0.07;
+const plotW  = () => W>900 ? W*0.58 : W*0.86;
+const binX = b => (b+0.5)/BINS * plotW() + plotX0();
+const binW = () => plotW()/BINS;
 
 function spawn(nPer){
   for (let i=0;i<nPer;i++){
@@ -561,18 +566,18 @@ function tickRain(){
     ctx.fillRect(x, top, Math.max(bw-1.2,1), h);
   }
   ctx.fillStyle = "rgba(195,210,234,.25)";
-  ctx.fillRect(W*0.07, H-MARGIN_B, W*0.86, 1);
+  ctx.fillRect(plotX0(), H-MARGIN_B, plotW(), 1);
   ctx.font = `10px "Space Mono", monospace`;
   ctx.fillStyle = "rgba(114,132,163,.8)";
   ctx.textAlign = "center";
   for (let t=0;t<=X_MAX;t+=10){
-    const px = t/X_MAX*(W*0.86)+W*0.07;
+    const px = t/X_MAX*plotW()+plotX0();
     ctx.fillRect(px, H-MARGIN_B+4, 1, 6);
     ctx.fillText(String(t), px, H-MARGIN_B+24);
   }
   if (W>560){
     ctx.textAlign = "right";
-    ctx.fillText("fantasy points →", W*0.93, H-MARGIN_B+40);
+    ctx.fillText("fantasy points →", plotX0()+plotW(), H-MARGIN_B+40);
     ctx.textAlign = "center";
   }
   if (running) spawn(storm ? 20 : (reduceMotion ? 1 : 3));
