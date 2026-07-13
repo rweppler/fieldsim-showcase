@@ -1,0 +1,549 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
+  <title>NFL DFS Lineup Simulator for DraftKings GPPs | SimSlate</title>
+  <meta name="description" content="Simulate your DraftKings NFL GPP contest 50,000 times against a realistic 10,000-lineup field. Correlated, duplication-aware sims rank lineups by ROI." />
+  <link rel="icon" href="./favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Spline+Sans+Mono:wght@300..700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./site/site.css" />
+  <script>
+    // The app used to live at "/": forward Stripe checkout returns and any
+    // auth-token fragments to /app/ so nothing that redirects here breaks.
+    if (/[?&]checkout=/.test(location.search) || /access_token=/.test(location.hash)) {
+      location.replace('https://simslate.com/app/' + location.search + location.hash);
+    }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "SimSlate",
+    "applicationCategory": "SportsApplication",
+    "operatingSystem": "Web",
+    "description": "Monte Carlo contest simulator for NFL DFS GPP tournaments on DraftKings. Builds a 10,000-lineup ownership-weighted field and runs 50,000 correlated simulations to rank lineups by expected ROI.",
+    "offers": { "@type": "Offer", "category": "subscription" }
+  }
+  </script>
+  <style>
+    /* ---- hero (page-specific) ---- */
+    .hero { position: relative; overflow: hidden; border-bottom: 1px solid var(--line); }
+    .hero-inner {
+      position: relative; z-index: 2;
+      padding-top: clamp(70px, 11vh, 130px);
+      padding-bottom: clamp(60px, 9vh, 110px);
+    }
+    .hero .eyebrow { display: inline-flex; gap: 14px; margin-bottom: 26px; }
+    .hero h1 { max-width: 11em; }
+    .hero h1 .ghost {
+      color: rgba(233, 238, 243, 0.07);
+      -webkit-text-stroke: 1.5px rgba(148, 163, 177, 0.85);
+    }
+    .hero h1 .lev { color: var(--lev); }
+    .hero .lede { margin: 28px 0 38px; }
+    #dist {
+      position: absolute; right: 0; bottom: 0; z-index: 1;
+      width: min(58vw, 820px); height: 100%;
+      pointer-events: none;
+      mask-image: linear-gradient(to right, transparent, black 30%);
+      -webkit-mask-image: linear-gradient(to right, transparent, black 30%);
+    }
+    .hero-note {
+      position: absolute; z-index: 3; right: 44px; bottom: 148px;
+      text-shadow: 0 0 6px var(--ink-0), 0 0 12px var(--ink-0), 0 1px 3px var(--ink-0);
+      text-align: right; color: var(--faint);
+      font-family: var(--font-m); font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase;
+      line-height: 1.9;
+    }
+    .hero-note b { color: var(--chalk); font-weight: 500; display: block; }
+    @media (max-width: 900px) {
+      #dist { opacity: 0.4; width: 100vw; mask-image: none; -webkit-mask-image: none; }
+      .hero-note { display: none; }
+    }
+    @media (max-width: 640px) {
+      .hero h1 br { display: none; } /* let the headline wrap naturally */
+    }
+    /* phase figures */
+    .minifig { width: 100%; height: auto; }
+    /* duality section */
+    .duality { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+    .duality > div { background: var(--ink-2); padding: 40px 36px; }
+    .duality h3 { font-size: 1.3rem; margin: 14px 0 12px; }
+    .duality p { font-size: 0.95rem; }
+    .duality .big {
+      font-family: var(--font-m); font-weight: 300; font-size: 2.6rem; line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+    @media (max-width: 760px) { .duality { grid-template-columns: 1fr; } }
+    /* teaser cards */
+    .teasers { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .teasers .card { display: flex; flex-direction: column; gap: 10px; text-decoration: none; transition: border-color 0.15s; }
+    .teasers .card:hover { border-color: var(--lev-deep); }
+    .teasers .card .go { margin-top: auto; padding-top: 18px; color: var(--lev); font-family: var(--font-m); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; }
+    @media (max-width: 760px) { .teasers { grid-template-columns: 1fr; } }
+    /* lab index rows (interactive plates) */
+    .lab-list { border-top: 1px solid var(--line-2); margin-top: 34px; }
+    .lab-row {
+      --tint: var(--lev); --tintbg: rgba(45, 227, 167, 0.05);
+      display: grid; grid-template-columns: 64px 96px 1fr auto;
+      gap: clamp(14px, 2.6vw, 30px); align-items: center;
+      padding: clamp(18px, 2.8vh, 26px) 8px; border-bottom: 1px solid var(--line);
+      text-decoration: none; position: relative; transition: background 0.35s;
+    }
+    .lab-row:hover { background: linear-gradient(to right, var(--tintbg), transparent 70%); }
+    .lab-row .no { font-family: var(--font-m); font-size: 0.72rem; color: var(--faint); letter-spacing: 0.1em; }
+    .lab-row:hover .no { color: var(--tint); }
+    .lab-row .glyph { width: 76px; height: 44px; }
+    .lab-row .glyph svg { width: 100%; height: 100%; overflow: visible; }
+    .lab-row h3 { font-size: clamp(1.15rem, 2.4vw, 1.6rem); letter-spacing: -0.015em; line-height: 1.15; transition: color 0.3s; }
+    .lab-row:hover h3 { color: var(--tint); }
+    .lab-row .t p { color: var(--dim); font-size: 0.85rem; margin-top: 4px; max-width: 62ch; }
+    .lab-row .tag {
+      font-family: var(--font-m); font-size: 0.6rem; letter-spacing: 0.16em; color: var(--faint);
+      text-transform: uppercase; text-align: right; white-space: nowrap;
+    }
+    .lab-row .tag b { display: block; color: var(--dim); margin-top: 4px; font-weight: 400; }
+    .lab-row .arrow { position: absolute; right: -22px; top: 50%; transform: translateY(-50%); opacity: 0; transition: opacity 0.3s, right 0.3s; color: var(--tint); font-size: 1.1rem; }
+    .lab-row:hover .arrow { opacity: 1; right: -12px; }
+    @media (max-width: 820px) {
+      .lab-row { grid-template-columns: 44px 1fr; }
+      .lab-row .glyph, .lab-row .tag { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap nav-top">
+    <a class="wordmark" href="https://simslate.com/">Sim<em>Slate</em></a>
+    <span class="nav-auth">
+      <a class="btn btn--ghost btn--nav" href="https://simslate.com/app/">Sign in</a>
+      <a class="btn btn--solid btn--nav" href="https://simslate.com/app/?signup=1">Join now</a>
+    </span>
+  </div>
+  <div class="wrap nav-main">
+    <nav class="nav-links" aria-label="Site">
+      <a class="nav-product" href="https://simslate.com/app/">The Simulator</a>
+      <a class="nav-product" href="https://simslate.com/builder/">Lineup Builder</a>
+      <span class="nav-sep" aria-hidden="true"></span>
+      <a href="https://simslate.com/methodology/">Methodology</a>
+      <a href="https://simslate.com/edge/">The Edge</a>
+      <a href="#lab">The Lab</a>
+      <details class="nav-dd">
+        <summary>Tools</summary>
+        <div class="nav-dd-menu">
+          <a href="https://simslate.com/tools/dupe-calculator/">Dupe Tax Calculator</a>
+        </div>
+      </details>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <canvas id="dist" aria-hidden="true"></canvas>
+    <div class="hero-note" aria-hidden="true">
+      <b>← projections tell you the median</b>
+      GPPs pay the tail
+    </div>
+    <div class="wrap hero-inner">
+      <span class="mono eyebrow">NFL · DraftKings · GPP</span>
+      <h1 class="display h-xl">
+        Beat the <span class="ghost">field</span><br />
+        before it <span class="lev">exists.</span>
+      </h1>
+      <p class="lede">
+        SimSlate rebuilds the whole tournament before lock: a 10,000-lineup field drawn from
+        projected ownership, then 50,000 correlated simulations of the slate powered by
+        AI-calibrated player models. Lineups are ranked by expected ROI against that
+        field — not by adding up projections.
+      </p>
+      <div class="cta-row" style="justify-content:flex-start">
+        <a class="btn btn--solid" href="https://simslate.com/app/">Run the sim</a>
+        <a class="btn btn--ghost" href="https://simslate.com/methodology/">Read the methodology</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ STAT RAIL ============ -->
+  <section class="rail" aria-label="Engine at a glance">
+    <div class="wrap rail-inner">
+      <div class="rail-cell reveal">
+        <div class="rail-num">50,000</div>
+        <div class="rail-label mono">correlated slate simulations</div>
+      </div>
+      <div class="rail-cell reveal">
+        <div class="rail-num">10,000</div>
+        <div class="rail-label mono">ownership-true field lineups</div>
+      </div>
+      <div class="rail-cell reveal">
+        <div class="rail-num">&le;2<span style="color:var(--faint)">pts</span></div>
+        <div class="rail-label mono">exposure vs projected ownership</div>
+      </div>
+      <div class="rail-cell reveal">
+        <div class="rail-num"><em>0</em></div>
+        <div class="rail-label mono">players modeled as a bell curve</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TWO PHASES ============ -->
+  <section class="section section--flush">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="mono eyebrow">How it works</span>
+        <div class="rule"></div>
+        <span class="mono eyebrow--dim">two phases, one contest</span>
+      </div>
+      <h2 class="display h-lg" style="max-width:15em">
+        Your lineup is a distribution,<br />not a <span class="lev">number.</span>
+      </h2>
+      <p class="mono eyebrow--chalk" style="margin:14px 0 34px">Because one number never won a milly</p>
+
+      <article class="phase reveal">
+        <div class="phase-no">/<b>01</b></div>
+        <div>
+          <span class="mono eyebrow--dim">Contest generator</span>
+          <h3>Build the field you'll actually face</h3>
+          <p>
+            Projected ownership is treated as ground truth — never renormalized, never smoothed.
+            The generator fills 10,000 valid DraftKings rosters and calibrates until every player's
+            exposure lands within a hard tolerance band of their projection. Scarce positions fill
+            first, so the salary squeeze falls where real fields feel it.
+          </p>
+        </div>
+        <svg class="phase-fig minifig" viewBox="0 0 360 150" role="img" aria-label="Bars showing generated exposure matching projected ownership within a tolerance band">
+          <g font-family="Spline Sans Mono, monospace" font-size="8" fill="#5d6b78">
+            <text x="0" y="10" letter-spacing="1">EXPOSURE VS PROJECTION</text>
+          </g>
+          <g>
+            <!-- projected (chalk ticks) vs generated (green bars) -->
+            <rect x="10"  y="60"  width="26" height="70" fill="#2de3a7" opacity="0.85"/><line x1="8"  y1="57"  x2="38"  y2="57"  stroke="#f0b23e" stroke-width="2"/>
+            <rect x="52"  y="45"  width="26" height="85" fill="#2de3a7" opacity="0.7"/><line x1="50" y1="48"  x2="80"  y2="48"  stroke="#f0b23e" stroke-width="2"/>
+            <rect x="94"  y="78"  width="26" height="52" fill="#2de3a7" opacity="0.6"/><line x1="92" y1="76"  x2="122" y2="76"  stroke="#f0b23e" stroke-width="2"/>
+            <rect x="136" y="92"  width="26" height="38" fill="#2de3a7" opacity="0.5"/><line x1="134" y1="94" x2="164" y2="94" stroke="#f0b23e" stroke-width="2"/>
+            <rect x="178" y="70"  width="26" height="60" fill="#2de3a7" opacity="0.65"/><line x1="176" y1="68" x2="206" y2="68" stroke="#f0b23e" stroke-width="2"/>
+            <rect x="220" y="104" width="26" height="26" fill="#2de3a7" opacity="0.45"/><line x1="218" y1="106" x2="248" y2="106" stroke="#f0b23e" stroke-width="2"/>
+            <rect x="262" y="86"  width="26" height="44" fill="#2de3a7" opacity="0.55"/><line x1="260" y1="84" x2="290" y2="84" stroke="#f0b23e" stroke-width="2"/>
+            <rect x="304" y="112" width="26" height="18" fill="#2de3a7" opacity="0.4"/><line x1="302" y1="114" x2="332" y2="114" stroke="#f0b23e" stroke-width="2"/>
+          </g>
+          <line x1="0" y1="130" x2="360" y2="130" stroke="#1f2a36"/>
+          <g font-family="Spline Sans Mono, monospace" font-size="7" fill="#5d6b78">
+            <text x="10" y="144">■ GENERATED</text>
+            <text x="90" y="144" fill="#f0b23e">— PROJECTED</text>
+          </g>
+        </svg>
+      </article>
+
+      <article class="phase reveal">
+        <div class="phase-no">/<b>02</b></div>
+        <div>
+          <span class="mono eyebrow--dim">Contest simulator</span>
+          <h3>Play the tournament 50,000 times</h3>
+          <p>
+            Every player gets a right-skewed distribution fitted to their mean, volatility, ceiling
+            and boom/bust odds. A Gaussian copula ties teammates, stacks and game environments
+            together, then the engine scores the full field 50,000 times, pays out a top-heavy
+            GPP curve — with duplication splitting prizes — and reports each lineup's ROI.
+          </p>
+        </div>
+        <svg class="phase-fig minifig" viewBox="0 0 360 150" role="img" aria-label="Many simulated outcome paths fanning out, with a payout curve applied at the end">
+          <g font-family="Spline Sans Mono, monospace" font-size="8" fill="#5d6b78">
+            <text x="0" y="10" letter-spacing="1">50,000 OUTCOMES → ROI</text>
+          </g>
+          <g stroke-width="1" fill="none">
+            <path d="M10 75 C 100 70, 200 40, 330 22" stroke="#2de3a7" opacity="0.9"/>
+            <path d="M10 75 C 100 72, 200 55, 330 44" stroke="#2de3a7" opacity="0.55"/>
+            <path d="M10 75 C 100 74, 200 68, 330 62" stroke="#2de3a7" opacity="0.35"/>
+            <path d="M10 75 C 100 76, 200 78, 330 80" stroke="#5d6b78" opacity="0.5"/>
+            <path d="M10 75 C 100 78, 200 90, 330 98" stroke="#5d6b78" opacity="0.4"/>
+            <path d="M10 75 C 100 80, 200 102, 330 116" stroke="#5d6b78" opacity="0.3"/>
+            <path d="M10 75 C 100 82, 200 112, 330 130" stroke="#5d6b78" opacity="0.2"/>
+          </g>
+          <circle cx="10" cy="75" r="3" fill="#e9eef3"/>
+          <g font-family="Spline Sans Mono, monospace" font-size="7">
+            <text x="338" y="25" fill="#2de3a7">1st</text>
+            <text x="338" y="47" fill="#2de3a7">cash</text>
+            <text x="338" y="120" fill="#5d6b78">dead</text>
+          </g>
+        </svg>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============ CHALK VS LEVERAGE ============ -->
+  <section class="section">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="mono eyebrow">Why ROI, not projection</span>
+        <div class="rule"></div>
+      </div>
+      <h2 class="display h-lg" style="max-width:14em; margin-bottom:44px">
+        Chalk splits the prize.<br />Leverage keeps it.
+      </h2>
+      <div class="duality reveal">
+        <div>
+          <div class="big chalk">m &gt; 1</div>
+          <h3 class="chalk">The chalk tax</h3>
+          <p>
+            Popular lineups get duplicated. SimSlate models expected duplicates for every field
+            lineup from joint ownership, so a chalky build that "wins" shares first place — and
+            its simulated ROI shows the dilution before you pay entry fees to find out.
+          </p>
+        </div>
+        <div>
+          <div class="big lev">corr &lt; 0</div>
+          <h3 class="lev">The leverage guarantee</h3>
+          <p>
+            Within every projected-score decile, simulated ROI is verified to correlate negatively
+            with ownership. Lower-owned paths to the same score are worth more — that's the math of
+            top-heavy payouts, and the engine won't ship a sim where it doesn't hold.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TEASERS ============ -->
+  <section class="section">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="mono eyebrow">Go deeper</span>
+        <div class="rule"></div>
+      </div>
+      <div class="teasers">
+        <a class="card reveal" href="https://simslate.com/methodology/">
+          <span class="mono eyebrow--dim">Statistical methodology</span>
+          <h3>Shifted lognormals, copulas, and calibrated thresholds</h3>
+          <p>How every marginal is fitted, why boom/bust thresholds are learned from the data
+          instead of hardcoded, and how the payout curve stays honest to the rake.</p>
+          <span class="go">Read the methodology →</span>
+        </a>
+        <a class="card reveal" href="https://simslate.com/edge/">
+          <span class="mono eyebrow--dim">The edge</span>
+          <h3>AI where it helps. Statistics where it counts.</h3>
+          <p>What separates a contest simulator from a lineup optimizer, and the design rules
+          that keep SimSlate from adding noise to your signal.</p>
+          <span class="go">See what's different →</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ THE LAB ============ -->
+  <section class="section" id="lab">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="mono eyebrow">The lab</span>
+        <div class="rule"></div>
+        <span class="mono eyebrow--dim">the engine, made touchable</span>
+      </div>
+      <h2 class="display h-lg" style="max-width:15em">
+        Don't take the math's<br />word for <span class="lev">it.</span>
+      </h2>
+      <p style="max-width:44em; margin-top:14px">
+        Four working exhibits built straight from the engine's statistics — no mockups,
+        every dot computed live in your browser. Each one puts your hands on a piece
+        of the machine that ranks your lineups.
+      </p>
+
+      <div class="lab-list">
+        <a class="lab-row reveal" href="https://simslate.com/lab/outcomes/" style="--tint:#2de3a7; --tintbg:rgba(45,227,167,.05);">
+          <span class="no">№ 01</span>
+          <span class="glyph" aria-hidden="true"><svg viewBox="0 0 76 44"><path d="M2 40 C 18 40 22 6 34 6 C 46 6 50 40 74 40" fill="none" stroke="#2de3a7" stroke-width="2"/><circle cx="58" cy="34" r="2.5" fill="#f0b23e"/><circle cx="30" cy="12" r="2" fill="#e9eef3"/><circle cx="40" cy="18" r="2" fill="#e9eef3"/></svg></span>
+          <span class="t"><h3>Outcome Space</h3><p>42,000 particles hang under a living probability density. Scrub percentiles, carve
+            the curve, and watch a bell curve re-fit into the skewed shapes the engine actually uses.</p></span>
+          <span class="tag">3D PARTICLES<b>the marginal, made matter</b></span>
+          <span class="arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="lab-row reveal" href="https://simslate.com/lab/monte-carlo/" style="--tint:#8b9dff; --tintbg:rgba(139,157,255,.06);">
+          <span class="no">№ 02</span>
+          <span class="glyph" aria-hidden="true"><svg viewBox="0 0 76 44"><g stroke="#8b9dff" stroke-width="1.6"><line x1="12" y1="2" x2="12" y2="12"/><line x1="30" y1="0" x2="30" y2="8"/><line x1="48" y1="4" x2="48" y2="14"/><line x1="64" y1="1" x2="64" y2="9"/></g><g fill="#8b9dff"><rect x="8" y="30" width="7" height="12" rx="1"/><rect x="26" y="22" width="7" height="20" rx="1"/><rect x="44" y="27" width="7" height="15" rx="1"/><rect x="60" y="35" width="7" height="7" rx="1" fill="#ff6b5e"/></g></svg></span>
+          <span class="t"><h3>Fifty Thousand Worlds</h3><p>Simulated Sundays fall as meteor rain and earn the histogram one world at a time —
+            with a correlation tether you can tighten yourself.</p></span>
+          <span class="tag">LIVE MONTE CARLO<b>the simulator, as weather</b></span>
+          <span class="arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="lab-row reveal" href="https://simslate.com/lab/correlation/" style="--tint:#8fb3dd; --tintbg:rgba(143,179,221,.06);">
+          <span class="no">№ 03</span>
+          <span class="glyph" aria-hidden="true"><svg viewBox="0 0 76 44"><g fill="none" stroke="#8fb3dd" stroke-width="1.4"><circle cx="14" cy="14" r="7"/><circle cx="62" cy="30" r="7"/><path d="M20 18 Q 38 2 56 26" stroke="#f0b23e"/></g></svg></span>
+          <span class="t"><h3>The Stack Schematic</h3><p>A blueprint of a real game stack. Drag any player's Sunday up or down and watch
+            conditional expectation ripple through every correlation wire, live.</p></span>
+          <span class="tag">DRAGGABLE BLUEPRINT<b>the copula, on paper</b></span>
+          <span class="arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="lab-row reveal" href="https://simslate.com/lab/showdown/" style="--tint:#f0b23e; --tintbg:rgba(240,178,62,.06);">
+          <span class="no">№ 04</span>
+          <span class="glyph" aria-hidden="true"><svg viewBox="0 0 76 44"><text x="38" y="30" text-anchor="middle" font-family="Spline Sans Mono, monospace" font-weight="bold" font-size="19" fill="#f0b23e">1.5×</text><path d="M6 10 L38 3 L70 10" stroke="#8b9dff" stroke-width="1.6" fill="none"/></svg></span>
+          <span class="t"><h3>Captain Theory</h3><p>Showdown's strangest rule, under the floodlights: hand any player the armband and
+            watch 1.5× salary math spend the cap to the very last dollar.</p></span>
+          <span class="tag">CAPTAIN DIAL<b>the single-game engine</b></span>
+          <span class="arrow" aria-hidden="true">→</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FIELD REPORT (email capture) ============ -->
+  <section class="wl">
+    <div class="wrap wl-inner">
+      <span class="mono eyebrow">The Field Report</span>
+      <h2 class="display h-lg">Leverage notes, weekly.</h2>
+      <p>One email a week during the season: where the field is over-concentrated,
+      where the sim sees leverage, and the dupe traps to avoid — from real engine runs.
+      Free, starts with Week&nbsp;1.</p>
+      <form class="wl-form" data-waitlist="landing">
+        <input type="email" name="email" placeholder="you@example.com" autocomplete="email" required />
+        <button class="btn btn--solid" type="submit">Get the Field Report</button>
+        <span class="wl-msg" role="status"></span>
+      </form>
+    </div>
+  </section>
+
+  <!-- ============ CTA ============ -->
+  <section class="cta-band">
+    <div class="wrap">
+      <span class="mono eyebrow">Sunday is a sample size of one</span>
+      <h2 class="display h-lg" style="margin-top:16px">Simulate the other 49,999.</h2>
+      <p>Load the slate, generate the field, and know your lineups' ROI before lock.</p>
+      <div class="cta-row">
+        <a class="btn btn--solid" href="https://simslate.com/app/">Launch the simulator</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap footer-inner">
+    <a class="wordmark" href="https://simslate.com/" style="font-size:0.9rem">Sim<em>Slate</em></a>
+    <span class="spacer"></span>
+    <a href="https://simslate.com/methodology/">Methodology</a>
+    <a href="https://simslate.com/edge/">The Edge</a>
+    <a href="#lab">The Lab</a>
+    <a href="https://simslate.com/tools/dupe-calculator/">Dupe Calculator</a>
+    <a href="https://simslate.com/app/">Simulator</a>
+    <a href="https://simslate.com/builder/">Lineup Builder</a>
+    <span style="width:100%; font-size:0.75rem; color:var(--faint)">
+      SimSlate is a research tool. It does not guarantee profit. Play responsibly. Not affiliated with DraftKings. Questions: <a href="mailto:support@simslate.com">support@simslate.com</a>
+    </span>
+  </div>
+</footer>
+
+<script>
+/* ---- Monte Carlo hero: dots accumulate into a right-skewed density ---- */
+(function () {
+  const cv = document.getElementById('dist');
+  const ctx = cv.getContext('2d');
+  const DPR = Math.min(window.devicePixelRatio || 1, 2);
+  let W, H;
+
+  function resize() {
+    const r = cv.getBoundingClientRect();
+    W = r.width; H = r.height;
+    cv.width = W * DPR; cv.height = H * DPR;
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+  resize();
+
+  // deterministic PRNG (mulberry32) — same field every load, on brand
+  let s = 20260705;
+  function rnd() { s |= 0; s = (s + 0x6D2B79F5) | 0; let t = Math.imul(s ^ (s >>> 15), 1 | s);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }
+  function normal() { const u = 1 - rnd(), v = rnd();
+    return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
+
+  // lognormal params → right-skewed marginal, like the engine's fits
+  const MU = 0.0, SIG = 0.58, N = 4200;
+  const raw = [];
+  for (let i = 0; i < N; i++) raw.push(Math.exp(MU + SIG * normal()));
+  const sorted = raw.slice().sort((a, b) => a - b);
+  const median = sorted[N >> 1];
+  const p88 = sorted[(N * 0.88) | 0];
+  // clip x-range to p99 so the curve fills the width instead of one outlier
+  const xMax = sorted[(N * 0.99) | 0];
+  const pts = raw.filter(x => x <= xMax);
+
+  // density estimate for vertical scatter (histogram of the sample itself)
+  const BINS = 64, hist = new Array(BINS).fill(0);
+  pts.forEach(x => { hist[Math.min(BINS - 1, (x / xMax * BINS) | 0)]++; });
+  // smooth the histogram so the silhouette reads as a curve
+  const sm = hist.map((v, i) => {
+    const a = hist[Math.max(0, i - 1)], b = hist[Math.min(BINS - 1, i + 1)];
+    return (a + 2 * v + b) / 4;
+  });
+  const hMax = Math.max(...sm);
+  const PEAK = 0.8; // peak height as fraction of drawable area
+
+  const dots = pts.map(x => {
+    const b = Math.min(BINS - 1, (x / xMax * BINS) | 0);
+    return { x: x / xMax, y: rnd() * (sm[b] / hMax) * PEAK, tail: x >= p88 };
+  });
+
+  const PAD_B = 40, PAD_T = 70;
+  function px(d) { return d.x * W; }
+  function py(d) { return H - PAD_B - d.y * (H - PAD_B - PAD_T); }
+
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let drawn = 0;
+  const PER_FRAME = 46;
+
+  function drawDot(d) {
+    ctx.beginPath();
+    ctx.arc(px(d), py(d), d.tail ? 1.9 : 1.5, 0, 7);
+    ctx.fillStyle = d.tail ? 'rgba(45,227,167,0.95)' : 'rgba(45,227,167,0.4)';
+    ctx.fill();
+  }
+  function drawMedian() {
+    const x = median / xMax * W;
+    ctx.strokeStyle = 'rgba(240,178,62,0.75)';
+    ctx.setLineDash([3, 5]);
+    ctx.beginPath(); ctx.moveTo(x, PAD_T - 26); ctx.lineTo(x, H - PAD_B + 10); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  function baseline() {
+    ctx.strokeStyle = 'rgba(31,42,54,1)';
+    ctx.beginPath(); ctx.moveTo(0, H - PAD_B + 10); ctx.lineTo(W, H - PAD_B + 10); ctx.stroke();
+  }
+
+  function frame() {
+    const upto = Math.min(dots.length, drawn + PER_FRAME);
+    for (let i = drawn; i < upto; i++) drawDot(dots[i]);
+    drawn = upto;
+    if (drawn === dots.length) { drawMedian(); return; }
+    requestAnimationFrame(frame);
+  }
+
+  function renderAll() {
+    ctx.clearRect(0, 0, W, H);
+    baseline();
+    if (reduced) { dots.forEach(drawDot); drawMedian(); }
+    else { drawn = 0; requestAnimationFrame(frame); }
+  }
+  renderAll();
+
+  let t; window.addEventListener('resize', () => {
+    clearTimeout(t); t = setTimeout(() => { resize(); ctx.clearRect(0,0,W,H); baseline(); dots.forEach(drawDot); drawMedian(); }, 150);
+  });
+})();
+
+/* ---- scroll reveal ---- */
+(function () {
+  const els = document.querySelectorAll('.reveal');
+  if (!('IntersectionObserver' in window)) { els.forEach(e => e.classList.add('in')); return; }
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
+  }, { threshold: 0.15 });
+  els.forEach(e => io.observe(e));
+})();
+</script>
+<script defer src="./site/fs.js"></script>
+</body>
+</html>
