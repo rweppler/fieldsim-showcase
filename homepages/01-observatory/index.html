@@ -188,13 +188,6 @@ section p b{color:var(--star);font-weight:600;}
 .plan-banner .pb-arrow{flex:none;font-family:"Space Mono",monospace;font-size:.58rem;
   letter-spacing:.14em;text-transform:uppercase;color:var(--comet);white-space:nowrap;}
 @media(max-width:640px){.plan-banner{flex-wrap:wrap;gap:8px;}.plan-banner .pb-copy{font-size:.7rem;}}
-/* wide screens: park the banner in the vacant canvas space right of the copy column,
-   bottom-aligned with the CTA row, so it adds no height to the hero stack */
-@media(min-width:1150px){
-  .plan-banner{position:absolute;left:calc(100% + 40px);bottom:84px;width:330px;
-    flex-direction:column;align-items:flex-start;gap:10px;padding:16px 18px;margin-top:0;}
-  .plan-banner .pb-copy{font-size:.8rem;}
-}
 
 /* plans */
 .plans-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:36px;}
@@ -282,18 +275,14 @@ footer{position:relative;z-index:1;border-top:1px solid var(--line);padding:clam
         Lineups are ranked by <b>expected ROI</b> against that field — not by adding
         up projections.
       </p>
-      <p class="lede lede--sub">Each streak falling behind this headline is one simulated
-      world. The distribution isn't drawn — it's <b>earned</b>.</p>
-      <div class="hero-cta">
-        <a class="btn btn--solid btn--big" href="#plans">Start free — run the sim</a>
-        <a class="btn btn--ghost btn--big" href="https://simslate.com/methodology/">Read the methodology</a>
-      </div>
       <a class="plan-banner" href="#plans">
         <span class="pb-tag">Free plan</span>
         <span class="pb-copy">Run a real <b>1,000-lineup field simulation</b> on the live engine —
           letter-graded outputs, no card required.</span>
         <span class="pb-arrow">Compare plans →</span>
       </a>
+      <p class="lede lede--sub">Each streak falling behind this headline is one simulated
+      world. The distribution isn't drawn — it's <b>earned</b>.</p>
     </div>
 
     <div class="odometer" aria-live="off">
