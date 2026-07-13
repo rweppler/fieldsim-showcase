@@ -58,7 +58,7 @@ a{color:inherit;}
 .nav-sep{width:1px;height:12px;background:var(--line-2);flex:none;}
 
 /* ---------- hero ---------- */
-.hero{position:relative;z-index:1;height:100svh;min-height:640px;overflow:hidden;}
+.hero{position:relative;z-index:1;height:100svh;min-height:860px;overflow:hidden;}
 #rain{position:absolute;inset:0;width:100%;height:100%;display:block;}
 .hero-copy{position:absolute;z-index:3;left:clamp(18px,3.4vw,38px);top:clamp(108px,16vh,170px);max-width:560px;}
 .hero-copy::before{content:"";position:absolute;inset:-40px -80px -60px -50px;z-index:-1;
@@ -89,13 +89,13 @@ h1 .tint2{color:var(--comet);}
 @keyframes fl{from{opacity:0;transform:translateX(10px);}to{opacity:1;transform:none;}}
 #flarelog b{color:var(--flare);font-weight:400;}
 
-.ctrl{position:absolute;z-index:4;left:50%;transform:translateX(-50%);bottom:30px;display:flex;gap:10px;align-items:center;}
+.ctrl{position:absolute;z-index:4;left:64%;transform:translateX(-50%);bottom:30px;display:flex;gap:10px;align-items:center;}
 .cbtn{font-family:"Space Mono",monospace;font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;
   background:rgba(10,16,32,.78);color:var(--star-dim);border:1px solid var(--line-2);border-radius:999px;
   padding:9px 16px;cursor:pointer;transition:all .3s;backdrop-filter:blur(6px);}
 .cbtn:hover{color:var(--star);border-color:var(--comet);}
 .cbtn.active{background:var(--comet);color:var(--space);border-color:var(--comet);font-weight:700;}
-.hero-note{position:absolute;z-index:3;left:50%;transform:translateX(-50%);bottom:78px;
+.hero-note{position:absolute;z-index:3;left:64%;transform:translateX(-50%);bottom:78px;
   font-family:"Space Mono",monospace;font-size:.58rem;letter-spacing:.26em;text-transform:uppercase;color:var(--mute);pointer-events:none;}
 .hero-note b{color:var(--gold);font-weight:400;}
 
@@ -174,8 +174,40 @@ section p b{color:var(--star);font-weight:600;}
 .wl-form input::placeholder{color:var(--mute);}
 .wl-form input:focus{outline:none;border-color:var(--comet);}
 
+/* hero plan banner */
+.plan-banner{margin-top:18px;display:flex;align-items:center;gap:14px;max-width:560px;
+  padding:11px 16px;border:1px solid rgba(87,230,214,.35);border-radius:12px;
+  background:rgba(10,16,32,.85);text-decoration:none;pointer-events:auto;
+  transition:border-color .3s, box-shadow .3s;backdrop-filter:blur(6px);}
+.plan-banner:hover{border-color:var(--comet);box-shadow:0 0 22px rgba(87,230,214,.25);}
+.plan-banner .pb-tag{flex:none;font-family:"Space Mono",monospace;font-size:.54rem;letter-spacing:.2em;
+  text-transform:uppercase;font-weight:700;color:var(--space);background:var(--comet);
+  padding:4px 8px;border-radius:999px;}
+.plan-banner .pb-copy{font-size:.76rem;color:var(--star-dim);line-height:1.5;}
+.plan-banner .pb-copy b{color:var(--star);font-weight:600;}
+.plan-banner .pb-arrow{flex:none;font-family:"Space Mono",monospace;font-size:.58rem;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--comet);white-space:nowrap;}
+@media(max-width:640px){.plan-banner{flex-wrap:wrap;gap:8px;}.plan-banner .pb-copy{font-size:.7rem;}}
+
+/* plans */
+.plans-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:36px;}
+@media(max-width:760px){.plans-grid{grid-template-columns:1fr;}}
+.plan-card{background:rgba(10,16,32,.6);border:1px solid var(--line-2);border-radius:14px;
+  padding:30px 28px;display:flex;flex-direction:column;gap:18px;}
+.plan-card--hot{border-color:rgba(87,230,214,.5);box-shadow:0 0 34px rgba(87,230,214,.08);}
+.plan-card .tier{font-family:"Space Mono",monospace;font-size:.62rem;letter-spacing:.3em;
+  text-transform:uppercase;color:var(--comet);}
+.plan-card .price{font-family:"Michroma",sans-serif;font-size:1.9rem;color:#fff;letter-spacing:.04em;margin-top:8px;}
+.plan-card .price small{font-family:"Space Mono",monospace;font-size:.62rem;letter-spacing:.14em;color:var(--mute);text-transform:uppercase;}
+.plan-card ul{list-style:none;display:flex;flex-direction:column;gap:10px;flex:1;}
+.plan-card li{font-size:.86rem;color:var(--star-dim);padding-left:20px;position:relative;line-height:1.55;max-width:none;}
+.plan-card li::before{content:"▸";position:absolute;left:0;color:var(--comet);font-size:.7rem;}
+.plan-card li b{color:var(--star);font-weight:600;}
+.plan-card .btn{text-align:center;}
+
 /* CTA */
 .cta{text-align:center;}
+.cta .cta-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
 .cta h2{margin:14px auto 12px;}
 .cta p{margin:0 auto 26px;}
 
@@ -199,7 +231,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--line);padding:clam
   .lede{font-size:.85rem;}
   .hero-note{display:none;}
   .cbtn{white-space:nowrap;padding:8px 12px;font-size:.54rem;letter-spacing:.12em;}
-  .ctrl{gap:7px;}
+  .ctrl{gap:7px;left:50%;}
 }
 @media(prefers-reduced-motion:reduce){
   html{scroll-behavior:auto;}
@@ -216,7 +248,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--line);padding:clam
     <a class="wordmark" href="https://simslate.com/">SIM<em>SLATE</em></a>
     <span class="nav-auth">
       <a class="btn btn--ghost" href="https://simslate.com/app/">Sign in</a>
-      <a class="btn btn--solid" href="https://simslate.com/app/?signup=1">Join now</a>
+      <a class="btn btn--solid" href="#plans">Start free</a>
     </span>
   </div>
   <nav class="nav-links" aria-label="Site">
@@ -238,7 +270,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--line);padding:clam
       <div class="kick">NFL · DraftKings · GPP</div>
       <h1 class="disp">EVERY SUNDAY,<br /><span class="tint">FIFTY THOUSAND</span><br /><span class="tint2">TIMES.</span></h1>
       <p class="lede">
-        SimSlate rebuilds the whole tournament before lock: a <b>10,000-lineup field</b> drawn
+        SimSlate rebuilds the whole tournament before lock: a <b>50,000-lineup field</b> drawn
         from projected ownership, then <b>50,000 correlated simulations</b> of the slate.
         Lineups are ranked by <b>expected ROI</b> against that field — not by adding
         up projections.
@@ -246,9 +278,15 @@ footer{position:relative;z-index:1;border-top:1px solid var(--line);padding:clam
       <p class="lede lede--sub">Each streak falling behind this headline is one simulated
       world. The distribution isn't drawn — it's <b>earned</b>.</p>
       <div class="hero-cta">
-        <a class="btn btn--solid btn--big" href="https://simslate.com/app/">Run the sim</a>
+        <a class="btn btn--solid btn--big" href="#plans">Start free — run the sim</a>
         <a class="btn btn--ghost btn--big" href="https://simslate.com/methodology/">Read the methodology</a>
       </div>
+      <a class="plan-banner" href="#plans">
+        <span class="pb-tag">Free plan</span>
+        <span class="pb-copy">Run a real <b>1,000-lineup field simulation</b> on the live engine —
+          letter-graded outputs, no card required.</span>
+        <span class="pb-arrow">Compare plans →</span>
+      </a>
     </div>
 
     <div class="odometer" aria-live="off">
@@ -270,7 +308,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--line);padding:clam
   <div class="rail" aria-label="Engine at a glance">
     <div class="rail-inner">
       <div class="rail-cell reveal"><div class="rail-num">50,000</div><div class="rail-label">correlated slate simulations</div></div>
-      <div class="rail-cell reveal"><div class="rail-num">10,000</div><div class="rail-label">ownership-true field lineups</div></div>
+      <div class="rail-cell reveal"><div class="rail-num">50,000</div><div class="rail-label">ownership-true field lineups</div></div>
       <div class="rail-cell reveal"><div class="rail-num">&lt;2<i>%</i></div><div class="rail-label">exposure vs projected ownership</div></div>
       <div class="rail-cell reveal"><div class="rail-num"><i>0</i></div><div class="rail-label">players modeled as a bell curve</div></div>
     </div>
@@ -288,7 +326,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--line);padding:clam
           <span class="pk">Contest generator</span>
           <h3>Build the field you'll actually face</h3>
           <p>Projected ownership is treated as ground truth — never renormalized, never smoothed.
-          The generator fills 10,000 valid DraftKings rosters and calibrates until every player's
+          The generator fills 50,000 valid DraftKings rosters and calibrates until every player's
           exposure lands within a hard tolerance band of their projection. Scarce positions fill
           first, so the salary squeeze falls where real fields feel it.</p>
         </div>
@@ -431,13 +469,54 @@ footer{position:relative;z-index:1;border-top:1px solid var(--line);padding:clam
     </div>
   </section>
 
+  <!-- ============ PLANS ============ -->
+  <section id="plans">
+    <div class="inner">
+      <div class="sec-head"><span class="sec-num">Plans</span><h2 class="disp">START FREE. UPGRADE WHEN YOU WANT EXACT NUMBERS.</h2></div>
+      <div class="plans-grid">
+        <div class="plan-card reveal">
+          <div>
+            <span class="tier">Free</span>
+            <div class="price">$0 <small>/ forever, no card</small></div>
+          </div>
+          <ul>
+            <li><b>Real 1,000-lineup field simulation</b> — the same engine, correlated sims and duplication model as the paid tier, at reduced scale</li>
+            <li>2,000 Monte Carlo simulations per run</li>
+            <li>Letter-graded outputs (A+ to F) for projections, ownership and lineup ROI</li>
+            <li>Top-10 lineups on the board, exportable to DraftKings CSV</li>
+            <li>Lineup Builder verdicts as a single overall grade</li>
+          </ul>
+          <a class="btn btn--ghost btn--big" href="https://simslate.com/app/?signup=1&amp;plan=free">Start free</a>
+        </div>
+        <div class="plan-card plan-card--hot reveal">
+          <div>
+            <span class="tier">Early Access</span>
+            <div class="price">$49 <small>/ month</small></div>
+          </div>
+          <ul>
+            <li><b>Full 50,000-lineup fields and 50,000 correlated sims</b> — up to 100,000 in max mode</li>
+            <li>Exact numbers everywhere: projections, ownership, ROI, dupes, leverage</li>
+            <li>The whole ranked board, full DraftKings CSV export</li>
+            <li>ROI boosts, projection overrides and sim-time model knobs</li>
+            <li>Lineup Builder with full AI Complete and itemized AI Advise</li>
+          </ul>
+          <a class="btn btn--solid btn--big" href="https://simslate.com/app/?signup=1&amp;plan=paid">Join Early Access</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ============ CTA ============ -->
   <section class="cta">
     <div class="inner">
       <span class="sec-num mono">Sunday is a sample size of one</span>
       <h2 class="disp" style="margin-top:14px;">SIMULATE THE OTHER 49,999.</h2>
-      <p style="margin:12px auto 26px;">Load the slate, generate the field, and know your lineups' ROI before lock.</p>
-      <a class="btn btn--solid btn--big" href="https://simslate.com/app/">Launch the simulator</a>
+      <p style="margin:12px auto 26px;">Load the slate, generate the field, and know your lineups' ROI before lock.
+      Start on the free plan — a real 1,000-lineup field simulation, letter-graded outputs, no card required.</p>
+      <div class="cta-row">
+        <a class="btn btn--solid btn--big" href="#plans">Start free</a>
+        <a class="btn btn--ghost btn--big" href="https://simslate.com/app/">Launch the simulator</a>
+      </div>
     </div>
   </section>
 </main>
