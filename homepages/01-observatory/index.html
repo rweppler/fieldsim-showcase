@@ -60,7 +60,7 @@ a{color:inherit;}
 /* ---------- hero ---------- */
 .hero{position:relative;z-index:1;height:100svh;min-height:640px;overflow:hidden;}
 #rain{position:absolute;inset:0;width:100%;height:100%;display:block;}
-.hero-copy{position:absolute;z-index:3;left:clamp(18px,3.4vw,38px);top:clamp(108px,16vh,170px);max-width:560px;}
+.hero-copy{position:absolute;z-index:3;left:clamp(18px,3.4vw,38px);top:clamp(142px,18vh,204px);max-width:560px;}
 .hero-copy::before{content:"";position:absolute;inset:-40px -80px -60px -50px;z-index:-1;
   background:radial-gradient(75% 85% at 32% 38%, rgba(4,6,11,.93) 35%, transparent 76%);}
 .kick{font-family:"Space Mono",monospace;font-size:.62rem;letter-spacing:.3em;text-transform:uppercase;
@@ -76,13 +76,13 @@ h1 .tint2{color:var(--comet);}
 .hero-cta{margin-top:30px;display:flex;gap:12px;flex-wrap:wrap;pointer-events:auto;}
 .btn--big{font-size:.7rem;padding:13px 26px;}
 
-.odometer{position:absolute;z-index:3;right:clamp(18px,3.4vw,38px);top:clamp(108px,16vh,170px);text-align:right;pointer-events:none;}
+.odometer{position:absolute;z-index:3;right:clamp(18px,3.4vw,38px);top:clamp(142px,18vh,204px);text-align:right;pointer-events:none;}
 .odo-cap{font-family:"Space Mono",monospace;font-size:.6rem;letter-spacing:.3em;color:var(--star-dim);text-transform:uppercase;}
 .odo-val{font-family:"Michroma",sans-serif;font-size:clamp(1.4rem,3vw,2.3rem);color:var(--comet);
   letter-spacing:.06em;margin-top:6px;text-shadow:0 0 30px rgba(87,230,214,.45);font-variant-numeric:tabular-nums;}
 .odo-sub{font-family:"Space Mono",monospace;font-size:.6rem;color:var(--mute);letter-spacing:.14em;margin-top:8px;}
 .odo-sub b{color:var(--gold);font-weight:400;}
-#flarelog{position:absolute;z-index:3;right:clamp(18px,3.4vw,38px);top:calc(clamp(108px,16vh,170px) + 132px);
+#flarelog{position:absolute;z-index:3;right:clamp(18px,3.4vw,38px);top:calc(clamp(142px,18vh,204px) + 132px);
   text-align:right;pointer-events:none;
   font-family:"Space Mono",monospace;font-size:.62rem;letter-spacing:.06em;color:var(--star-dim);}
 #flarelog div{opacity:0;animation:fl .6s ease forwards;}
@@ -174,20 +174,21 @@ section p b{color:var(--star);font-weight:600;}
 .wl-form input::placeholder{color:var(--mute);}
 .wl-form input:focus{outline:none;border-color:var(--comet);}
 
-/* hero plan banner */
-.plan-banner{margin-top:18px;display:flex;align-items:center;gap:14px;max-width:560px;
-  padding:11px 16px;border:1px solid rgba(87,230,214,.35);border-radius:12px;
-  background:rgba(10,16,32,.85);text-decoration:none;pointer-events:auto;
-  transition:border-color .3s, box-shadow .3s;backdrop-filter:blur(6px);}
-.plan-banner:hover{border-color:var(--comet);box-shadow:0 0 22px rgba(87,230,214,.25);}
-.plan-banner .pb-tag{flex:none;font-family:"Space Mono",monospace;font-size:.54rem;letter-spacing:.2em;
+/* free-plan announcement strip (very top, above the wordmark) */
+.plan-strip{display:flex;align-items:center;justify-content:center;gap:14px;
+  padding:8px clamp(18px,3.4vw,38px);text-decoration:none;
+  background:rgba(87,230,214,.08);border-bottom:1px solid rgba(87,230,214,.3);
+  transition:background .3s;}
+.plan-strip:hover{background:rgba(87,230,214,.15);}
+.plan-strip .pb-tag{flex:none;font-family:"Space Mono",monospace;font-size:.54rem;letter-spacing:.2em;
   text-transform:uppercase;font-weight:700;color:var(--space);background:var(--comet);
-  padding:4px 8px;border-radius:999px;}
-.plan-banner .pb-copy{font-size:.76rem;color:var(--star-dim);line-height:1.5;}
-.plan-banner .pb-copy b{color:var(--star);font-weight:600;}
-.plan-banner .pb-arrow{flex:none;font-family:"Space Mono",monospace;font-size:.58rem;
+  padding:3px 8px;border-radius:999px;}
+.plan-strip .pb-copy{font-size:.78rem;color:var(--star-dim);line-height:1.4;}
+.plan-strip .pb-copy b{color:var(--star);font-weight:600;}
+.plan-strip .pb-arrow{flex:none;font-family:"Space Mono",monospace;font-size:.58rem;
   letter-spacing:.14em;text-transform:uppercase;color:var(--comet);white-space:nowrap;}
-@media(max-width:640px){.plan-banner{flex-wrap:wrap;gap:8px;}.plan-banner .pb-copy{font-size:.7rem;}}
+@media(max-width:700px){.plan-strip{flex-wrap:wrap;gap:6px;padding:7px 14px;}
+  .plan-strip .pb-copy{font-size:.68rem;}}
 
 /* plans */
 .plans-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:36px;}
@@ -244,6 +245,11 @@ footer{position:relative;z-index:1;border-top:1px solid var(--line);padding:clam
 <canvas id="stars" aria-hidden="true"></canvas>
 
 <header class="nav">
+  <a class="plan-strip" href="#plans">
+    <span class="pb-tag">Free plan</span>
+    <span class="pb-copy">Run a real <b>1,000-lineup field simulation</b> on the live engine — letter-graded outputs, no card required.</span>
+    <span class="pb-arrow">Compare plans →</span>
+  </a>
   <div class="nav-top">
     <a class="wordmark" href="https://simslate.com/">SIM<em>SLATE</em></a>
     <span class="nav-auth">
@@ -275,12 +281,6 @@ footer{position:relative;z-index:1;border-top:1px solid var(--line);padding:clam
         Lineups are ranked by <b>expected ROI</b> against that field — not by adding
         up projections.
       </p>
-      <a class="plan-banner" href="#plans">
-        <span class="pb-tag">Free plan</span>
-        <span class="pb-copy">Run a real <b>1,000-lineup field simulation</b> on the live engine —
-          letter-graded outputs, no card required.</span>
-        <span class="pb-arrow">Compare plans →</span>
-      </a>
       <p class="lede lede--sub">Each streak falling behind this headline is one simulated
       world. The distribution isn't drawn — it's <b>earned</b>.</p>
     </div>
