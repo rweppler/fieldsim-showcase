@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SimSlate — homepage concept 04 · The Blueprint</title>
+<meta name="description" content="SimSlate homepage redesign concept: the contest engine as a drafting-table blueprint. A rotating 3D correlation constellation wires two teams together." />
+<meta name="robots" content="noindex" />
+<meta name="theme-color" content="#081d3a" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23081d3a'/%3E%3Cg stroke='%237fd6ff' stroke-width='1.4' fill='none'%3E%3Ccircle cx='10' cy='11' r='3'/%3E%3Ccircle cx='23' cy='20' r='3'/%3E%3Cpath d='M13 13 L20 18'/%3E%3C/g%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@400;600;700;800&family=Azeret+Mono:wght@300;400;500&family=Archivo:wght@300;400;600&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --paper:#081d3a; --paper-2:#0a2244; --panel:#0d2850;
+  --ink:#e8f1ff; --ink-dim:#9db4d4; --mute:#5b7499;
+  --wire:#7fd6ff; --wire-deep:#3f8fc4; --amber:#ffc24b; --neg:#ff6b5e; --lev:#9dffb0;
+  --line:rgba(232,241,255,.12); --line-2:rgba(232,241,255,.28);
+  --grid:rgba(127,214,255,.07); --grid-2:rgba(127,214,255,.13);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:
+  linear-gradient(rgba(127,214,255,.045) 1px, transparent 1px),
+  linear-gradient(90deg, rgba(127,214,255,.045) 1px, transparent 1px),
+  linear-gradient(rgba(127,214,255,.09) 1px, transparent 1px),
+  linear-gradient(90deg, rgba(127,214,255,.09) 1px, transparent 1px),
+  var(--paper);
+  background-size:20px 20px, 20px 20px, 100px 100px, 100px 100px;
+  color:var(--ink);font-family:"Archivo",system-ui,sans-serif;
+  font-weight:300;line-height:1.7;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+::selection{background:var(--wire);color:var(--paper);}
+a{color:inherit;}
+:focus-visible{outline:2px solid var(--wire);outline-offset:3px;border-radius:2px;}
+.disp{font-family:"Big Shoulders Display",sans-serif;font-weight:700;}
+.mono{font-family:"Azeret Mono",monospace;}
+::-webkit-scrollbar{width:10px;}
+::-webkit-scrollbar-track{background:var(--paper-2);}
+::-webkit-scrollbar-thumb{background:#1c3f75;border-radius:8px;}
+
+/* ---------- nav = title block ---------- */
+.nav{position:fixed;top:0;left:0;right:0;z-index:50;
+  background:linear-gradient(to bottom,rgba(8,29,58,.95) 60%,transparent);}
+.nav-top{display:flex;justify-content:space-between;align-items:center;padding:14px clamp(18px,3.4vw,38px) 8px;}
+.wordmark{font-family:"Big Shoulders Display",sans-serif;font-weight:800;font-size:1.5rem;letter-spacing:.05em;
+  text-decoration:none;color:#fff;text-transform:uppercase;}
+.wordmark em{font-style:normal;color:var(--wire);}
+.nav-auth{display:flex;gap:10px;align-items:center;}
+.btn{font-family:"Azeret Mono",monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;
+  text-decoration:none;padding:10px 20px;transition:all .25s;display:inline-block;border:1px solid var(--line-2);}
+.btn--ghost{color:var(--ink-dim);}
+.btn--ghost:hover{color:#fff;border-color:var(--wire);}
+.btn--solid{background:var(--wire);color:var(--paper);border-color:var(--wire);font-weight:500;}
+.btn--solid:hover{background:#a9e4ff;box-shadow:0 0 24px rgba(127,214,255,.35);}
+.nav-links{display:flex;gap:22px;align-items:center;padding:4px clamp(18px,3.4vw,38px) 12px;
+  font-family:"Azeret Mono",monospace;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-dim);
+  overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--line);}
+.nav-links::-webkit-scrollbar{display:none;}
+.nav-links a{text-decoration:none;transition:color .3s;white-space:nowrap;}
+.nav-links a:hover{color:var(--wire);}
+.nav-links a.prod{color:var(--ink);}
+.nav-links a.prod::before{content:"▸ ";color:var(--wire);}
+.nav-sep{width:1px;height:12px;background:var(--line-2);flex:none;}
+
+/* ---------- hero: sheet 01, the constellation ---------- */
+.hero{position:relative;height:100svh;min-height:660px;overflow:hidden;border-bottom:1px solid var(--line-2);}
+#wires{position:absolute;inset:0;width:100%;height:100%;display:block;}
+.hero-copy{position:absolute;z-index:3;left:clamp(18px,3.4vw,38px);top:clamp(112px,16vh,180px);max-width:560px;}
+.stamp{display:inline-block;font-family:"Azeret Mono",monospace;font-size:.58rem;letter-spacing:.26em;text-transform:uppercase;
+  color:var(--wire);border:1px solid rgba(127,214,255,.5);padding:6px 14px;margin-bottom:22px;}
+h1.disp{font-size:clamp(2.6rem,7vw,5.6rem);line-height:.94;letter-spacing:.015em;color:#fff;text-transform:uppercase;font-weight:800;}
+h1 .out{color:transparent;-webkit-text-stroke:1.6px rgba(157,180,212,.9);}
+h1 .tint{color:var(--wire);}
+.lede{margin-top:24px;font-size:1rem;color:var(--ink-dim);max-width:47ch;}
+.lede b{color:var(--ink);font-weight:600;}
+.hero-cta{margin-top:30px;display:flex;gap:12px;flex-wrap:wrap;}
+.btn--big{font-size:.7rem;padding:14px 28px;}
+
+/* dimension strip along hero bottom */
+.dim-strip{position:absolute;z-index:3;left:clamp(18px,3.4vw,38px);right:clamp(18px,3.4vw,38px);bottom:26px;
+  display:flex;justify-content:space-between;align-items:flex-end;pointer-events:none;
+  font-family:"Azeret Mono",monospace;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--mute);}
+.dim-strip b{color:var(--wire);font-weight:400;}
+.dim-strip .r{text-align:right;}
+.dim-strip i{color:var(--neg);font-style:normal;}
+
+/* ---------- sheet sections ---------- */
+section{position:relative;border-bottom:1px solid var(--line-2);padding:clamp(64px,9vw,120px) clamp(18px,3.4vw,38px);}
+.inner{max-width:1120px;margin:0 auto;}
+.sheet-tag{font-family:"Azeret Mono",monospace;font-size:.58rem;letter-spacing:.26em;text-transform:uppercase;color:var(--mute);
+  display:flex;align-items:center;gap:14px;margin-bottom:18px;}
+.sheet-tag b{color:var(--wire);font-weight:400;}
+.sheet-tag::after{content:"";flex:1;height:1px;background:var(--line);}
+h2.disp{font-size:clamp(2rem,4.6vw,3.6rem);line-height:.98;color:#fff;text-transform:uppercase;font-weight:800;letter-spacing:.015em;max-width:22ch;}
+h2 .tint{color:var(--wire);}
+h2 .gold{color:var(--amber);}
+section p{color:var(--ink-dim);font-size:.96rem;max-width:62ch;margin-bottom:16px;}
+section p b{color:var(--ink);font-weight:600;}
+
+/* stat rail — bill of materials */
+.rail{border-bottom:1px solid var(--line-2);}
+.rail-inner{max-width:1120px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);
+  border-left:1px solid var(--line-2);}
+.rail-cell{border-right:1px solid var(--line-2);padding:26px 22px;position:relative;}
+.rail-cell::before{content:attr(data-i);position:absolute;top:10px;right:12px;
+  font-family:"Azeret Mono",monospace;font-size:.55rem;color:var(--mute);}
+.rail-num{font-family:"Big Shoulders Display",sans-serif;font-weight:800;font-size:clamp(1.8rem,3.4vw,2.8rem);color:#fff;line-height:1;}
+.rail-num i{font-style:normal;color:var(--wire);}
+.rail-label{font-family:"Azeret Mono",monospace;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);margin-top:10px;line-height:1.8;}
+@media(max-width:820px){.rail-inner{grid-template-columns:1fr 1fr;}.rail-cell{border-bottom:1px solid var(--line-2);}}
+
+/* phases — two sheets */
+.phases{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:42px;}
+.phase{border:1px solid var(--line-2);padding:0;background:rgba(13,40,80,.35);}
+.phase-head{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line-2);
+  padding:12px 20px;font-family:"Azeret Mono",monospace;font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;}
+.phase-head .l{color:var(--wire);}
+.phase-head .r{color:var(--mute);}
+.phase-body{padding:24px 22px 28px;}
+.phase h3{font-family:"Big Shoulders Display",sans-serif;font-weight:700;font-size:1.7rem;color:#fff;margin:0 0 12px;text-transform:uppercase;letter-spacing:.02em;}
+.phase p{font-size:.9rem;margin:0 0 20px;}
+.phase svg{width:100%;height:auto;display:block;}
+@media(max-width:860px){.phases{grid-template-columns:1fr;}}
+
+/* duality — annotated detail views */
+.duality{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:42px;}
+.duality>div{border:1px solid var(--line-2);padding:30px 28px;background:rgba(13,40,80,.35);position:relative;}
+.duality>div::before{content:"DETAIL " attr(data-d);position:absolute;top:-9px;left:18px;background:var(--paper);
+  font-family:"Azeret Mono",monospace;font-size:.55rem;letter-spacing:.22em;color:var(--mute);padding:0 10px;}
+.duality .big{font-family:"Big Shoulders Display",sans-serif;font-weight:800;font-size:2.8rem;line-height:1;}
+.duality h3{font-family:"Big Shoulders Display",sans-serif;font-weight:700;font-size:1.3rem;margin:12px 0 10px;text-transform:uppercase;letter-spacing:.03em;}
+.duality p{font-size:.9rem;margin:0;}
+.gold{color:var(--amber);}
+.grn{color:var(--lev);}
+@media(max-width:760px){.duality{grid-template-columns:1fr;}}
+
+/* teasers + lab */
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:42px;}
+.card{border:1px solid var(--line-2);padding:28px;text-decoration:none;background:rgba(13,40,80,.35);
+  display:flex;flex-direction:column;gap:10px;transition:all .3s;}
+.card:hover{border-color:var(--wire);background:rgba(13,40,80,.6);}
+.card .pk{font-family:"Azeret Mono",monospace;font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--mute);}
+.card h3{font-family:"Big Shoulders Display",sans-serif;font-weight:700;font-size:1.5rem;color:#fff;line-height:1.1;text-transform:uppercase;letter-spacing:.02em;}
+.card p{font-size:.9rem;margin:0;}
+.card .go{margin-top:auto;padding-top:16px;font-family:"Azeret Mono",monospace;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--wire);}
+@media(max-width:760px){.cards{grid-template-columns:1fr;}}
+
+.lab-list{margin-top:42px;border:1px solid var(--line-2);}
+.lab-row{--tint:var(--wire);
+  display:grid;grid-template-columns:110px 1fr auto;gap:clamp(14px,2.6vw,30px);align-items:center;
+  padding:20px clamp(16px,2.6vw,28px);border-top:1px solid var(--line);text-decoration:none;transition:background .3s;}
+.lab-row:first-child{border-top:none;}
+.lab-row:hover{background:rgba(127,214,255,.06);}
+.lab-row .no{font-family:"Azeret Mono",monospace;font-size:.6rem;color:var(--mute);letter-spacing:.14em;text-transform:uppercase;}
+.lab-row:hover .no{color:var(--tint);}
+.lab-row h3{font-family:"Big Shoulders Display",sans-serif;font-weight:700;font-size:1.4rem;color:#fff;transition:color .3s;text-transform:uppercase;letter-spacing:.02em;}
+.lab-row:hover h3{color:var(--tint);}
+.lab-row .t p{color:var(--ink-dim);font-size:.85rem;margin:2px 0 0;max-width:62ch;}
+.lab-row .tag{font-family:"Azeret Mono",monospace;font-size:.56rem;letter-spacing:.16em;color:var(--mute);text-transform:uppercase;text-align:right;white-space:nowrap;}
+@media(max-width:820px){.lab-row{grid-template-columns:64px 1fr;}.lab-row .tag{display:none;}}
+
+/* waitlist + cta */
+.wl-inner{max-width:720px;margin:0 auto;text-align:center;}
+.wl-inner .sheet-tag{justify-content:center;}
+.wl-inner .sheet-tag::after{display:none;}
+.wl h2{margin:0 auto;}
+.wl-form{display:flex;gap:10px;justify-content:center;margin-top:28px;flex-wrap:wrap;}
+.wl-form input{font-family:"Azeret Mono",monospace;font-size:.74rem;color:var(--ink);
+  background:rgba(13,40,80,.5);border:1px solid var(--line-2);padding:13px 20px;min-width:270px;}
+.wl-form input::placeholder{color:var(--mute);}
+.wl-form input:focus{outline:none;border-color:var(--wire);}
+.wl-form .btn{cursor:pointer;}
+.cta{text-align:center;}
+.cta .sheet-tag{justify-content:center;}
+.cta .sheet-tag::after{display:none;}
+.cta h2{margin:0 auto;}
+
+/* footer = drawing title block */
+footer{padding:0;}
+.tblock{max-width:1120px;margin:clamp(44px,6vw,70px) auto;border:1px solid var(--line-2);
+  display:grid;grid-template-columns:2fr 1fr 1fr;font-family:"Azeret Mono",monospace;font-size:.62rem;letter-spacing:.1em;color:var(--mute);}
+.tblock>div{padding:18px 20px;border-right:1px solid var(--line-2);}
+.tblock>div:last-child{border-right:none;}
+.tblock b{display:block;color:var(--ink-dim);font-weight:400;margin-bottom:6px;font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;}
+.tblock a{color:var(--ink-dim);text-decoration:none;}
+.tblock a:hover{color:var(--wire);}
+.tblock .links{display:flex;flex-direction:column;gap:4px;}
+.tblock .legal{grid-column:1 / -1;border-top:1px solid var(--line-2);border-right:none;font-size:.6rem;line-height:1.8;}
+@media(max-width:760px){.tblock{grid-template-columns:1fr;} .tblock>div{border-right:none;border-bottom:1px solid var(--line);}}
+
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .7s ease, transform .7s ease;}
+.reveal.in{opacity:1;transform:none;}
+
+@media(max-width:820px){
+  h1.disp{font-size:clamp(2.1rem,10vw,3.2rem);}
+  .lede{font-size:.9rem;}
+  .dim-strip .r{display:none;}
+  .hero-copy{top:clamp(100px,14vh,150px);}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto;}
+  .reveal{opacity:1;transform:none;transition:none;}
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-top">
+    <a class="wordmark" href="https://simslate.com/">SIM<em>SLATE</em></a>
+    <span class="nav-auth">
+      <a class="btn btn--ghost" href="https://simslate.com/app/">Sign in</a>
+      <a class="btn btn--solid" href="https://simslate.com/app/?signup=1">Join now</a>
+    </span>
+  </div>
+  <nav class="nav-links" aria-label="Site">
+    <a class="prod" href="https://simslate.com/app/">The Simulator</a>
+    <a class="prod" href="https://simslate.com/builder/">Lineup Builder</a>
+    <span class="nav-sep" aria-hidden="true"></span>
+    <a href="https://simslate.com/methodology/">Methodology</a>
+    <a href="https://simslate.com/edge/">The Edge</a>
+    <a href="#lab">The Lab</a>
+    <a href="https://simslate.com/tools/dupe-calculator/">Dupe Tax Calculator</a>
+  </nav>
+</header>
+
+<main>
+  <!-- ============ HERO: SHEET 01, the correlation constellation ============ -->
+  <section class="hero" aria-label="Rotating 3D correlation diagram of a game stack" style="padding:0;">
+    <canvas id="wires"></canvas>
+    <div class="hero-copy">
+      <span class="stamp">DWG № SS-26 · NFL GPP contest engine</span>
+      <h1 class="disp">Sunday,<br /><span class="out">drawn to</span><br /><span class="tint">scale.</span></h1>
+      <p class="lede">
+        No player booms alone — the wires in this drawing are real NFL correlations,
+        and SimSlate simulates along every one of them. A <b>10,000-lineup field</b> built
+        from projected ownership, <b>50,000 correlated simulations</b> of the slate, and
+        every lineup priced by <b>expected ROI</b> — not by adding up projections.
+      </p>
+      <div class="hero-cta">
+        <a class="btn btn--solid btn--big" href="https://simslate.com/app/">Run the sim</a>
+        <a class="btn btn--ghost btn--big" href="https://simslate.com/methodology/">Read the methodology</a>
+      </div>
+    </div>
+    <div class="dim-strip" aria-hidden="true">
+      <span>solid wire <b>ρ &gt; 0</b> — stacks rise together<br />dashed wire <i>ρ &lt; 0</i> — one side's ceiling is the other's floor</span>
+      <span class="r">projection: <b>orthographic → perspective</b><br />rotate: drag / move pointer</span>
+    </div>
+  </section>
+
+  <!-- ============ STAT RAIL: bill of materials ============ -->
+  <div class="rail" aria-label="Engine at a glance">
+    <div class="rail-inner">
+      <div class="rail-cell reveal" data-i="ITEM 1"><div class="rail-num">50,000</div><div class="rail-label">correlated slate simulations</div></div>
+      <div class="rail-cell reveal" data-i="ITEM 2"><div class="rail-num">10,000</div><div class="rail-label">ownership-true field lineups</div></div>
+      <div class="rail-cell reveal" data-i="ITEM 3"><div class="rail-num">≤3<i>pts</i></div><div class="rail-label">exposure vs projected ownership</div></div>
+      <div class="rail-cell reveal" data-i="ITEM 4"><div class="rail-num"><i>0</i></div><div class="rail-label">players modeled as a bell curve</div></div>
+    </div>
+  </div>
+
+  <!-- ============ TWO PHASES ============ -->
+  <section>
+    <div class="inner">
+      <div class="sheet-tag">SHEET 02 · <b>how it works — two phases, one contest</b></div>
+      <h2 class="disp">Your lineup is a distribution, <span class="tint">not a number.</span></h2>
+      <p class="mono" style="font-size:.64rem;letter-spacing:.2em;text-transform:uppercase;color:var(--amber);margin-top:14px;">Because one number never won a milly</p>
+
+      <div class="phases">
+        <article class="phase reveal">
+          <div class="phase-head"><span class="l">Phase 01</span><span class="r">contest generator</span></div>
+          <div class="phase-body">
+            <h3>Build the field you'll face</h3>
+            <p>Projected ownership is treated as ground truth — never renormalized, never smoothed.
+            The generator fills 10,000 valid DraftKings rosters and calibrates until every player's
+            exposure lands within a hard tolerance band of their projection. Scarce positions fill
+            first, so the salary squeeze lands where real fields feel it.</p>
+            <svg viewBox="0 0 340 120" role="img" aria-label="Generated exposure matching projected ownership within a band">
+              <g font-family="Azeret Mono, monospace" font-size="8" fill="#5b7499"><text x="0" y="10" letter-spacing="2">EXPOSURE VS PROJECTION</text></g>
+              <rect x="8"   y="44" width="30" height="58" fill="#7fd6ff" opacity=".65"/><line x1="5"  y1="41" x2="41"  y2="41" stroke="#ffc24b" stroke-width="2"/>
+              <rect x="56"  y="32" width="30" height="70" fill="#7fd6ff" opacity=".5"/><line x1="53" y1="35" x2="89"  y2="35" stroke="#ffc24b" stroke-width="2"/>
+              <rect x="104" y="60" width="30" height="42" fill="#7fd6ff" opacity=".45"/><line x1="101" y1="58" x2="137" y2="58" stroke="#ffc24b" stroke-width="2"/>
+              <rect x="152" y="74" width="30" height="28" fill="#7fd6ff" opacity=".38"/><line x1="149" y1="76" x2="185" y2="76" stroke="#ffc24b" stroke-width="2"/>
+              <rect x="200" y="52" width="30" height="50" fill="#7fd6ff" opacity=".48"/><line x1="197" y1="50" x2="233" y2="50" stroke="#ffc24b" stroke-width="2"/>
+              <rect x="248" y="82" width="30" height="20" fill="#7fd6ff" opacity=".34"/><line x1="245" y1="84" x2="281" y2="84" stroke="#ffc24b" stroke-width="2"/>
+              <rect x="296" y="66" width="30" height="36" fill="#7fd6ff" opacity=".42"/><line x1="293" y1="64" x2="329" y2="64" stroke="#ffc24b" stroke-width="2"/>
+              <line x1="0" y1="102" x2="340" y2="102" stroke="rgba(232,241,255,.2)"/>
+              <g font-family="Azeret Mono, monospace" font-size="7" fill="#5b7499"><text x="8" y="116">■ GENERATED</text><text x="96" y="116" fill="#ffc24b">— PROJECTED</text></g>
+            </svg>
+          </div>
+        </article>
+
+        <article class="phase reveal">
+          <div class="phase-head"><span class="l">Phase 02</span><span class="r">contest simulator</span></div>
+          <div class="phase-body">
+            <h3>Play the tournament 50,000×</h3>
+            <p>Every player gets a right-skewed distribution fitted to mean, volatility, ceiling and
+            boom/bust odds. A Gaussian copula ties stacks and game environments together, then the
+            engine scores the full field 50,000 times, pays a top-heavy GPP curve — duplication
+            splitting prizes — and reports each lineup's ROI.</p>
+            <svg viewBox="0 0 340 120" role="img" aria-label="Simulated outcome paths fanning to a payout verdict">
+              <g font-family="Azeret Mono, monospace" font-size="8" fill="#5b7499"><text x="0" y="10" letter-spacing="2">50,000 OUTCOMES → ROI</text></g>
+              <g stroke-width="1.2" fill="none">
+                <path d="M8 62 C 100 56, 190 30, 310 16" stroke="#7fd6ff" opacity=".9"/>
+                <path d="M8 62 C 100 59, 190 44, 310 36" stroke="#7fd6ff" opacity=".55"/>
+                <path d="M8 62 C 100 61, 190 55, 310 50" stroke="#7fd6ff" opacity=".35"/>
+                <path d="M8 62 C 100 63, 190 64, 310 66" stroke="#9db4d4" opacity=".5"/>
+                <path d="M8 62 C 100 65, 190 74, 310 82" stroke="#9db4d4" opacity=".4"/>
+                <path d="M8 62 C 100 68, 190 86, 310 98" stroke="#9db4d4" opacity=".3"/>
+              </g>
+              <circle cx="8" cy="62" r="3" fill="#fff"/>
+              <g font-family="Azeret Mono, monospace" font-size="7">
+                <text x="318" y="19" fill="#7fd6ff">1st</text>
+                <text x="318" y="39" fill="#7fd6ff">cash</text>
+                <text x="318" y="101" fill="#9db4d4">dead</text>
+              </g>
+            </svg>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CHALK VS LEVERAGE ============ -->
+  <section>
+    <div class="inner">
+      <div class="sheet-tag">SHEET 03 · <b>why ROI, not projection</b></div>
+      <h2 class="disp">Chalk splits the prize. <span class="gold">Leverage keeps it.</span></h2>
+      <div class="duality reveal">
+        <div data-d="A">
+          <div class="big gold">m &gt; 1</div>
+          <h3 class="gold">The chalk tax</h3>
+          <p>Popular lineups get duplicated. SimSlate models expected duplicates for every field
+          lineup from joint ownership, so a chalky build that "wins" shares first place — and its
+          simulated ROI shows the dilution before you pay entry fees to find out.</p>
+        </div>
+        <div data-d="B">
+          <div class="big grn">corr &lt; 0</div>
+          <h3 class="grn">The leverage guarantee</h3>
+          <p>Within every projected-score decile, simulated ROI is verified to correlate negatively
+          with ownership. Lower-owned paths to the same score are worth more — that's the math of
+          top-heavy payouts, and the engine won't ship a sim where it doesn't hold.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TEASERS ============ -->
+  <section>
+    <div class="inner">
+      <div class="sheet-tag">SHEET 04 · <b>go deeper</b></div>
+      <h2 class="disp">Specifications.</h2>
+      <div class="cards">
+        <a class="card reveal" href="https://simslate.com/methodology/">
+          <span class="pk">Statistical methodology</span>
+          <h3>Shifted lognormals, copulas, calibrated thresholds</h3>
+          <p>How every marginal is fitted, why boom/bust thresholds are learned from the data
+          instead of hardcoded, and how the payout curve stays honest to the rake.</p>
+          <span class="go">Read the methodology →</span>
+        </a>
+        <a class="card reveal" href="https://simslate.com/edge/">
+          <span class="pk">The edge</span>
+          <h3>AI where it helps. Statistics where it counts.</h3>
+          <p>What separates a contest simulator from a lineup optimizer, and the design rules
+          that keep SimSlate from adding noise to your signal.</p>
+          <span class="go">See what's different →</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ THE LAB ============ -->
+  <section id="lab">
+    <div class="inner">
+      <div class="sheet-tag">SHEET 05 · <b>the lab — the engine, made touchable</b></div>
+      <h2 class="disp">Don't take the math's <span class="tint">word for it.</span></h2>
+      <p style="margin-top:14px;">Four working exhibits built straight from the engine's statistics — no mockups,
+      every dot computed live in your browser.</p>
+      <div class="lab-list">
+        <a class="lab-row reveal" href="https://simslate.com/lab/outcomes/" style="--tint:#7fd6ff;">
+          <span class="no">FIG. 01</span>
+          <span class="t"><h3>Outcome Space</h3><p>42,000 particles hang under a living probability density. Scrub percentiles and carve the curve.</p></span>
+          <span class="tag">3D particles</span>
+        </a>
+        <a class="lab-row reveal" href="https://simslate.com/lab/monte-carlo/" style="--tint:#9dffb0;">
+          <span class="no">FIG. 02</span>
+          <span class="t"><h3>Fifty Thousand Worlds</h3><p>Simulated Sundays fall as meteor rain and earn the histogram one world at a time.</p></span>
+          <span class="tag">Live Monte Carlo</span>
+        </a>
+        <a class="lab-row reveal" href="https://simslate.com/lab/correlation/" style="--tint:#ffc24b;">
+          <span class="no">FIG. 03</span>
+          <span class="t"><h3>The Stack Schematic</h3><p>Drag any player's Sunday up or down and watch conditional expectation ripple through every wire.</p></span>
+          <span class="tag">Draggable blueprint</span>
+        </a>
+        <a class="lab-row reveal" href="https://simslate.com/lab/showdown/" style="--tint:#ff6b5e;">
+          <span class="no">FIG. 04</span>
+          <span class="t"><h3>Captain Theory</h3><p>Hand any player the armband and watch 1.5× salary math spend the cap to the very last dollar.</p></span>
+          <span class="tag">Captain dial</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FIELD REPORT ============ -->
+  <section class="wl">
+    <div class="wl-inner">
+      <div class="sheet-tag">REVISION NOTES · <b>the Field Report</b></div>
+      <h2 class="disp">Leverage notes, weekly.</h2>
+      <p style="margin:14px auto 0;">One email a week during the season: where the field is over-concentrated,
+      where the sim sees leverage, and the dupe traps to avoid — from real engine runs. Free, starts with Week 1.</p>
+      <form class="wl-form" onsubmit="return false;">
+        <input type="email" name="email" placeholder="you@example.com" autocomplete="email" required />
+        <button class="btn btn--solid" type="submit">Get the Field Report</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ============ CTA ============ -->
+  <section class="cta" style="border-bottom:none;">
+    <div class="inner">
+      <div class="sheet-tag">FINAL SHEET · <b>Sunday is a sample size of one</b></div>
+      <h2 class="disp">Simulate the other <span class="tint">49,999.</span></h2>
+      <p style="margin:14px auto 28px;">Load the slate, generate the field, and know your lineups' ROI before lock.</p>
+      <a class="btn btn--solid btn--big" href="https://simslate.com/app/">Launch the simulator</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="tblock">
+    <div>
+      <b>Drawing title</b>
+      SIMSLATE — NFL DFS GPP CONTEST SIMULATOR<br />
+      DWG № SS-26 · CONCEPT 04 “THE BLUEPRINT”
+    </div>
+    <div class="links">
+      <b>Product</b>
+      <a href="https://simslate.com/app/">The Simulator</a>
+      <a href="https://simslate.com/builder/">Lineup Builder</a>
+      <a href="https://simslate.com/tools/dupe-calculator/">Dupe Calculator</a>
+    </div>
+    <div class="links">
+      <b>Reading</b>
+      <a href="https://simslate.com/methodology/">Methodology</a>
+      <a href="https://simslate.com/edge/">The Edge</a>
+      <a href="#lab">The Lab</a>
+    </div>
+    <div class="legal">SimSlate is a research tool. It does not guarantee profit. Play responsibly. Not affiliated with DraftKings.</div>
+  </div>
+</footer>
+
+<script>
+(() => {
+"use strict";
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const cv = document.getElementById("wires"), ctx = cv.getContext("2d");
+let W=0,H=0,DPR=1;
+function resize(){
+  DPR = Math.min(devicePixelRatio||1, 2);
+  const r = cv.getBoundingClientRect();
+  W = r.width; H = r.height;
+  cv.width = W*DPR; cv.height = H*DPR;
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+}
+resize();
+addEventListener("resize", resize);
+
+/* The constellation: two teams' skill players in 3D, wired with
+   illustrative NFL correlations (same values the public lab plate shows). */
+const NODES = [
+  // home team (right hemisphere)
+  {id:"QB",   team:0, p:[ .55,  .10,  .25]},
+  {id:"WR1",  team:0, p:[ .95, -.32,  .55]},
+  {id:"WR2",  team:0, p:[ .80,  .48,  .80]},
+  {id:"TE",   team:0, p:[ .38, -.55, -.15]},
+  {id:"RB",   team:0, p:[ .95,  .38, -.45]},
+  {id:"DST",  team:0, p:[ .45,  .82, -.75]},
+  // away team (left hemisphere)
+  {id:"QB2",  team:1, p:[-.55, -.12, -.30]},
+  {id:"WR1'", team:1, p:[-.95,  .30, -.60]},
+  {id:"RB'",  team:1, p:[-.85, -.50,  .35]},
+  {id:"DST'", team:1, p:[-.45, -.85,  .70]},
+];
+const EDGES = [
+  ["QB","WR1",  .62],["QB","WR2",  .38],["QB","TE",  .32],
+  ["QB","RB",  -.12],["RB","DST",  .18],
+  ["QB","QB2",  .22],                      // shootout bring-back
+  ["QB2","WR1'",.62],["QB2","RB'",-.10],
+  ["QB","DST'",-.38],["QB2","DST",-.38],   // QB vs opposing DST
+  ["WR1","QB2", .15],
+];
+const byId = {}; NODES.forEach(n => byId[n.id] = n);
+
+let tx=0, ty=0, cx=0, cy=0;
+addEventListener("pointermove", e => {
+  tx = (e.clientX/W - 0.5) * 0.7;
+  ty = (e.clientY/H - 0.5) * 0.45;
+}, {passive:true});
+
+let rot = 0.2;
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  cx += (tx-cx)*0.045; cy += (ty-cy)*0.045;
+  if (!reduceMotion) rot += 0.0028;
+
+  const cosR = Math.cos(rot+cx), sinR = Math.sin(rot+cx);
+  const pitch = -0.12 + cy;
+  const cosP = Math.cos(pitch), sinP = Math.sin(pitch);
+  const CX = W>860 ? W*0.68 : W*0.5, CY = H*0.46;
+  const FOV = 2.6, SCALE = Math.min(W,H)*0.52;
+
+  // drafting guides: concentric construction circles + center axes
+  ctx.save();
+  ctx.strokeStyle = "rgba(127,214,255,.10)";
+  ctx.lineWidth = 1;
+  for (const gr of [0.32, 0.58, 0.86]){
+    ctx.beginPath(); ctx.ellipse(CX, CY, SCALE*gr, SCALE*gr*0.62, -0.16, 0, 7); ctx.stroke();
+  }
+  ctx.setLineDash([2,7]);
+  ctx.beginPath(); ctx.moveTo(CX - SCALE*0.98, CY); ctx.lineTo(CX + SCALE*0.98, CY); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(CX, CY - SCALE*0.66); ctx.lineTo(CX, CY + SCALE*0.66); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.font = `9px "Azeret Mono", monospace`;
+  ctx.fillStyle = "rgba(91,116,153,.8)";
+  ctx.textAlign = "left";
+  ctx.fillText("GAME ENVIRONMENT — CONSTRUCTION VIEW", CX - SCALE*0.95, CY - SCALE*0.60);
+  ctx.restore();
+
+  const proj = {};
+  for (const n of NODES){
+    let [x,y,z] = n.p;
+    let x1 = x*cosR - z*sinR, z1 = x*sinR + z*cosR, y1 = y;
+    const y2 = y1*cosP - z1*sinP, z2 = y1*sinP + z1*cosP;
+    const s = FOV/(z2 + FOV + 1.2);
+    proj[n.id] = { x: CX + x1*s*SCALE, y: CY + y2*s*SCALE, s, z: z2 };
+  }
+
+  // edges first
+  for (const [a,b,rho] of EDGES){
+    const A = proj[a], B = proj[b];
+    const depth = Math.max(0.45, Math.min(1, ((A.s+B.s)/2 - 0.45)*2.6));
+    const w = 0.8 + Math.abs(rho)*4;
+    ctx.lineWidth = w;
+    if (rho >= 0){
+      ctx.strokeStyle = `rgba(127,214,255,${(0.28 + Math.abs(rho)*0.85)*depth})`;
+      ctx.setLineDash([]);
+    } else {
+      ctx.strokeStyle = `rgba(255,107,94,${(0.3 + Math.abs(rho)*0.9)*depth})`;
+      ctx.setLineDash([6,6]);
+    }
+    ctx.beginPath(); ctx.moveTo(A.x, A.y); ctx.lineTo(B.x, B.y); ctx.stroke();
+    ctx.setLineDash([]);
+    // annotate the strongest wires
+    if (Math.abs(rho) >= 0.38 && W > 860){
+      const mx = (A.x+B.x)/2, my = (A.y+B.y)/2;
+      ctx.font = `10px "Azeret Mono", monospace`;
+      ctx.fillStyle = rho >= 0 ? `rgba(127,214,255,${.85*depth})` : `rgba(255,107,94,${.85*depth})`;
+      ctx.textAlign = "center";
+      const label = (rho>0?"+":"−") + Math.abs(rho).toFixed(2).slice(1);
+      ctx.fillText(label, mx, my - 7);
+    }
+  }
+
+  // nodes
+  for (const n of NODES){
+    const P = proj[n.id];
+    const depth = Math.max(0.45, Math.min(1, (P.s - 0.45)*2.6));
+    const r = 9*P.s + 3;
+    // crosshair ring
+    ctx.strokeStyle = n.team === 0 ? `rgba(232,241,255,${.85*depth})` : `rgba(157,180,212,${.8*depth})`;
+    ctx.lineWidth = 1.3;
+    ctx.beginPath(); ctx.arc(P.x, P.y, r, 0, 7); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(P.x - r - 5, P.y); ctx.lineTo(P.x - r + 2, P.y);
+    ctx.moveTo(P.x + r - 2, P.y); ctx.lineTo(P.x + r + 5, P.y);
+    ctx.moveTo(P.x, P.y - r - 5); ctx.lineTo(P.x, P.y - r + 2);
+    ctx.moveTo(P.x, P.y + r - 2); ctx.lineTo(P.x, P.y + r + 5);
+    ctx.stroke();
+    // core dot
+    ctx.fillStyle = n.id.startsWith("DST") ? `rgba(255,194,75,${.95*depth})` : `rgba(127,214,255,${.95*depth})`;
+    ctx.beginPath(); ctx.arc(P.x, P.y, 2.6*P.s + 1, 0, 7); ctx.fill();
+    // label
+    ctx.font = `${Math.round(10 + P.s*3)}px "Azeret Mono", monospace`;
+    ctx.fillStyle = `rgba(232,241,255,${.9*depth})`;
+    ctx.textAlign = "left";
+    ctx.fillText(n.id, P.x + r + 8, P.y + 4);
+  }
+}
+
+function loop(){
+  requestAnimationFrame(loop);
+  if (document.hidden) return;
+  draw();
+}
+if (reduceMotion) draw(); else requestAnimationFrame(loop);
+
+/* scroll reveal */
+const els = document.querySelectorAll(".reveal");
+if (!("IntersectionObserver" in window)) els.forEach(e => e.classList.add("in"));
+else {
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => { if (en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); } });
+  }, { threshold: .15 });
+  els.forEach(e => io.observe(e));
+}
+})();
+</script>
+</body>
+</html>

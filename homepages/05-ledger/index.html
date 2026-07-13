@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SimSlate — homepage concept 05 · The Ledger</title>
+<meta name="description" content="SimSlate homepage redesign concept: a statistical almanac in riso ink. Ten thousand lineups stand as an isometric field on paper, and a simulation wave rolls through them." />
+<meta name="robots" content="noindex" />
+<meta name="theme-color" content="#f4f6f2" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23f4f6f2'/%3E%3Cg fill='%230c7a4b'%3E%3Crect x='6' y='18' width='4' height='8'/%3E%3Crect x='12' y='12' width='4' height='14'/%3E%3Crect x='18' y='15' width='4' height='11'/%3E%3C/g%3E%3Crect x='24' y='21' width='4' height='5' fill='%23c96f00'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,500;12..96,700;12..96,800&family=Spline+Sans+Mono:wght@300;400;500&family=Archivo:wght@300;400;600&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --paper:#f4f6f2; --paper-2:#ecefe8; --card:#ffffff;
+  --ink:#131a16; --ink-dim:#4c5a52; --mute:#8a968e;
+  --grn:#0c7a4b; --grn-soft:#dcede2; --amber:#c96f00; --amber-soft:#f7e8d2; --red:#c2452d;
+  --line:rgba(19,26,22,.14); --line-2:rgba(19,26,22,.32);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--paper);color:var(--ink);font-family:"Archivo",system-ui,sans-serif;
+  font-weight:400;line-height:1.7;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+::selection{background:var(--grn);color:var(--paper);}
+a{color:inherit;}
+:focus-visible{outline:2px solid var(--grn);outline-offset:3px;border-radius:2px;}
+.disp{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;}
+.mono{font-family:"Spline Sans Mono",monospace;}
+::-webkit-scrollbar{width:10px;}
+::-webkit-scrollbar-track{background:var(--paper-2);}
+::-webkit-scrollbar-thumb{background:#c4cdc4;border-radius:8px;}
+
+/* ---------- nav ---------- */
+.nav{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(244,246,242,.92);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);}
+.nav-top{display:flex;justify-content:space-between;align-items:center;padding:14px clamp(18px,3.4vw,38px) 6px;}
+.wordmark{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:1.25rem;letter-spacing:-.02em;text-decoration:none;color:var(--ink);}
+.wordmark em{font-style:normal;color:var(--grn);}
+.nav-auth{display:flex;gap:10px;align-items:center;}
+.btn{font-family:"Spline Sans Mono",monospace;font-size:.63rem;letter-spacing:.14em;text-transform:uppercase;
+  text-decoration:none;border-radius:999px;padding:10px 20px;transition:all .25s;display:inline-block;}
+.btn--ghost{color:var(--ink-dim);border:1px solid var(--line-2);}
+.btn--ghost:hover{color:var(--ink);border-color:var(--grn);}
+.btn--solid{background:var(--grn);color:#fff;border:1px solid var(--grn);font-weight:500;}
+.btn--solid:hover{background:#0a6a41;box-shadow:0 4px 18px rgba(12,122,75,.25);}
+.nav-links{display:flex;gap:22px;align-items:center;padding:2px clamp(18px,3.4vw,38px) 10px;
+  font-family:"Spline Sans Mono",monospace;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-dim);
+  overflow-x:auto;scrollbar-width:none;}
+.nav-links::-webkit-scrollbar{display:none;}
+.nav-links a{text-decoration:none;transition:color .3s;white-space:nowrap;}
+.nav-links a:hover{color:var(--grn);}
+.nav-links a.prod{color:var(--ink);font-weight:500;}
+.nav-links a.prod::before{content:"▸ ";color:var(--grn);}
+.nav-sep{width:1px;height:12px;background:var(--line-2);flex:none;}
+
+/* ---------- hero ---------- */
+.hero{position:relative;padding:clamp(120px,17vh,190px) clamp(18px,3.4vw,38px) 0;}
+.hero-inner{max-width:1180px;margin:0 auto;}
+.kick{font-family:"Spline Sans Mono",monospace;font-size:.62rem;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--amber);margin-bottom:20px;display:flex;align-items:center;gap:12px;}
+.kick::before{content:"VOL. 26";border:1px solid var(--amber);border-radius:999px;padding:2px 10px;font-size:.56rem;}
+h1.disp{font-size:clamp(2.6rem,7.2vw,5.8rem);line-height:.98;letter-spacing:-.035em;color:var(--ink);max-width:14ch;}
+h1 .tint{color:var(--grn);}
+h1 .mark{position:relative;white-space:nowrap;}
+h1 .mark::after{content:"";position:absolute;left:-2%;right:-2%;bottom:6%;height:34%;background:var(--amber-soft);z-index:-1;transform:skewX(-6deg);}
+.lede{margin-top:26px;font-size:1.05rem;color:var(--ink-dim);max-width:54ch;}
+.lede b{color:var(--ink);font-weight:600;}
+.hero-cta{margin-top:32px;display:flex;gap:12px;flex-wrap:wrap;}
+.btn--big{font-size:.7rem;padding:14px 28px;}
+
+/* the plate */
+.plate{max-width:1180px;margin:clamp(34px,5vh,64px) auto 0;position:relative;
+  border:1px solid var(--line-2);background:var(--card);border-radius:4px;overflow:hidden;
+  box-shadow:0 24px 60px -30px rgba(19,26,22,.35);}
+#iso{display:block;width:100%;height:clamp(320px,52vh,520px);}
+.plate-cap{display:flex;justify-content:space-between;gap:18px;border-top:1px solid var(--line);
+  padding:12px 18px;font-family:"Spline Sans Mono",monospace;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--mute);}
+.plate-cap b{color:var(--grn);font-weight:500;}
+.plate-cap i{color:var(--amber);font-style:normal;}
+.plate-cap .r{text-align:right;}
+@media(max-width:700px){.plate-cap .r{display:none;}}
+
+/* ---------- sections ---------- */
+section{position:relative;padding:clamp(70px,9vw,130px) clamp(18px,3.4vw,38px) 0;}
+.inner{max-width:1180px;margin:0 auto;}
+.sec-head{display:flex;align-items:center;gap:16px;margin-bottom:16px;
+  font-family:"Spline Sans Mono",monospace;font-size:.62rem;letter-spacing:.28em;text-transform:uppercase;color:var(--amber);}
+.sec-head::after{content:"";flex:1;height:1px;background:var(--line);}
+h2.disp{font-size:clamp(1.9rem,4.4vw,3.4rem);line-height:1.02;letter-spacing:-.03em;color:var(--ink);max-width:22ch;}
+h2 .tint{color:var(--grn);}
+section p{color:var(--ink-dim);font-size:.98rem;max-width:62ch;margin-bottom:16px;}
+section p b{color:var(--ink);font-weight:600;}
+
+/* stat rail — table of figures */
+.rail{max-width:1180px;margin:clamp(60px,8vw,100px) auto 0;border-top:2px solid var(--ink);
+  display:grid;grid-template-columns:repeat(4,1fr);}
+.rail-cell{border-right:1px solid var(--line);padding:22px 20px 26px;position:relative;}
+.rail-cell:last-child{border-right:none;}
+.rail-num{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:clamp(1.7rem,3.2vw,2.6rem);letter-spacing:-.03em;line-height:1;color:var(--ink);}
+.rail-num i{font-style:normal;color:var(--grn);}
+.rail-label{font-family:"Spline Sans Mono",monospace;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);margin-top:10px;line-height:1.8;}
+@media(max-width:820px){.rail{grid-template-columns:1fr 1fr;}.rail-cell{border-bottom:1px solid var(--line);}}
+
+/* phases — ledger entries */
+.phases{margin-top:44px;border-top:2px solid var(--ink);}
+.phase{display:grid;grid-template-columns:150px 1fr 320px;gap:clamp(20px,3.4vw,54px);align-items:center;
+  padding:clamp(30px,4.4vh,48px) 0;border-bottom:1px solid var(--line);}
+.phase-no{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:clamp(2.6rem,5vw,4rem);letter-spacing:-.04em;color:var(--grn-soft);
+  -webkit-text-stroke:1.5px var(--grn);}
+.phase .pk{font-family:"Spline Sans Mono",monospace;font-size:.58rem;letter-spacing:.24em;text-transform:uppercase;color:var(--amber);}
+.phase h3{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:1.5rem;letter-spacing:-.02em;color:var(--ink);margin:8px 0 12px;}
+.phase p{font-size:.94rem;margin:0;}
+.phase svg{width:100%;height:auto;display:block;}
+@media(max-width:900px){.phase{grid-template-columns:84px 1fr;}.phase svg{display:none;}}
+
+/* duality — two-ink spread */
+.duality{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:44px;}
+.duality>div{border-radius:4px;padding:34px 30px;}
+.duality .chalk-side{background:var(--amber-soft);}
+.duality .lev-side{background:var(--grn-soft);}
+.duality .big{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:2.6rem;letter-spacing:-.03em;line-height:1;}
+.duality h3{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:1.2rem;margin:14px 0 10px;letter-spacing:-.01em;}
+.duality p{font-size:.92rem;margin:0;color:var(--ink-dim);}
+.gold{color:var(--amber);}
+.grn{color:var(--grn);}
+@media(max-width:760px){.duality{grid-template-columns:1fr;}}
+
+/* teasers + lab */
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:44px;}
+.card{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:30px;text-decoration:none;
+  display:flex;flex-direction:column;gap:10px;transition:all .3s;box-shadow:0 1px 0 rgba(19,26,22,.05);}
+.card:hover{border-color:var(--grn);transform:translateY(-3px);box-shadow:0 16px 34px -20px rgba(19,26,22,.3);}
+.card .pk{font-family:"Spline Sans Mono",monospace;font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--mute);}
+.card h3{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:1.3rem;letter-spacing:-.02em;color:var(--ink);line-height:1.3;}
+.card p{font-size:.92rem;margin:0;}
+.card .go{margin-top:auto;padding-top:16px;font-family:"Spline Sans Mono",monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--grn);}
+@media(max-width:760px){.cards{grid-template-columns:1fr;}}
+
+.lab-list{margin-top:44px;border-top:2px solid var(--ink);}
+.lab-row{--tint:var(--grn);
+  display:grid;grid-template-columns:90px 1fr auto;gap:clamp(14px,2.6vw,30px);align-items:center;
+  padding:24px 4px;border-bottom:1px solid var(--line);text-decoration:none;transition:background .3s;}
+.lab-row:hover{background:rgba(12,122,75,.05);}
+.lab-row .no{font-family:"Spline Sans Mono",monospace;font-size:.62rem;color:var(--mute);letter-spacing:.14em;}
+.lab-row:hover .no{color:var(--tint);}
+.lab-row h3{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:1.3rem;letter-spacing:-.02em;color:var(--ink);transition:color .3s;}
+.lab-row:hover h3{color:var(--tint);}
+.lab-row .t p{color:var(--ink-dim);font-size:.88rem;margin:2px 0 0;max-width:62ch;}
+.lab-row .tag{font-family:"Spline Sans Mono",monospace;font-size:.56rem;letter-spacing:.16em;color:var(--mute);text-transform:uppercase;text-align:right;white-space:nowrap;}
+@media(max-width:820px){.lab-row{grid-template-columns:56px 1fr;}.lab-row .tag{display:none;}}
+
+/* waitlist */
+.wl{padding-bottom:0;}
+.wl-card{max-width:1180px;margin:0 auto;background:var(--ink);color:var(--paper);border-radius:6px;
+  padding:clamp(44px,6vw,70px);text-align:center;}
+.wl-card .sec-head{justify-content:center;color:var(--amber);}
+.wl-card .sec-head::after{display:none;}
+.wl-card h2{color:var(--paper);margin:0 auto;}
+.wl-card p{color:#b9c4bc;margin:14px auto 0;}
+.wl-form{display:flex;gap:10px;justify-content:center;margin-top:28px;flex-wrap:wrap;}
+.wl-form input{font-family:"Spline Sans Mono",monospace;font-size:.74rem;color:var(--paper);
+  background:rgba(244,246,242,.08);border:1px solid rgba(244,246,242,.3);border-radius:999px;padding:13px 22px;min-width:270px;}
+.wl-form input::placeholder{color:#7d8a81;}
+.wl-form input:focus{outline:none;border-color:var(--grn);}
+.wl-form .btn{cursor:pointer;}
+
+/* cta */
+.cta{text-align:center;padding-bottom:clamp(70px,9vw,130px);}
+.cta .sec-head{justify-content:center;}
+.cta .sec-head::after{display:none;}
+.cta h2{margin:0 auto;}
+
+footer{border-top:2px solid var(--ink);padding:clamp(44px,6vw,70px) clamp(18px,3.4vw,38px);background:var(--paper-2);}
+.foot{max-width:1180px;margin:0 auto;display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between;
+  font-family:"Spline Sans Mono",monospace;font-size:.62rem;letter-spacing:.1em;color:var(--mute);}
+.foot a{color:var(--ink-dim);text-decoration:none;transition:color .3s;}
+.foot a:hover{color:var(--grn);}
+.foot-links{display:flex;gap:22px;flex-wrap:wrap;}
+.foot-legal{width:100%;font-size:.6rem;line-height:1.8;}
+
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .7s ease, transform .7s ease;}
+.reveal.in{opacity:1;transform:none;}
+
+@media(max-width:820px){
+  h1.disp{font-size:clamp(2.1rem,9.6vw,3rem);}
+  .lede{font-size:.92rem;}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto;}
+  .reveal{opacity:1;transform:none;transition:none;}
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-top">
+    <a class="wordmark" href="https://simslate.com/">Sim<em>Slate</em></a>
+    <span class="nav-auth">
+      <a class="btn btn--ghost" href="https://simslate.com/app/">Sign in</a>
+      <a class="btn btn--solid" href="https://simslate.com/app/?signup=1">Join now</a>
+    </span>
+  </div>
+  <nav class="nav-links" aria-label="Site">
+    <a class="prod" href="https://simslate.com/app/">The Simulator</a>
+    <a class="prod" href="https://simslate.com/builder/">Lineup Builder</a>
+    <span class="nav-sep" aria-hidden="true"></span>
+    <a href="https://simslate.com/methodology/">Methodology</a>
+    <a href="https://simslate.com/edge/">The Edge</a>
+    <a href="#lab">The Lab</a>
+    <a href="https://simslate.com/tools/dupe-calculator/">Dupe Tax Calculator</a>
+  </nav>
+</header>
+
+<main>
+  <!-- ============ HERO ============ -->
+  <section class="hero" style="padding-bottom:0;">
+    <div class="hero-inner">
+      <div class="kick">The almanac of one NFL Sunday · DraftKings GPP</div>
+      <h1 class="disp">The field, <span class="mark">counted.</span><br />The tail, <span class="tint">priced.</span></h1>
+      <p class="lede">
+        Below: all <b>10,000 lineups</b> of a simulated DraftKings field, standing in ownership
+        order — and a wave of <b>50,000 correlated simulations</b> rolling through them.
+        SimSlate builds this census before lock and ranks your lineups by <b>expected ROI</b>
+        against it, not by adding up projections.
+      </p>
+      <div class="hero-cta">
+        <a class="btn btn--solid btn--big" href="https://simslate.com/app/">Run the sim</a>
+        <a class="btn btn--ghost btn--big" href="https://simslate.com/methodology/">Read the methodology</a>
+      </div>
+    </div>
+
+    <div class="plate reveal in">
+      <canvas id="iso" aria-label="Isometric field of ten thousand lineup bars with a simulation wave rolling through"></canvas>
+      <div class="plate-cap">
+        <span>PLATE I — THE TEN-THOUSAND · <b>bar height = expected duplicates</b> · <i>amber = chalk clusters</i></span>
+        <span class="r">sim wave: <b>one pass = one simulated Sunday</b></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ STAT RAIL ============ -->
+  <div class="rail" aria-label="Engine at a glance">
+    <div class="rail-cell reveal"><div class="rail-num">50,000</div><div class="rail-label">correlated slate simulations</div></div>
+    <div class="rail-cell reveal"><div class="rail-num">10,000</div><div class="rail-label">ownership-true field lineups</div></div>
+    <div class="rail-cell reveal"><div class="rail-num">≤3<i>pts</i></div><div class="rail-label">exposure vs projected ownership</div></div>
+    <div class="rail-cell reveal"><div class="rail-num"><i>0</i></div><div class="rail-label">players modeled as a bell curve</div></div>
+  </div>
+
+  <!-- ============ TWO PHASES ============ -->
+  <section>
+    <div class="inner">
+      <div class="sec-head">Entry 01 — how it works, two phases, one contest</div>
+      <h2 class="disp">Your lineup is a distribution, <span class="tint">not a number.</span></h2>
+      <p class="mono" style="font-size:.64rem;letter-spacing:.2em;text-transform:uppercase;color:var(--amber);margin-top:14px;">Because one number never won a milly</p>
+
+      <div class="phases">
+        <article class="phase reveal">
+          <div class="phase-no">01</div>
+          <div>
+            <span class="pk">Contest generator</span>
+            <h3>Build the field you'll face</h3>
+            <p>Projected ownership is treated as ground truth — never renormalized, never smoothed.
+            The generator fills 10,000 valid DraftKings rosters and calibrates until every player's
+            exposure lands within a hard tolerance band of their projection. Scarce positions fill
+            first, so the salary squeeze lands where real fields feel it.</p>
+          </div>
+          <svg viewBox="0 0 340 120" role="img" aria-label="Generated exposure matching projected ownership within a band">
+            <g font-family="Spline Sans Mono, monospace" font-size="8" fill="#8a968e"><text x="0" y="10" letter-spacing="2">EXPOSURE VS PROJECTION</text></g>
+            <rect x="8"   y="44" width="30" height="58" fill="#0c7a4b" opacity=".8"/><line x1="5"  y1="41" x2="41"  y2="41" stroke="#c96f00" stroke-width="2.4"/>
+            <rect x="56"  y="32" width="30" height="70" fill="#0c7a4b" opacity=".62"/><line x1="53" y1="35" x2="89"  y2="35" stroke="#c96f00" stroke-width="2.4"/>
+            <rect x="104" y="60" width="30" height="42" fill="#0c7a4b" opacity=".5"/><line x1="101" y1="58" x2="137" y2="58" stroke="#c96f00" stroke-width="2.4"/>
+            <rect x="152" y="74" width="30" height="28" fill="#0c7a4b" opacity=".42"/><line x1="149" y1="76" x2="185" y2="76" stroke="#c96f00" stroke-width="2.4"/>
+            <rect x="200" y="52" width="30" height="50" fill="#0c7a4b" opacity=".56"/><line x1="197" y1="50" x2="233" y2="50" stroke="#c96f00" stroke-width="2.4"/>
+            <rect x="248" y="82" width="30" height="20" fill="#0c7a4b" opacity=".36"/><line x1="245" y1="84" x2="281" y2="84" stroke="#c96f00" stroke-width="2.4"/>
+            <rect x="296" y="66" width="30" height="36" fill="#0c7a4b" opacity=".48"/><line x1="293" y1="64" x2="329" y2="64" stroke="#c96f00" stroke-width="2.4"/>
+            <line x1="0" y1="102" x2="340" y2="102" stroke="rgba(19,26,22,.3)"/>
+            <g font-family="Spline Sans Mono, monospace" font-size="7" fill="#8a968e"><text x="8" y="116">■ GENERATED</text><text x="96" y="116" fill="#c96f00">— PROJECTED</text></g>
+          </svg>
+        </article>
+
+        <article class="phase reveal">
+          <div class="phase-no">02</div>
+          <div>
+            <span class="pk">Contest simulator</span>
+            <h3>Play the tournament 50,000 times</h3>
+            <p>Every player gets a right-skewed distribution fitted to mean, volatility, ceiling and
+            boom/bust odds. A Gaussian copula ties stacks and game environments together, then the
+            engine scores the full field 50,000 times, pays a top-heavy GPP curve — duplication
+            splitting prizes — and reports each lineup's ROI.</p>
+          </div>
+          <svg viewBox="0 0 340 120" role="img" aria-label="Simulated outcome paths fanning to a payout verdict">
+            <g font-family="Spline Sans Mono, monospace" font-size="8" fill="#8a968e"><text x="0" y="10" letter-spacing="2">50,000 OUTCOMES → ROI</text></g>
+            <g stroke-width="1.4" fill="none">
+              <path d="M8 62 C 100 56, 190 30, 310 16" stroke="#0c7a4b" opacity=".95"/>
+              <path d="M8 62 C 100 59, 190 44, 310 36" stroke="#0c7a4b" opacity=".6"/>
+              <path d="M8 62 C 100 61, 190 55, 310 50" stroke="#0c7a4b" opacity=".4"/>
+              <path d="M8 62 C 100 63, 190 64, 310 66" stroke="#8a968e" opacity=".55"/>
+              <path d="M8 62 C 100 65, 190 74, 310 82" stroke="#8a968e" opacity=".45"/>
+              <path d="M8 62 C 100 68, 190 86, 310 98" stroke="#8a968e" opacity=".35"/>
+            </g>
+            <circle cx="8" cy="62" r="3" fill="#131a16"/>
+            <g font-family="Spline Sans Mono, monospace" font-size="7">
+              <text x="318" y="19" fill="#0c7a4b">1st</text>
+              <text x="318" y="39" fill="#0c7a4b">cash</text>
+              <text x="318" y="101" fill="#8a968e">dead</text>
+            </g>
+          </svg>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CHALK VS LEVERAGE ============ -->
+  <section>
+    <div class="inner">
+      <div class="sec-head">Entry 02 — why ROI, not projection</div>
+      <h2 class="disp">Chalk splits the prize. <span class="tint">Leverage keeps it.</span></h2>
+      <div class="duality reveal">
+        <div class="chalk-side">
+          <div class="big gold">m &gt; 1</div>
+          <h3 class="gold">The chalk tax</h3>
+          <p>Popular lineups get duplicated. SimSlate models expected duplicates for every field
+          lineup from joint ownership, so a chalky build that "wins" shares first place — and its
+          simulated ROI shows the dilution before you pay entry fees to find out.</p>
+        </div>
+        <div class="lev-side">
+          <div class="big grn">corr &lt; 0</div>
+          <h3 class="grn">The leverage guarantee</h3>
+          <p>Within every projected-score decile, simulated ROI is verified to correlate negatively
+          with ownership. Lower-owned paths to the same score are worth more — that's the math of
+          top-heavy payouts, and the engine won't ship a sim where it doesn't hold.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TEASERS ============ -->
+  <section>
+    <div class="inner">
+      <div class="sec-head">Entry 03 — go deeper</div>
+      <h2 class="disp">The appendices.</h2>
+      <div class="cards">
+        <a class="card reveal" href="https://simslate.com/methodology/">
+          <span class="pk">Statistical methodology</span>
+          <h3>Shifted lognormals, copulas, and calibrated thresholds</h3>
+          <p>How every marginal is fitted, why boom/bust thresholds are learned from the data
+          instead of hardcoded, and how the payout curve stays honest to the rake.</p>
+          <span class="go">Read the methodology →</span>
+        </a>
+        <a class="card reveal" href="https://simslate.com/edge/">
+          <span class="pk">The edge</span>
+          <h3>AI where it helps. Statistics where it counts.</h3>
+          <p>What separates a contest simulator from a lineup optimizer, and the design rules
+          that keep SimSlate from adding noise to your signal.</p>
+          <span class="go">See what's different →</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ THE LAB ============ -->
+  <section id="lab">
+    <div class="inner">
+      <div class="sec-head">Entry 04 — the lab, the engine made touchable</div>
+      <h2 class="disp">Don't take the math's <span class="tint">word for it.</span></h2>
+      <p style="margin-top:14px;">Four working exhibits built straight from the engine's statistics — no mockups,
+      every dot computed live in your browser.</p>
+      <div class="lab-list">
+        <a class="lab-row reveal" href="https://simslate.com/lab/outcomes/" style="--tint:#0c7a4b;">
+          <span class="no">PLATE 01</span>
+          <span class="t"><h3>Outcome Space</h3><p>42,000 particles hang under a living probability density. Scrub percentiles and carve the curve.</p></span>
+          <span class="tag">3D particles</span>
+        </a>
+        <a class="lab-row reveal" href="https://simslate.com/lab/monte-carlo/" style="--tint:#3b55c4;">
+          <span class="no">PLATE 02</span>
+          <span class="t"><h3>Fifty Thousand Worlds</h3><p>Simulated Sundays fall as meteor rain and earn the histogram one world at a time.</p></span>
+          <span class="tag">Live Monte Carlo</span>
+        </a>
+        <a class="lab-row reveal" href="https://simslate.com/lab/correlation/" style="--tint:#c96f00;">
+          <span class="no">PLATE 03</span>
+          <span class="t"><h3>The Stack Schematic</h3><p>Drag any player's Sunday up or down and watch conditional expectation ripple through every wire.</p></span>
+          <span class="tag">Draggable blueprint</span>
+        </a>
+        <a class="lab-row reveal" href="https://simslate.com/lab/showdown/" style="--tint:#c2452d;">
+          <span class="no">PLATE 04</span>
+          <span class="t"><h3>Captain Theory</h3><p>Hand any player the armband and watch 1.5× salary math spend the cap to the very last dollar.</p></span>
+          <span class="tag">Captain dial</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FIELD REPORT ============ -->
+  <section class="wl">
+    <div class="wl-card reveal">
+      <div class="sec-head">The Field Report</div>
+      <h2 class="disp">Leverage notes, weekly.</h2>
+      <p>One email a week during the season: where the field is over-concentrated,
+      where the sim sees leverage, and the dupe traps to avoid — from real engine runs. Free, starts with Week 1.</p>
+      <form class="wl-form" onsubmit="return false;">
+        <input type="email" name="email" placeholder="you@example.com" autocomplete="email" required />
+        <button class="btn btn--solid" type="submit">Get the Field Report</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ============ CTA ============ -->
+  <section class="cta">
+    <div class="inner">
+      <div class="sec-head">Sunday is a sample size of one</div>
+      <h2 class="disp">Simulate the other <span class="tint">49,999.</span></h2>
+      <p style="margin:14px auto 28px;">Load the slate, generate the field, and know your lineups' ROI before lock.</p>
+      <a class="btn btn--solid btn--big" href="https://simslate.com/app/">Launch the simulator</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="foot">
+    <span class="disp" style="font-size:1rem;color:var(--ink);">Sim<span style="color:var(--grn)">Slate</span></span>
+    <span class="foot-links">
+      <a href="https://simslate.com/methodology/">Methodology</a>
+      <a href="https://simslate.com/edge/">The Edge</a>
+      <a href="#lab">The Lab</a>
+      <a href="https://simslate.com/tools/dupe-calculator/">Dupe Calculator</a>
+      <a href="https://simslate.com/app/">Simulator</a>
+      <a href="https://simslate.com/builder/">Lineup Builder</a>
+    </span>
+    <span class="foot-legal">SimSlate is a research tool. It does not guarantee profit. Play responsibly.
+    Not affiliated with DraftKings. Homepage concept 05 — “The Ledger.”</span>
+  </div>
+</footer>
+
+<script>
+(() => {
+"use strict";
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const cv = document.getElementById("iso"), ctx = cv.getContext("2d");
+let W=0,H=0,DPR=1;
+function resize(){
+  DPR = Math.min(devicePixelRatio||1, 2);
+  const r = cv.getBoundingClientRect();
+  W = r.width; H = r.height;
+  cv.width = W*DPR; cv.height = H*DPR;
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+}
+resize();
+addEventListener("resize", resize);
+
+/* isometric field: GX × GY bars ≈ the ten-thousand, height = expected dupes.
+   A sim wave rolls diagonally through the field, briefly lifting each bar. */
+function hash2(x,y){ const s = Math.sin(x*127.1 + y*311.7)*43758.5453; return s - Math.floor(s); }
+function smooth2(x,y){
+  const xi=Math.floor(x), yi=Math.floor(y), xf=x-xi, yf=y-yi;
+  const u=xf*xf*(3-2*xf), v=yf*yf*(3-2*yf);
+  return hash2(xi,yi)*(1-u)*(1-v) + hash2(xi+1,yi)*u*(1-v) + hash2(xi,yi+1)*(1-u)*v + hash2(xi+1,yi+1)*u*v;
+}
+
+const GX = 100, GY = 40;                     // 4,000 bars drawn; census of 10k
+const base = new Float32Array(GX*GY);
+const chalk = new Uint8Array(GX*GY);
+{
+  for (let j=0;j<GY;j++) for (let i=0;i<GX;i++){
+    const n = smooth2(i*0.14, j*0.2)*0.75 + smooth2(i*0.5+9, j*0.5+3)*0.25;
+    const spike = Math.pow(smooth2(i*0.9+40, j*0.9+17), 9) * 2.6;   // chalk clusters
+    base[j*GX+i] = 0.12 + n*0.5 + spike;
+    chalk[j*GX+i] = spike > 0.85 ? 1 : 0;
+  }
+}
+
+let t = 0;
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  // plate paper
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0,0,W,H);
+  // faint ruled lines
+  ctx.strokeStyle = "rgba(19,26,22,.05)";
+  ctx.lineWidth = 1;
+  for (let y=20;y<H;y+=26){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+
+  const tileW = W / (GX + GY) * 1.72;
+  const tileH = tileW * 0.5;
+  const ox = W*0.5, oy = H*0.30;
+  const hMax = H*0.30;
+
+  for (let j=0;j<GY;j++){
+    for (let i=0;i<GX;i++){
+      const idx = j*GX+i;
+      // sim wave: diagonal pulse
+      const ph = (i+j)*0.09 - t;
+      const wave = Math.max(0, Math.sin(ph)) ** 3 * 0.5;
+      const h = Math.min(1.6, base[idx] + (reduceMotion ? 0 : wave));
+      const px = ox + ((i - j) - (GX - GY)/2) * tileW * 0.5;
+      const py = oy + (i + j) * tileH * 0.5;
+      const bh = h * hMax * 0.42;
+      const isChalk = chalk[idx];
+      const hot = wave > 0.28;
+      // bar: top diamond + front faces suggested by two quads (cheap iso)
+      const w2 = tileW*0.46, h2 = tileH*0.46;
+      // side faces
+      ctx.fillStyle = isChalk ? (hot ? "#f09a10" : "#c96f00") : (hot ? "#17b573" : "#0c7a4b");
+      ctx.globalAlpha = 0.28 + Math.min(0.6, h*0.42);
+      ctx.beginPath();
+      ctx.moveTo(px - w2, py);           // left
+      ctx.lineTo(px, py + h2);           // bottom
+      ctx.lineTo(px, py + h2 - bh);
+      ctx.lineTo(px - w2, py - bh);
+      ctx.closePath(); ctx.fill();
+      ctx.globalAlpha = 0.16 + Math.min(0.5, h*0.3);
+      ctx.beginPath();
+      ctx.moveTo(px + w2, py);           // right
+      ctx.lineTo(px, py + h2);
+      ctx.lineTo(px, py + h2 - bh);
+      ctx.lineTo(px + w2, py - bh);
+      ctx.closePath(); ctx.fill();
+      // top
+      ctx.globalAlpha = 0.75 + Math.min(0.25, h*0.2);
+      ctx.beginPath();
+      ctx.moveTo(px, py - h2 - bh);
+      ctx.lineTo(px + w2, py - bh);
+      ctx.lineTo(px, py + h2 - bh);
+      ctx.lineTo(px - w2, py - bh);
+      ctx.closePath(); ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+  }
+  if (!reduceMotion) t += 0.05;
+}
+
+function loop(){
+  requestAnimationFrame(loop);
+  if (document.hidden) return;
+  // only animate while the plate is on screen
+  const r = cv.getBoundingClientRect();
+  if (r.bottom < 0 || r.top > innerHeight) return;
+  draw();
+}
+draw();
+if (!reduceMotion) requestAnimationFrame(loop);
+
+/* scroll reveal */
+const els = document.querySelectorAll(".reveal");
+if (!("IntersectionObserver" in window)) els.forEach(e => e.classList.add("in"));
+else {
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => { if (en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); } });
+  }, { threshold: .15 });
+  els.forEach(e => io.observe(e));
+}
+})();
+</script>
+</body>
+</html>

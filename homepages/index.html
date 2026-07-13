@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SimSlate — five homepage redesign concepts</title>
+<meta name="description" content="Five full homepage redesign mockups for simslate.com: the Observatory, the Terrain, the Ten Thousand, the Blueprint, and the Ledger." />
+<meta name="robots" content="noindex" />
+<meta name="theme-color" content="#080b11" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23080b11'/%3E%3Cpath d='M4 25 C10 25 11 8 16 8 C21 8 22 25 28 25' stroke='%233fe39c' stroke-width='2.2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;500;700;900&family=Spline+Sans+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --bg:#080b11; --bg-2:#0c1019; --ink:#e8edf4; --ink-dim:#8b98ab; --mute:#535f70;
+  --lev:#3fe39c; --amber:#ffb454;
+  --line:rgba(232,237,244,.09); --line-2:rgba(232,237,244,.22);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--ink);font-family:"Archivo",system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;}
+::selection{background:var(--lev);color:var(--bg);}
+a{color:inherit;}
+:focus-visible{outline:2px solid var(--lev);outline-offset:3px;border-radius:2px;}
+.mono{font-family:"Spline Sans Mono",monospace;}
+.wrap{max-width:980px;margin:0 auto;padding:0 clamp(18px,3.4vw,40px);}
+header{padding:clamp(50px,9vh,100px) 0 clamp(28px,4vh,44px);}
+.kick{font-family:"Spline Sans Mono",monospace;font-size:.64rem;letter-spacing:.3em;text-transform:uppercase;color:var(--mute);margin-bottom:18px;}
+h1{font-weight:900;font-size:clamp(1.9rem,5vw,3.2rem);letter-spacing:-.02em;line-height:1.05;}
+h1 em{font-style:normal;color:var(--lev);}
+.sub{color:var(--ink-dim);max-width:56ch;margin-top:18px;font-weight:300;}
+.list{border-top:1px solid var(--line-2);margin:34px 0 90px;}
+.row{--tint:var(--lev);
+  display:grid;grid-template-columns:70px 1fr auto;gap:clamp(14px,3vw,34px);align-items:center;
+  padding:clamp(20px,3.4vh,30px) 8px;border-bottom:1px solid var(--line);text-decoration:none;transition:background .3s;}
+.row:hover{background:linear-gradient(to right, color-mix(in srgb, var(--tint) 7%, transparent), transparent 70%);}
+.no{font-family:"Spline Sans Mono",monospace;font-size:.7rem;color:var(--mute);letter-spacing:.12em;}
+.row:hover .no{color:var(--tint);}
+.row h2{font-size:clamp(1.2rem,2.6vw,1.7rem);font-weight:700;letter-spacing:-.015em;transition:color .3s;}
+.row:hover h2{color:var(--tint);}
+.row p{color:var(--ink-dim);font-size:.88rem;margin-top:4px;max-width:60ch;font-weight:300;}
+.tag{font-family:"Spline Sans Mono",monospace;font-size:.6rem;letter-spacing:.16em;color:var(--mute);text-transform:uppercase;text-align:right;white-space:nowrap;}
+.tag b{display:block;color:var(--ink-dim);font-weight:400;margin-top:4px;}
+@media(max-width:720px){.row{grid-template-columns:46px 1fr;}.tag{display:none;}}
+footer{border-top:1px solid var(--line);padding:30px 0 60px;
+  font-family:"Spline Sans Mono",monospace;font-size:.64rem;letter-spacing:.1em;color:var(--mute);}
+footer a{color:var(--ink-dim);text-decoration:none;}
+footer a:hover{color:var(--lev);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kick">SimSlate · design exploration · 2026-07-13</div>
+    <h1>Five homepages,<br />one <em>engine.</em></h1>
+    <p class="sub">Full redesign mockups of the simslate.com landing page. Same sections, same
+    engine facts, five different worlds. Every graphic is computed live — no images.</p>
+  </header>
+
+  <nav class="list" aria-label="Concepts">
+    <a class="row" href="./01-observatory/" style="--tint:#8b9dff;">
+      <span class="no">№ 01</span>
+      <span><h2>The Observatory</h2><p>The falling-worlds Monte Carlo hero: simulated Sundays rain down and earn the
+      distribution behind the headline, with a live odometer and p99 flares.</p></span>
+      <span class="tag">Outcome rain<b>Michroma · Space Mono</b></span>
+    </a>
+    <a class="row" href="./02-terrain/" style="--tint:#49f2a8;">
+      <span class="no">№ 02</span>
+      <span><h2>The Terrain</h2><p>A night flight over the slate's probability surface — a 3D wireframe ridge
+      that scrolls beneath the headline, with flight-instrument HUD chrome.</p></span>
+      <span class="tag">3D flyover<b>Chakra Petch · IBM Plex</b></span>
+    </a>
+    <a class="row" href="./03-field/" style="--tint:#55d6ff;">
+      <span class="no">№ 03</span>
+      <span><h2>The Ten Thousand</h2><p>The field as a living 3D crowd: ten thousand ownership-weighted lineups orbit
+      in the dark, chalk densest at the core — and one amber dot is yours.</p></span>
+      <span class="tag">Particle galaxy<b>Space Grotesk · Outfit</b></span>
+    </a>
+    <a class="row" href="./04-blueprint/" style="--tint:#7fd6ff;">
+      <span class="no">№ 04</span>
+      <span><h2>The Blueprint</h2><p>Sunday drawn to scale on cobalt drafting paper: a rotating 3D correlation
+      constellation wires two teams together, annotated like a drawing set.</p></span>
+      <span class="tag">Drafting table<b>Big Shoulders · Azeret</b></span>
+    </a>
+    <a class="row" href="./05-ledger/" style="--tint:#ffb454;">
+      <span class="no">№ 05</span>
+      <span><h2>The Ledger</h2><p>The light option — a statistical almanac in riso ink, with an isometric census
+      of the ten-thousand and a simulation wave rolling through the bars.</p></span>
+      <span class="tag">Print almanac<b>Bricolage · Spline Mono</b></span>
+    </a>
+  </nav>
+
+  <footer>
+    <a href="../">← Back to the FieldSim gallery</a> · live site: <a href="https://simslate.com/">simslate.com</a>
+  </footer>
+</div>
+</body>
+</html>
